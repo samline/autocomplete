@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+bun.lockb
+
+# Private notes (client project inventories); never publish
+.local/

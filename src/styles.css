@@ -1,0 +1,51 @@
+[data-autocomplete-list] {
+  position: absolute;
+  z-index: var(--autocomplete-z-index, 50);
+  right: 0;
+  left: 0;
+  max-height: var(--autocomplete-max-height, 18rem);
+  margin-top: var(--autocomplete-offset, 0.25rem);
+  overflow-y: auto;
+  border: 1px solid var(--autocomplete-border, #d1d5db);
+  border-radius: var(--autocomplete-radius, 0.5rem);
+  background: var(--autocomplete-background, #fff);
+  box-shadow: var(--autocomplete-shadow, 0 10px 25px rgb(0 0 0 / 12%));
+  color: var(--autocomplete-color, #111827);
+}
+
+[data-autocomplete-list][hidden] {
+  display: none;
+}
+
+[data-autocomplete-option] {
+  display: block;
+  width: 100%;
+  padding: var(--autocomplete-option-padding, 0.75rem 1rem);
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+[data-autocomplete-option]:hover,
+[data-autocomplete-option][data-active='true'] {
+  background: var(--autocomplete-active-background, #f3f4f6);
+  color: var(--autocomplete-active-color, inherit);
+}
+
+[data-autocomplete-status] {
+  padding: var(--autocomplete-option-padding, 0.75rem 1rem);
+  color: var(--autocomplete-muted-color, #6b7280);
+}
+
+[data-autocomplete-status='error'] {
+  color: var(--autocomplete-error-color, #b91c1c);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-autocomplete-list] {
+    scroll-behavior: auto;
+  }
+}

@@ -1,0 +1,17 @@
+src/
+test/
+docs/
+example/
+.agents/
+.github/
+AGENTS.md
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+bun.lock
+bun.lockb
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+coverage/
+.DS_Store

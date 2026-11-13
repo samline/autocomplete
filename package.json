@@ -1,0 +1,64 @@
+{
+  "name": "@samline/autocomplete",
+  "version": "0.1.0",
+  "description": "Framework-agnostic remote autocomplete for vanilla JS and direct browser usage.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://samline.github.io/autocomplete/",
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./browser": {
+      "types": "./dist/browser/global.d.ts",
+      "default": "./dist/browser/global.global.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "scripts": {
+    "clean": "rm -rf dist coverage",
+    "build": "tsup --config tsup.config.ts",
+    "dev": "tsup --config tsup.config.ts --watch",
+    "pack:check": "npm pack --dry-run",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepublishOnly": "npm run clean && npm run build && npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.3.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samline/autocomplete.git"
+  },
+  "bugs": {
+    "url": "https://github.com/samline/autocomplete/issues"
+  }
+}

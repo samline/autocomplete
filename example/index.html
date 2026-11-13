@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Autocomplete browser example</title>
+    <link rel="stylesheet" href="../dist/styles.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+        font-family: system-ui, sans-serif;
+        background: #f4f4f2;
+        color: #172033;
+      }
+      main {
+        width: min(100%, 38rem);
+        padding: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 1rem;
+        background: white;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      .field {
+        position: relative;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+      }
+      input {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border: 2px solid #aeb7c4;
+        border-radius: 0.5rem;
+        font: inherit;
+      }
+      input:focus {
+        border-color: #e65f2a;
+        outline: 3px solid rgb(230 95 42 / 15%);
+      }
+      output {
+        display: block;
+        min-height: 1.5rem;
+        margin-top: 1rem;
+        color: #285d3c;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Remote autocomplete</h1>
+      <p>The package knows nothing about this endpoint or its response shape.</p>
+      <div class="field">
+        <label for="address">Address</label>
+        <input id="address" placeholder="Try Mexico or Morelos" />
+      </div>
+      <output id="selection" aria-live="polite">No selection yet.</output>
+    </main>
+
+    <script src="../dist/browser/global.global.js"></script>
+    <script>
+      const output = document.querySelector('#selection')
+
+      window.Autocomplete.create('#address', {
+        endpoint: './suggestions.json',
+        queryParam: 'search',
+        minLength: 1,
+        mapResponse(payload, response, query) {
+          const normalized = query.toLocaleLowerCase()
+          return payload.results.filter((item) =>
+            item.name.toLocaleLowerCase().includes(normalized)
+          )
+        },
+        getId: (item) => item.key,
+        getLabel: (item) => item.name,
+        getValue: (item) => item.name,
+        onSelect(item) {
+          output.value = `Selected ${item.name} (${item.latitude}, ${item.longitude})`
+        }
+      })
+    </script>
+  </body>
+</html>
