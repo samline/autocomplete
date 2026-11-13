@@ -1,0 +1,40 @@
+---
+locale: en
+sidebar:
+  group: start
+  order: 1
+title: 'Autocomplete, end to end'
+titleAccent: 'end to end'
+description: 'What @samline/autocomplete does, how its combobox behaves and where to find installation, examples, options and the complete API.'
+---
+
+import CardGrid from '../../../../shared/components/CardGrid.astro'
+import LinkCard from '../../../../shared/components/LinkCard.astro'
+import { href } from '../../lib/routes'
+
+`@samline/autocomplete` turns an existing text input into an accessible combobox that searches a remote endpoint. You own the endpoint and the response shape; the package owns debounce, cancellation, request ordering, the listbox, keyboard interaction, events and cleanup.
+
+## Choose your next step
+
+<CardGrid columns={2}>
+  <LinkCard href={href('getting-started')} title="Installation">
+    Package / ESM and HTML / CDN, and the first working search.
+  </LinkCard>
+  <LinkCard href={href('guides/examples')} title="Examples">
+    Live previews with the complete, copyable source of each one.
+  </LinkCard>
+  <LinkCard href={href('reference/configuration')} title="Options">
+    Every option with its default, from endpoint to messages.
+  </LinkCard>
+  <LinkCard href={href('reference/api')} title="API reference">
+    createAutocomplete, the controller, helpers and events.
+  </LinkCard>
+</CardGrid>
+
+## How a search works
+
+1. Typing schedules a search after `debounce` ms once the query reaches `minLength` characters.
+2. A new search aborts the previous request; responses that arrive late are ignored.
+3. The response goes through `parseResponse` and `mapResponse`, then the first `maxResults` suggestions are rendered as options.
+4. Choosing an option writes `getValue(suggestion)` into the input, closes the list and dispatches `autocomplete:select`.
+5. Escape, Tab, clicking outside, selecting or `close()` cancel the pending search and abort the request in flight.

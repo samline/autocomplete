@@ -4,9 +4,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     environmentOptions: {
-      jsdom: { url: 'http://localhost/' }
+      jsdom: { url: 'http://localhost/' },
     },
     include: ['test/**/*.test.ts'],
-    restoreMocks: true
-  }
+    restoreMocks: true,
+  },
 })

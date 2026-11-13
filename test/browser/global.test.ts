@@ -2,10 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { AutocompleteApi } from '../../src/browser/registry'
 
+// The IIFE build assigns these named exports to window.Autocomplete
+// (scripts/test-package.mjs checks the built global itself).
 async function importGlobal(): Promise<AutocompleteApi> {
   vi.resetModules()
-  const module = (await import('../../src/browser/global')) as { default: AutocompleteApi }
-  return module.default
+  const module = (await import('../../src/browser/global')) as unknown as AutocompleteApi
+  window.Autocomplete = { ...module }
+  return window.Autocomplete
 }
 
 describe('browser global', () => {

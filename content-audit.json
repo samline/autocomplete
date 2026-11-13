@@ -1,0 +1,188 @@
+{
+  "capabilityReview": {
+    "status": "verified",
+    "integrations": [
+      {
+        "name": "Package / ESM and CommonJS",
+        "evidence": "package.json exports and scripts/test-package.mjs",
+        "destination": "docs/src/content/docs/getting-started.md",
+        "reviewed": true
+      },
+      {
+        "name": "HTML / CDN (window.Autocomplete)",
+        "evidence": "src/browser/global.ts and the IIFE smoke test",
+        "destination": "docs/src/content/docs/getting-started.md",
+        "reviewed": true
+      }
+    ],
+    "scenarios": [
+      {
+        "name": "Remote search with keyboard selection",
+        "evidence": "test/core/controller.test.ts",
+        "destination": "site/examples/basic.astro",
+        "reviewed": true
+      },
+      {
+        "name": "Custom option rendering",
+        "evidence": "renderOption in src/core/controller.ts",
+        "destination": "site/examples/render.astro",
+        "reviewed": true
+      },
+      {
+        "name": "Events with a hidden id field",
+        "evidence": "dispatch() events in src/core/controller.ts",
+        "destination": "site/examples/events.astro",
+        "reviewed": true
+      }
+    ],
+    "onboarding": {
+      "equivalentModes": true
+    }
+  },
+  "themeReview": {
+    "status": "pending",
+    "source": "Teal pair proposed on 2026-11-13 (dark accent raised for contrast on cards and code); awaiting maintainer confirmation.",
+    "accentLight": "#2b6f6a",
+    "accentDark": "#8cc2bd"
+  },
+  "status": "verified",
+  "packageVersion": "1.0.0",
+  "sources": [
+    {
+      "source": "README.md",
+      "sha256": "f04a3603b264a528fc66e28404c0d92d07b6ce40586a92cd45e61a41d778489f",
+      "destination": "README.md",
+      "reviewed": true
+    },
+    {
+      "source": "CHANGELOG.md",
+      "sha256": "d8aa99aeaa687abbfad7ce6732ab572aba846d65190cc5f792df53e87f8296bd",
+      "destination": "CHANGELOG.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/api/create-autocomplete.ts",
+      "sha256": "a260845430e6b8f6a886d75d4f76c8c17784db8ed68199969797037a8d8b8a23",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/browser/global.ts",
+      "sha256": "2f401ccf2b29c89bf3e617204077c05f7a8cfb83c4ad89998bd0f1269facf6d2",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/browser/registry.ts",
+      "sha256": "b144b8f3069d2cd4acd2ed7ad79b13f60a25ee48bae412673e8e6dabeb517546",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/controller.ts",
+      "sha256": "fca126e9e9796fce5e37a1c58abafb3727ae88946e5885feb697d1564b6f20fd",
+      "destination": "docs/src/content/docs/guides/accessibility.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/defaults.ts",
+      "sha256": "59fcaa807c57d31526815e1833be7d8e988f52a8598b2f57d94338f8eebd4133",
+      "destination": "docs/src/content/docs/reference/configuration.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/dom.ts",
+      "sha256": "36925af57b07b7f3c5587332a59fe2eec9a08f48bbbafeb6cb54da221cc411a6",
+      "destination": "docs/src/content/docs/guides/accessibility.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/index.ts",
+      "sha256": "b6f10c161027ff41ea40fe3c32f5bd81a3e7dec37e6fbf8cb000a39a4617dc45",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/types.ts",
+      "sha256": "dda14c5602937d7adc8c9f5115aec674d37751fef1e5c4a0fc9f4937a0becd07",
+      "destination": "docs/src/content/docs/reference/configuration.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/index.ts",
+      "sha256": "7df2a7db84e8caccb8a44e0df4a5af567a4b8b78e14230ed418b2db187cdfe60",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/styles.css",
+      "sha256": "5040e207553f31decedc1b707dc0a4c571e0db0490ee25ea8abd9681fba9443f",
+      "destination": "docs/src/content/docs/guides/styling.md",
+      "reviewed": true
+    }
+  ],
+  "publicExports": [
+    {
+      "source": "createAutocomplete",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "autocomplete (alias)",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "createAutocompleteController",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "mapCommonResponse",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "parseJsonResponse",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "browser registry",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "window.Autocomplete",
+      "destination": "docs/src/content/docs/getting-started.md",
+      "reviewed": true
+    },
+    {
+      "source": "AutocompleteOptions and option types",
+      "destination": "docs/src/content/docs/reference/configuration.md",
+      "reviewed": true
+    },
+    {
+      "source": "Event detail types",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "styles.css and --autocomplete-* properties",
+      "destination": "docs/src/content/docs/guides/styling.md",
+      "reviewed": true
+    }
+  ],
+  "notes": "Reviewed 2026-11-13 against src at 1.0.0. The 0.1.0 Markdown docs and example/ page were migrated into docs/src/content/docs and site/ and removed.",
+  "iconReview": {
+    "kept": [
+      "package",
+      "eye",
+      "refresh",
+      "branch",
+      "layers",
+      "wrench"
+    ],
+    "reason": "The template icons read as endpoint, accessibility, cancellation, entry points, events and styling for these cards; reviewed 2026-11-13."
+  }
+}

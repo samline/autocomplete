@@ -1,0 +1,74 @@
+---
+// Home preview: a city search on a static JSON endpoint. The package does the
+// debounce, cancellation, keyboard navigation and accessibility.
+import '../dist/styles.css'
+---
+
+<autocomplete-demo class="demo" data-endpoint={`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`}>
+  <label class="label" for="demo-city">City</label>
+  <div class="field">
+    <input id="demo-city" class="input" type="text" placeholder="Try “san” or “mex”" />
+  </div>
+  <p class="selected" aria-live="polite">Nothing selected yet.</p>
+</autocomplete-demo>
+
+<script>
+  import { createAutocomplete } from '@samline/autocomplete'
+
+  type City = { key: string; name: string; country: string }
+
+  for (const root of document.querySelectorAll<HTMLElement>('autocomplete-demo')) {
+    const output = root.querySelector('.selected')!
+    createAutocomplete<City>(root.querySelector('input')!, {
+      endpoint: root.dataset.endpoint!,
+      minLength: 2,
+      mapResponse: (payload, _response, query) =>
+        (payload as { results: City[] }).results.filter(city =>
+          city.name.toLowerCase().includes(query.toLowerCase())
+        ),
+      getId: city => city.key,
+      getLabel: city => `${city.name}, ${city.country}`,
+      getValue: city => city.name,
+      onSelect: city => {
+        output.textContent = `Selected ${city.name} (${city.country}).`
+      },
+    })
+  }
+</script>
+
+<style>
+  .demo {
+    display: grid;
+    gap: 0.5rem;
+    --autocomplete-background: var(--color-bg-soft);
+    --autocomplete-color: var(--color-text);
+    --autocomplete-border: var(--color-border);
+    --autocomplete-active-background: var(--color-bg);
+    --autocomplete-muted-color: var(--color-text-subtle);
+  }
+  .label {
+    font-size: 0.875rem;
+    color: var(--palette-specimen-text);
+  }
+  .field {
+    position: relative;
+  }
+  /* The preview frame clips overflow: let the list take space inside it. */
+  .field :global([data-autocomplete-list]) {
+    position: static;
+  }
+  .input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 0.0625rem solid var(--color-border);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-soft);
+    color: var(--color-text);
+    font: inherit;
+  }
+  .selected {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+</style>

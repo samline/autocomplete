@@ -1,0 +1,45 @@
+---
+import '../../dist/styles.css'
+import './_shared.css'
+const endpoint = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`
+---
+
+<div class="preview" data-preview="events" data-endpoint={endpoint}>
+  <div class="field">
+    <label for="preview-origin">Origin</label>
+    <input id="preview-origin" type="text" />
+  </div>
+  <input type="hidden" name="origin" />
+  <p class="note" aria-live="polite">No events yet.</p>
+  <button type="button" class="reset">Clear</button>
+</div>
+
+<script>
+  import { createAutocomplete } from '@samline/autocomplete'
+  type City = { key: string; name: string; country: string }
+  const root = document.querySelector<HTMLElement>('[data-preview="events"]')!
+  const input = root.querySelector<HTMLInputElement>('#preview-origin')!
+  const key = root.querySelector<HTMLInputElement>('input[type="hidden"]')!
+  const log = root.querySelector('.note')!
+
+  const controller = createAutocomplete<City>(input, {
+    endpoint: root.dataset.endpoint!,
+    mapResponse: (payload, _response, query) =>
+      (payload as { results: City[] }).results.filter(city =>
+        city.name.toLowerCase().includes(query.toLowerCase())
+      ),
+    getId: city => city.key,
+    getLabel: city => city.name,
+  })
+
+  input.addEventListener('autocomplete:select', event => {
+    const { suggestion, label } = (event as CustomEvent<{ suggestion: City; label: string }>).detail
+    key.value = suggestion.key
+    log.textContent = `select: ${label} (key ${key.value})`
+  })
+  input.addEventListener('autocomplete:clear', () => {
+    key.value = ''
+    log.textContent = 'clear: selection removed'
+  })
+  root.querySelector('.reset')!.addEventListener('click', () => controller.clear())
+</script>

@@ -1,0 +1,179 @@
+{
+  "results": [
+    {
+      "key": "mx-cdmx",
+      "name": "Mexico City",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-gdl",
+      "name": "Guadalajara",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-mty",
+      "name": "Monterrey",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-pue",
+      "name": "Puebla",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-qro",
+      "name": "Querétaro",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-mer",
+      "name": "Mérida",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-cun",
+      "name": "Cancún",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-oax",
+      "name": "Oaxaca",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-cue",
+      "name": "Cuernavaca",
+      "country": "Mexico"
+    },
+    {
+      "key": "mx-tij",
+      "name": "Tijuana",
+      "country": "Mexico"
+    },
+    {
+      "key": "us-nyc",
+      "name": "New York",
+      "country": "United States"
+    },
+    {
+      "key": "us-la",
+      "name": "Los Angeles",
+      "country": "United States"
+    },
+    {
+      "key": "us-chi",
+      "name": "Chicago",
+      "country": "United States"
+    },
+    {
+      "key": "us-mia",
+      "name": "Miami",
+      "country": "United States"
+    },
+    {
+      "key": "us-sf",
+      "name": "San Francisco",
+      "country": "United States"
+    },
+    {
+      "key": "us-sea",
+      "name": "Seattle",
+      "country": "United States"
+    },
+    {
+      "key": "ca-tor",
+      "name": "Toronto",
+      "country": "Canada"
+    },
+    {
+      "key": "ca-van",
+      "name": "Vancouver",
+      "country": "Canada"
+    },
+    {
+      "key": "ca-mtl",
+      "name": "Montréal",
+      "country": "Canada"
+    },
+    {
+      "key": "es-mad",
+      "name": "Madrid",
+      "country": "Spain"
+    },
+    {
+      "key": "es-bcn",
+      "name": "Barcelona",
+      "country": "Spain"
+    },
+    {
+      "key": "es-sev",
+      "name": "Seville",
+      "country": "Spain"
+    },
+    {
+      "key": "es-val",
+      "name": "Valencia",
+      "country": "Spain"
+    },
+    {
+      "key": "ar-bue",
+      "name": "Buenos Aires",
+      "country": "Argentina"
+    },
+    {
+      "key": "co-bog",
+      "name": "Bogotá",
+      "country": "Colombia"
+    },
+    {
+      "key": "co-med",
+      "name": "Medellín",
+      "country": "Colombia"
+    },
+    {
+      "key": "cl-scl",
+      "name": "Santiago",
+      "country": "Chile"
+    },
+    {
+      "key": "pe-lim",
+      "name": "Lima",
+      "country": "Peru"
+    },
+    {
+      "key": "fr-par",
+      "name": "Paris",
+      "country": "France"
+    },
+    {
+      "key": "gb-lon",
+      "name": "London",
+      "country": "United Kingdom"
+    },
+    {
+      "key": "de-ber",
+      "name": "Berlin",
+      "country": "Germany"
+    },
+    {
+      "key": "it-rom",
+      "name": "Rome",
+      "country": "Italy"
+    },
+    {
+      "key": "pt-lis",
+      "name": "Lisbon",
+      "country": "Portugal"
+    },
+    {
+      "key": "nl-ams",
+      "name": "Amsterdam",
+      "country": "Netherlands"
+    },
+    {
+      "key": "jp-tyo",
+      "name": "Tokyo",
+      "country": "Japan"
+    }
+  ]
+}

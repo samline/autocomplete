@@ -9,7 +9,7 @@ interface Place {
 
 const places: Place[] = [
   { key: 'mx', description: 'Mexico City' },
-  { key: 'mor', description: 'Cuernavaca, Morelos' }
+  { key: 'mor', description: 'Cuernavaca, Morelos' },
 ]
 
 function inputMarkup(): void {
@@ -19,7 +19,7 @@ function inputMarkup(): void {
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json' }
+    headers: { 'content-type': 'application/json' },
   })
 }
 
@@ -30,7 +30,7 @@ function options() {
     mapResponse: (payload: unknown) => (payload as { results: Place[] }).results,
     getId: (place: Place) => place.key,
     getLabel: (place: Place) => place.description,
-    getValue: (place: Place) => place.description
+    getValue: (place: Place) => place.description,
   }
 }
 
@@ -39,7 +39,7 @@ describe('createAutocomplete', () => {
     inputMarkup()
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
       configurable: true,
-      value: vi.fn()
+      value: vi.fn(),
     })
   })
 
@@ -72,7 +72,7 @@ describe('createAutocomplete', () => {
     const controller = createAutocomplete('#place', {
       ...options(),
       queryParam: 'search',
-      requestInit: { headers: { 'X-Client': 'test' } }
+      requestInit: { headers: { 'X-Client': 'test' } },
     })
 
     await controller.search('mex')
@@ -92,8 +92,8 @@ describe('createAutocomplete', () => {
     const controller = createAutocomplete<Place>(input, {
       endpoint: (query, element) => `/lookup/${element.id}/${query}`,
       queryParam: null,
-      requestInit: (query) => ({ headers: { 'X-Query': query } }),
-      getLabel: (place) => place.description
+      requestInit: query => ({ headers: { 'X-Query': query } }),
+      getLabel: place => place.description,
     })
 
     await controller.search('city')
@@ -168,7 +168,7 @@ describe('createAutocomplete', () => {
     )
     const controller = createAutocomplete('#place', {
       ...options(),
-      messages: { loading: 'Loading', empty: 'Nothing', error: 'Failed' }
+      messages: { loading: 'Loading', empty: 'Nothing', error: 'Failed' },
     })
 
     const pending = controller.search('empty')
@@ -184,7 +184,7 @@ describe('createAutocomplete', () => {
 
   it('ignores stale responses and aborts the previous request', async () => {
     let resolveFirst: ((response: Response) => void) | undefined
-    const first = new Promise<Response>((resolve) => {
+    const first = new Promise<Response>(resolve => {
       resolveFirst = resolve
     })
     const fetchMock = vi
@@ -231,9 +231,12 @@ describe('createAutocomplete', () => {
     }
 
     for (const dismiss of [
-      () => controller.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true })),
+      () =>
+        controller.element.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Escape', cancelable: true })
+        ),
       () => controller.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' })),
-      () => document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+      () => document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })),
     ]) {
       type('mexico')
       dismiss()
@@ -246,7 +249,9 @@ describe('createAutocomplete', () => {
     let resolve!: (response: Response) => void
     fetchMock.mockImplementationOnce(() => new Promise<Response>(r => (resolve = r)))
     const pending = controller.search('mexico')
-    controller.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }))
+    controller.element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', cancelable: true })
+    )
     resolve(jsonResponse({ results: places }))
     await pending
     expect(controller.listElement.hidden).toBe(true)
@@ -291,7 +296,9 @@ describe('createAutocomplete', () => {
 
     controller.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', cancelable: true }))
     expect(controller.element.getAttribute('aria-activedescendant')).toContain('mor')
-    controller.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', cancelable: true }))
+    controller.element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Home', cancelable: true })
+    )
     expect(controller.element.getAttribute('aria-activedescendant')).toContain('mx')
 
     controller.close()

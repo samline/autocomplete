@@ -1,114 +1,139 @@
-# Autocomplete
+# @samline/autocomplete
 
-> A small, framework- and provider-agnostic remote autocomplete for Vanilla JS and direct browser usage.
+An accessible, framework-agnostic remote autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML. Point an input at your endpoint; debounce, cancellation, keyboard navigation, events and cleanup are handled for you.
 
-The consumer defines the endpoint, request options, response mapping, and suggestion labels. The package provides debounce, abortable requests, stale-response protection, accessible listbox rendering, pointer/keyboard selection, events, and cleanup.
+[Demo](https://samline.github.io/autocomplete/) · [Examples](https://samline.github.io/autocomplete/examples/) · [Documentation](https://samline.github.io/autocomplete/docs/) · [Changelog](CHANGELOG.md)
+
+## Table of contents
+
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [HTML / CDN](#html--cdn)
+- [Capabilities](#capabilities)
+- [API at a glance](#api-at-a-glance)
+- [Documentation](#documentation)
+- [Changelog](#changelog)
+- [AI agent skill](#ai-agent-skill)
+- [License](#license)
 
 ## Installation
 
-```bash
+```sh
 npm install @samline/autocomplete
-# or
+```
+
+```sh
+pnpm add @samline/autocomplete
+```
+
+```sh
 bun add @samline/autocomplete
 ```
 
-Requires Node 20+ when bundling. Runtime target is ES2020.
+Works in modern browsers with `fetch` and `AbortController`, and imports in Node 20 or newer. No runtime dependencies; the stylesheet is optional.
 
 ## Quick start
 
-```ts
+```html
+<div class="field" style="position: relative">
+  <label for="city">City</label>
+  <input id="city" type="text" />
+</div>
+```
+
+```js
 import { createAutocomplete } from '@samline/autocomplete'
 import '@samline/autocomplete/styles.css'
 
-const controller = createAutocomplete('#address', {
-  endpoint: '/api/addresses',
-  queryParam: 'search',
-  mapResponse: (payload) => payload.results,
-  getId: (address) => address.key,
-  getLabel: (address) => address.description,
-  getValue: (address) => address.description,
-  onSelect(address) {
-    console.log(address)
-  }
+const controller = createAutocomplete('#city', {
+  endpoint: '/api/cities', // GET /api/cities?q=<query>
+  getId: city => city.id,
+  getLabel: city => city.name,
+  onSelect: city => console.log('Selected', city),
 })
+
+controller.destroy() // removes the list and restores the input
 ```
 
-No response shape is built into the package. The default mapper only recognizes a root array and the common root properties `suggestions`, `items`, or `data`.
+## HTML / CDN
 
-## Browser / CDN
+For Shopify, WordPress or plain HTML pages without a build step, load the stylesheet and the browser bundle. Pin the version in production.
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/@samline/autocomplete@0.1.0/dist/styles.css" />
-<input id="search" />
-<script src="https://unpkg.com/@samline/autocomplete@0.1.0/dist/browser/global.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/browser/global.global.js"></script>
 <script>
-  window.Autocomplete.create('#search', { endpoint: '/api/search' })
+  window.Autocomplete.create('#city', { endpoint: '/api/cities' })
 </script>
 ```
 
-Pin the version in production. The browser entrypoint exposes `window.Autocomplete` with `autocomplete`, `create`, `destroy`, and `available`.
+`window.Autocomplete` has `create(target, options)` (requires an input id and registers the controller), `destroy(id)`, `available` and `autocomplete(target, options)`.
 
-## Entrypoints
+## Capabilities
 
-| Entrypoint                         | Use                                             |
-| ---------------------------------- | ----------------------------------------------- |
-| `@samline/autocomplete`            | ESM/CJS factory, helpers, and TypeScript types. |
-| `@samline/autocomplete/browser`    | IIFE exposing `window.Autocomplete`.            |
-| `@samline/autocomplete/styles.css` | Optional base stylesheet.                       |
+### Any endpoint, any response
 
-## Features
+`endpoint` is a URL or a function of the query. `requestInit` adds headers or credentials, `parseResponse` replaces JSON parsing, and `mapResponse`, `getId`, `getLabel` and `getValue` adapt whatever your API returns.
 
-- Configurable endpoint or endpoint resolver.
-- Configurable query parameter, `RequestInit`, parser, and response mapper.
-- Generic TypeScript suggestion type.
-- Debounce and `AbortController` cancellation.
-- Sequence guard against stale responses.
-- Loading, empty, and error states.
-- `ArrowUp`, `ArrowDown`, `Home`, `End`, `Enter`, `Escape`, and `Tab` support. Closing the list (`Escape`, `Tab`, clicking outside, a selection or `close()`) also cancels the pending search and aborts the request in flight, so a late response never reopens it.
-- Waits for IME composition (Japanese, Chinese, Korean input) to finish before searching.
-- WAI-ARIA combobox/listbox attributes.
-- Pointer selection and outside-click dismissal.
-- Bubbling lifecycle events.
-- Attribute restoration and complete `destroy()` cleanup.
-- No framework, provider, or runtime dependency.
-- No HTML injection from endpoint content.
+### An accessible combobox
 
-## Controller
+ARIA `combobox` and `listbox` roles, `aria-expanded` and `aria-activedescendant`, status and error messages, and ArrowUp, ArrowDown, Home, End, Enter, Escape and Tab. Searches wait for IME composition to finish.
 
-`createAutocomplete` returns `AutocompleteController<T>`:
+### No stale results
 
-```ts
-controller.search('mex')
-controller.close()
-controller.clear()
-controller.cancel()
-controller.getSelected()
-controller.destroy()
-```
+Searches are debounced, superseded requests are aborted and late responses ignored. Closing the list (Escape, Tab, clicking outside, selecting or `close()`) cancels the pending search.
+
+### Events and styling
+
+`autocomplete:select`, `autocomplete:clear`, `autocomplete:load`, `autocomplete:loadstart` and `autocomplete:error` bubble from the input. The optional stylesheet is themed with `--autocomplete-*` custom properties, and `renderOption` adds your own content to each option.
+
+## API at a glance
+
+| API | Purpose |
+| --- | --- |
+| `createAutocomplete(input, options)` | Attach the combobox and return a controller (`autocomplete` is an alias). |
+| `controller.search(query?)` / `close()` / `clear()` / `cancel()` | Run a search now, close the list, clear everything or cancel pending work. |
+| `controller.getSelected()` / `destroy()` | Read the selected suggestion or remove the combobox. |
+| `mapCommonResponse`, `parseJsonResponse` | The default response mapper and parser. |
+
+### Entrypoints
+
+| Entrypoint | When to use |
+| --- | --- |
+| `@samline/autocomplete` | ESM or CommonJS: `createAutocomplete`, helpers, `browser` registry and types. |
+| `@samline/autocomplete/browser` | Classic script that defines `window.Autocomplete`. |
+| `@samline/autocomplete/styles.css` | Optional base stylesheet. |
 
 ## Documentation
 
-| Guide                                                      | Purpose                                              |
-| ---------------------------------------------------------- | ---------------------------------------------------- |
-| [`docs/getting-started.md`](docs/getting-started.md)       | Runtime model and first integration.                 |
-| [`docs/options.md`](docs/options.md)                       | Complete options reference.                          |
-| [`docs/api/index.md`](docs/api/index.md)                   | Factory, controller, helpers, and events.            |
-| [`docs/browser.md`](docs/browser.md)                       | `window.Autocomplete` usage.                         |
-| [`docs/css-styling.md`](docs/css-styling.md)               | Data attributes and CSS variables.                   |
-| [`docs/typescript.md`](docs/typescript.md)                 | Generic types and typed events.                      |
-| [`docs/recipes.md`](docs/recipes.md)                       | Auth, endpoint resolvers, Next.js, custom parsers.   |
+Read the [documentation](https://samline.github.io/autocomplete/docs/) for the full guides and API contracts, and explore [working examples](https://samline.github.io/autocomplete/examples/) with complete and separate source files.
 
-## Development
+| Guide | What it covers |
+| --- | --- |
+| [Installation](https://samline.github.io/autocomplete/docs/getting-started/) | Package / ESM, HTML / CDN and working starter files. |
+| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/) | Every option and its default. |
+| [API reference](https://samline.github.io/autocomplete/docs/reference/api/) | The controller, helpers, browser global and events. |
+| [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides. |
+| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/) | The DOM contract and the custom properties. |
 
-```bash
-bun install
-bun run build
-bun run typecheck
-bun run test
-bun run format:check
-npm pack --dry-run
+## Changelog
+
+Read [CHANGELOG.md](CHANGELOG.md) or the [published changelog](https://samline.github.io/autocomplete/docs/changelog/) for release history and explicitly marked breaking and behavior changes. Review the notes before upgrading.
+
+## AI agent skill
+
+The [Autocomplete skill](https://samline.github.io/autocomplete/skills/autocomplete/SKILL.md) teaches verified package integration. Its maintained [repository source](skills/autocomplete/SKILL.md) and website download are the same file. Verify the installed package version before applying its guidance.
+
+Download [SKILL.md](https://samline.github.io/autocomplete/skills/autocomplete/SKILL.md) into an `autocomplete/` folder in your agent's supported skill directory. For agents that discover project skills from `.agents/skills/`:
+
+```sh
+mkdir -p .agents/skills/autocomplete
+curl --fail --location https://samline.github.io/autocomplete/skills/autocomplete/SKILL.md \
+  --output .agents/skills/autocomplete/SKILL.md
 ```
+
+When working from this repository, copy `skills/autocomplete/SKILL.md` instead. Keep the filename `SKILL.md`; discovery paths and invocation syntax depend on the agent.
 
 ## License
 
-MIT
+MIT — [LICENSE.md](LICENSE.md).

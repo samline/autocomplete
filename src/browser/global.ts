@@ -1,3 +1,8 @@
+// Standalone IIFE entry (`dist/browser/global.global.js`).
+// tsup assigns this module's named exports to `window.Autocomplete` through
+// `globalName`, so the global has exactly the documented shape:
+// { autocomplete, create, destroy, available }. Do not add a default export or
+// assign the global here: the IIFE would overwrite it with the module namespace.
 import { browser, type AutocompleteApi } from './registry'
 
 declare global {
@@ -6,14 +11,4 @@ declare global {
   }
 }
 
-const Autocomplete: AutocompleteApi = browser
-
-if (typeof globalThis !== 'undefined') {
-  ;(globalThis as typeof globalThis & { Autocomplete: AutocompleteApi }).Autocomplete = Autocomplete
-}
-
-if (typeof window !== 'undefined' && (window as typeof globalThis) !== globalThis) {
-  ;(window as { Autocomplete?: AutocompleteApi }).Autocomplete = Autocomplete
-}
-
-export default Autocomplete
+export const { autocomplete, create, destroy, available } = browser

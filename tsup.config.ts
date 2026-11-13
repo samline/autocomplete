@@ -16,7 +16,7 @@ export default defineConfig([
     clean: true,
     target: 'es2020',
     outDir: 'dist',
-    onSuccess: copyStyles
+    onSuccess: copyStyles,
   },
   {
     entry: { 'browser/global': 'src/browser/global.ts' },
@@ -26,6 +26,6 @@ export default defineConfig([
     clean: false,
     target: 'es2020',
     outDir: 'dist',
-    globalName: 'Autocomplete'
-  }
+    globalName: 'Autocomplete',
+  },
 ])

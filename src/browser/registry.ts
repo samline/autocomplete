@@ -38,5 +38,5 @@ export const browser: AutocompleteApi = {
   autocomplete: createAutocomplete,
   create,
   destroy,
-  available
+  available,
 }

@@ -2,18 +2,18 @@ import type {
   AutocompleteMessages,
   AutocompleteOptions,
   AutocompleteParser,
-  AutocompleteResponseMapper
+  AutocompleteResponseMapper,
 } from './types'
 
 export const DEFAULT_MESSAGES: AutocompleteMessages = {
   loading: 'Searching...',
   empty: 'No results',
-  error: 'Search failed'
+  error: 'Search failed',
 }
 
-export const parseJsonResponse: AutocompleteParser = async (response) => response.json()
+export const parseJsonResponse: AutocompleteParser = async response => response.json()
 
-export const mapCommonResponse: AutocompleteResponseMapper<unknown> = (payload) => {
+export const mapCommonResponse: AutocompleteResponseMapper<unknown> = payload => {
   if (Array.isArray(payload)) return payload
   if (!payload || typeof payload !== 'object') throw invalidPayloadError()
 

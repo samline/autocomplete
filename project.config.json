@@ -1,0 +1,38 @@
+{
+  "package": {
+    "name": "Autocomplete",
+    "npmName": "@samline/autocomplete",
+    "version": "1.0.0",
+    "description": "An accessible, framework-agnostic remote autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
+    "author": "Samuel Olvera (samline)",
+    "license": "MIT",
+    "keywords": [
+      "autocomplete",
+      "combobox",
+      "typeahead",
+      "search",
+      "accessibility",
+      "aria"
+    ]
+  },
+  "site": {
+    "url": "https://samline.github.io/autocomplete/",
+    "repository": "https://github.com/samline/autocomplete",
+    "namespace": "samline-autocomplete",
+    "template": false,
+    "credit": "samline"
+  },
+  "theme": {
+    "accentLight": "#2b6f6a",
+    "accentDark": "#8cc2bd"
+  },
+  "delivery": {
+    "cdnScript": "https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/browser/global.global.js",
+    "cdnStylesheet": "https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/styles.css"
+  },
+  "dev": {
+    "landingPort": 4370,
+    "docsPort": 4371,
+    "testPort": 4378
+  }
+}

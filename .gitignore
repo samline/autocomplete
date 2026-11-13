@@ -10,3 +10,14 @@ bun.lockb
 
 # Private notes (client project inventories); never publish
 .local/
+
+# Website build output and generated assets (package-landing-docs)
+.astro/
+test-results/
+playwright-report/
+blob-report/
+brief/
+shared/generated/
+**/public/fonts/
+**/public/font-licenses/
+**/public/favicon.svg

@@ -11,5 +11,5 @@ export type {
   AutocompleteRequestInit,
   AutocompleteResponseMapper,
   AutocompleteSelectDetail,
-  AutocompleteTarget
+  AutocompleteTarget,
 } from './types'

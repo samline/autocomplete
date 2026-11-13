@@ -5,7 +5,7 @@ import {
   getDefaultValue,
   mapCommonResponse,
   parseJsonResponse,
-  validateOptions
+  validateOptions,
 } from './defaults'
 import { resolveInput, restoreAttribute, sanitizeId } from './dom'
 import type {
@@ -14,7 +14,7 @@ import type {
   AutocompleteOptions,
   AutocompleteResponseMapper,
   AutocompleteTarget,
-  NormalizedSuggestion
+  NormalizedSuggestion,
 } from './types'
 
 let instanceCount = 0
@@ -44,7 +44,7 @@ export function createAutocompleteController<T>(
     maxResults: options.maxResults ?? 8,
     searchOnFocus: options.searchOnFocus ?? true,
     onSelect: options.onSelect,
-    onError: options.onError
+    onError: options.onError,
   }
   const list = document.createElement('div')
   const originalAttributes = new Map<string, string | null>()
@@ -69,7 +69,7 @@ export function createAutocompleteController<T>(
     'aria-autocomplete',
     'aria-controls',
     'aria-expanded',
-    'aria-activedescendant'
+    'aria-activedescendant',
   ]) {
     originalAttributes.set(name, input.getAttribute(name))
   }
@@ -155,7 +155,7 @@ export function createAutocompleteController<T>(
 
       dispatch('autocomplete:load', {
         query,
-        suggestions: suggestions.map((suggestion) => suggestion.data)
+        suggestions: suggestions.map(suggestion => suggestion.data),
       })
     } catch (error) {
       if (isAbortError(error) || sequence !== requestSequence) return
@@ -175,7 +175,7 @@ export function createAutocompleteController<T>(
       id: `${instanceId}-option-${sanitizeId(settings.getId(suggestion, index))}`,
       label: String(settings.getLabel(suggestion)),
       value: String(settings.getValue(suggestion)),
-      data: suggestion
+      data: suggestion,
     }
   }
 
@@ -285,7 +285,7 @@ export function createAutocompleteController<T>(
     dispatch('autocomplete:select', {
       suggestion: suggestion.data,
       label: suggestion.label,
-      value: suggestion.value
+      value: suggestion.value,
     })
     settings.onSelect?.(suggestion.data, input)
   }
@@ -391,7 +391,7 @@ export function createAutocompleteController<T>(
     clear,
     cancel,
     getSelected: () => selected,
-    destroy
+    destroy,
   }
 }
 
