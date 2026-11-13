@@ -40,8 +40,8 @@
     }
   },
   "themeReview": {
-    "status": "pending",
-    "source": "Teal pair proposed on 2026-11-13 (dark accent raised for contrast on cards and code); awaiting maintainer confirmation.",
+    "status": "verified",
+    "source": "Confirmed by the maintainer in chat on 2026-11-13.",
     "accentLight": "#2b6f6a",
     "accentDark": "#8cc2bd"
   },
@@ -175,14 +175,7 @@
   ],
   "notes": "Reviewed 2026-11-13 against src at 1.0.0. The 0.1.0 Markdown docs and example/ page were migrated into docs/src/content/docs and site/ and removed.",
   "iconReview": {
-    "kept": [
-      "package",
-      "eye",
-      "refresh",
-      "branch",
-      "layers",
-      "wrench"
-    ],
+    "kept": ["package", "eye", "refresh", "branch", "layers", "wrench"],
     "reason": "The template icons read as endpoint, accessibility, cancellation, entry points, events and styling for these cards; reviewed 2026-11-13."
   }
 }
