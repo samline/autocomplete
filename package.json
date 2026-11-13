@@ -51,7 +51,7 @@
     "site:dev": "node site-tools/assets.mjs && node site-tools/dev.mjs",
     "site:build": "node site-tools/assets.mjs && npm --workspace docs run build && npm --workspace landing run build && node site-tools/assemble.mjs && node site-tools/check-site.mjs",
     "site:preview": "node site-tools/preview.mjs",
-    "site:check": "node site-tools/check-config.mjs && npm run site:check:design && npm --workspace landing run check && npm --workspace docs run check",
+    "site:check": "node site-tools/assets.mjs && node site-tools/check-config.mjs && npm run site:check:design && npm --workspace landing run check && npm --workspace docs run check",
     "site:format": "prettier --plugin prettier-plugin-astro --write landing docs/src docs/scripts shared site-tools site-tests site-e2e skills playwright.site.config.ts project.config.json content-audit.json design-reference.json SITE.md --ignore-path .site-prettierignore",
     "site:format:check": "prettier --plugin prettier-plugin-astro --check landing docs/src docs/scripts shared site-tools site-tests site-e2e skills playwright.site.config.ts project.config.json content-audit.json design-reference.json SITE.md --ignore-path .site-prettierignore",
     "site:test": "node --test site-tests/*.test.mjs",
