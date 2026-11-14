@@ -23,3 +23,31 @@ This is an audit of the loading-mode omission, not a general runtime or document
 - Template: collection-fixture builds check CDN/ESM tabs and module files, plus a second build without CDN delivery. Package-specific browser execution remains the responsibility of each adaptation.
 
 The browser runners read the generated CodeFiles output. Package examples pass through esbuild with aliases to local public build entrypoints, matching a consumer bundler; CDN requests resolve to those same local builds. No registry availability or deployment is asserted.
+
+## Complete Packages directory review — 2026-11-14
+
+Follow-up scope: remove redundant installation/delivery prose from code viewers. Enumerated every top-level repository and every utils subpackage from disk and package manifests. Reviewed all maintained code-disclosure and CodeFiles consumers, including FrameworkExamples and CmsExamples. Preserved ordinary documentation, preview descriptions and no-JavaScript fallback labels.
+
+| Directory               | Manifest                   | Outcome                                                     |
+| ----------------------- | -------------------------- | ----------------------------------------------------------- |
+| autocomplete            | @samline/autocomplete      | Corrected code disclosures                                  |
+| date                    | @samline/date              | No website code viewer                                      |
+| drawer                  | @samline/drawer            | Corrected code disclosures                                  |
+| formatter               | @samline/formatter         | Corrected code disclosures                                  |
+| forms                   | @samline/forms             | Corrected code disclosures                                  |
+| notify                  | @samline/notify            | Corrected code disclosures                                  |
+| package-landing-docs    | package-landing-docs       | Corrected code disclosures                                  |
+| ticker                  | @samline/ticker            | Corrected code disclosures                                  |
+| utils                   | @samline/utils-monorepo    | Collection: nine public utility sites reviewed individually |
+| utils/counter           | @samline/counter           | Shared fix verified on its own Examples and Docs pages      |
+| utils/debounce          | @samline/debounce          | Shared fix verified on its own Examples and Docs pages      |
+| utils/horizontal-scroll | @samline/horizontal-scroll | Shared fix verified on its own Examples and Docs pages      |
+| utils/internal          | @samline/internal          | Private helper; no website code viewer                      |
+| utils/is-visible        | @samline/is-visible        | Shared fix verified on its own Examples and Docs pages      |
+| utils/reveal            | @samline/reveal            | Shared fix verified on its own Examples and Docs pages      |
+| utils/scroll-spy        | @samline/scroll-spy        | Shared fix verified on its own Examples and Docs pages      |
+| utils/scroll-to         | @samline/scroll-to         | Shared fix verified on its own Examples and Docs pages      |
+| utils/string            | @samline/string            | Shared fix verified on its own Examples and Docs pages      |
+| utils/theme             | @samline/theme             | Shared fix verified on its own Examples and Docs pages      |
+
+The inventory covers nine top-level repositories and ten utils subpackages: sixteen public runtime packages, the private internal helper, the utils collection and the template. Date and internal have no website viewer. Every public utils site was checked individually in Chromium on its Examples and Docs routes: no redundant viewer prose, mode/file selection, exact clipboard contents, both themes and 320/1280px layout. Ticker's remaining pre-tab installation/source notes were also removed; its landing check and combined site/link build passed.

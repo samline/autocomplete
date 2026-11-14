@@ -189,7 +189,5 @@ export default {
     'Enable JavaScript to update the preview as you type. The example source files remain readable below.',
   openCode: 'Explore the code',
   modeLabel: 'Loading mode',
-  packageNote: (npmName: string) =>
-    `Install ${npmName} with npm, pnpm, yarn or bun, then serve these files with your bundler or dev server.`,
   copyComplete: 'Copy the complete example',
 } as const

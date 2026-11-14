@@ -4,14 +4,11 @@ import TabPanel from './TabPanel.astro'
 import CodeFiles from './CodeFiles.astro'
 import demo, { loadingModes } from '../i18n/translations/en/demo'
 import { filesFor, modesFor, type PackageExample } from '../lib/package-examples'
-import { findPackage } from '../lib/identity'
-import { project } from '../lib/project.mjs'
 interface Props {
   slug?: string | null
   example: PackageExample
 }
 const { slug, example } = Astro.props
-const identity = slug ? findPackage(slug) : project
 const modes = await Promise.all(
   modesFor(slug).map(async id => ({
     id,
@@ -29,9 +26,6 @@ const modes = await Promise.all(
 >
   {modes.map(mode => (
     <TabPanel id={mode.id} label={mode.label} class:list={['mode-panel']}>
-      <p class:list={['note']}>
-        {mode.id === 'esm' ? demo.packageNote(identity.npmName) : loadingModes.cdn.note}
-      </p>
       <CodeFiles
         files={mode.source.files}
         complete={{ code: mode.source.complete, copyLabel: demo.copyComplete }}
@@ -43,11 +37,5 @@ const modes = await Promise.all(
 <style>
   .mode-panel {
     margin-bottom: 0;
-  }
-  .note {
-    margin-block: 0 var(--space-lg);
-    color: var(--color-text-muted);
-    font-size: var(--text-small);
-    line-height: 1.75;
   }
 </style>
