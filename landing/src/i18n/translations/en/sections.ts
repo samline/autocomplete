@@ -99,7 +99,7 @@ export default {
         label: 'HTML / CDN',
         entrypoint: 'window.Autocomplete',
         description:
-          'newAutocomplete(), getAutocomplete(), destroyAutocomplete() and the available registry, keyed by input id, for pages without a build step.',
+          'Mounts input[data-autocomplete] on load, plus newAutocomplete(), getAutocomplete() and destroyAutocomplete() keyed by input id, for pages without a build step.',
       },
       controller: {
         label: 'Controller',

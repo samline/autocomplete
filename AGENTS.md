@@ -9,9 +9,9 @@
 Mirror the sibling `@samline` packages (`../ticker` is the closest reference).
 
 - `src/constants.ts`: defaults and data-attribute names.
-- `src/core/`: DOM-free contracts and helpers (types, validation, sources, cache, text matching and highlighting).
-- `src/vanilla/`: the DOM controller (`autocomplete` / `createAutocomplete`) and DOM helpers.
-- `src/browser/`: the shared registry (`newAutocomplete`, `getAutocomplete`, `getAutocompletes`, `destroyAutocomplete`, `destroyAutocompletes`, `available`), its module entrypoint and the `window.Autocomplete` IIFE entrypoint (`global.ts`).
+- `src/core/`: DOM-free contracts and helpers (types, validation, sources, the `createSearch` pipeline, cache, recent store, text matching and highlighting).
+- `src/vanilla/`: the DOM controller (`autocomplete` / `createAutocomplete`), positioning, dataset parsing and DOM helpers.
+- `src/browser/`: the shared registry (`newAutocomplete`, `getAutocomplete`, `getAutocompletes`, `destroyAutocomplete`, `destroyAutocompletes`, `available`), the declarative `mount()`, its module entrypoint and the `window.Autocomplete` IIFE entrypoint (`global.ts`, which mounts on load).
 - `src/index.ts`: side-effect-free package entrypoint.
 - `src/styles.css`: optional data-attribute-driven styles.
 - `test/`: Vitest + jsdom contracts.

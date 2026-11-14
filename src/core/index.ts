@@ -1,6 +1,7 @@
 export * from './types'
 export { createCache } from './cache'
 export { createRecentStore } from './recent'
+export { createSearch, DEFAULT_SECTION_ID } from './search'
 export type { AutocompleteStorage, CreateRecentStoreOptions } from './recent'
 export { fromEndpoint, mapCommonResponse, parseJsonResponse } from './source'
 export { DEFAULT_MESSAGES } from './state'

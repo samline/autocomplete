@@ -214,4 +214,30 @@ document.querySelector('#trip').addEventListener('submit', event => {
 })`,
     },
   },
+  {
+    id: 'declarative',
+    tab: 'No JavaScript',
+    title: 'Configure it with data attributes',
+    description:
+      'The standalone script mounts every input with data-autocomplete. Point it at an endpoint or a JSON list and tune it with data-autocomplete-* attributes, without writing a line of JavaScript.',
+    files: {
+      html: `<script type="application/json" id="fruits">
+  ["Aguacate", "Guayaba", "Limón", "Mamey", "Mango", "Papaya", "Pitahaya", "Tamarindo"]
+</script>
+
+<div class="field">
+  <label for="fruit">Fruit</label>
+  <input
+    id="fruit"
+    type="text"
+    data-autocomplete
+    data-autocomplete-source="#fruits"
+    data-autocomplete-empty="No fruit matches"
+  />
+</div>`,
+      css: baseCss,
+      js: `// Nothing to write: the browser bundle mounts input[data-autocomplete] on load.
+// Read a mounted controller with window.Autocomplete.getAutocomplete('fruit').`,
+    },
+  },
 ] as const

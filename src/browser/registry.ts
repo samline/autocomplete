@@ -1,4 +1,6 @@
 import { autocomplete } from '../vanilla/render'
+import { available, type AutocompleteAvailable } from './available'
+import { getMounted, mount, refresh, unmount } from './mount'
 import type { AutocompleteController, AutocompleteOptions } from '../core/types'
 
 export interface NewAutocompleteInput<T = unknown> {
@@ -6,9 +8,7 @@ export interface NewAutocompleteInput<T = unknown> {
   id: string
   options: AutocompleteOptions<T>
 }
-export interface AutocompleteAvailable {
-  [id: string]: AutocompleteController<unknown>
-}
+export type { AutocompleteAvailable }
 export interface AutocompleteApi {
   autocomplete: typeof autocomplete
   newAutocomplete: <T = unknown>(input: NewAutocompleteInput<T>) => AutocompleteController<T> | null
@@ -17,9 +17,13 @@ export interface AutocompleteApi {
   destroyAutocomplete: (target: string | HTMLInputElement) => void
   destroyAutocompletes: () => void
   available: AutocompleteAvailable
+  mount: typeof mount
+  unmount: typeof unmount
+  refresh: typeof refresh
+  getMounted: typeof getMounted
 }
 
-export const available: AutocompleteAvailable = Object.create(null) as AutocompleteAvailable
+export { available }
 
 const removeRegistration = (id: string): void => {
   const entry = available[id]
@@ -79,5 +83,9 @@ export const Autocomplete: AutocompleteApi = {
   destroyAutocomplete,
   destroyAutocompletes,
   available,
+  mount,
+  unmount,
+  refresh,
+  getMounted,
 }
 export const browser = Autocomplete

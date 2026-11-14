@@ -31,7 +31,11 @@ describe('browser global', () => {
       'destroyAutocompletes',
       'getAutocomplete',
       'getAutocompletes',
+      'getMounted',
+      'mount',
       'newAutocomplete',
+      'refresh',
+      'unmount',
     ])
   })
 

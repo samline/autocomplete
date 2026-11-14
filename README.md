@@ -80,9 +80,9 @@ Choose **Package / ESM** when installing with npm, pnpm or bun and importing Aut
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/styles.css"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/styles.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/browser/global.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/browser/global.global.js"></script>
 ```
 
 > Pin the version in production, or self-host the same files.
@@ -116,6 +116,21 @@ The global follows the same registry shape as the other `@samline` packages:
 
 `newAutocomplete` logs and returns `null` when the id is empty or no input has it.
 
+### No JavaScript at all
+
+The standalone script also mounts every `input[data-autocomplete]`, now and as inputs are added or removed:
+
+```html
+<input id="city" data-autocomplete="/api/cities" data-autocomplete-label-key="name" />
+
+<script type="application/json" id="states">
+  ["Jalisco", "Michoacán", "Querétaro"]
+</script>
+<input id="state" data-autocomplete data-autocomplete-source="#states" />
+```
+
+Every option with a plain value has an attribute (`data-autocomplete-min-length`, `-hidden-input`, `-recent`, `-popover`, `-empty`, …); see the [API reference](https://samline.github.io/autocomplete/docs/reference/api/#declarative-mount). With a bundler, call `mount({ defaults })` to do the same with options attributes cannot express. `mount`, `unmount`, `refresh` and `getMounted` are on `window.Autocomplete` too.
+
 ## Capabilities
 
 - Three kinds of source: an HTTP endpoint, an async function (SDKs, GraphQL, workers) or a local array.
@@ -128,13 +143,17 @@ The global follows the same registry shape as the other `@samline` packages:
 - A hidden form field that holds the selected id.
 - Placement that flips above when there is no room, and an optional top-layer popup through the Popover API.
 - Custom status, header and footer content.
+- No-JavaScript setup: the standalone script mounts every `input[data-autocomplete]`.
+- An observable state (`getState`, `subscribe`, `on`) for React, Vue, Alpine and other bindings.
+- Hooks and plugins: `beforeSearch`, `transformSuggestions`, `beforeSelect`.
+- A DOM-free `createSearch` pipeline for fully custom rendering.
 - WAI-ARIA combobox and listbox with full keyboard operation and a polite live region.
 - Debounced searches, aborted superseded requests and ignored late responses.
 - Bubbling DOM events that keep hidden fields and other UI in sync.
 - An optional stylesheet themed with `--autocomplete-*` custom properties.
 - React, Vue, Svelte, Shopify and WordPress through the same API, with no adapter.
 
-[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, events, local data, sections and forms, each with copyable files.
+[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, events, local data, sections, forms and a no-JavaScript setup, each with copyable files.
 
 ### Any source
 
@@ -233,6 +252,39 @@ createAutocomplete('#city', {
 
 Header and footer content sits outside the listbox and is not reached with the arrow keys.
 
+### State, events and plugins
+
+```js
+const controller = createAutocomplete('#city', { endpoint: '/api/cities' })
+
+controller.getState() // { query, status, open, suggestions, sections, activeIndex, selected }
+const unsubscribe = controller.subscribe(state => render(state))
+const off = controller.on('select', ({ suggestion }) => save(suggestion))
+controller.setValue({ id: 42, name: 'Guadalajara' }) // prefill an edit form, no events
+```
+
+`subscribe` and `getState` plug into React's `useSyncExternalStore`, Vue refs or any store. Hooks shape the behavior without forking it, and plugins package them:
+
+```js
+createAutocomplete('#city', {
+  endpoint: '/api/cities',
+  beforeSearch: query => query.replace(/^#/, ''), // or false to skip
+  transformSuggestions: (items, { query }) => rank(items, query),
+  beforeSelect: city => !city.disabled, // false keeps the list open
+  plugins: [
+    {
+      name: 'analytics',
+      setup: controller => {
+        const off = controller.on('select', ({ value }) => track('select', value))
+        return { destroy: off }
+      },
+    },
+  ],
+})
+```
+
+[Recipes](https://samline.github.io/autocomplete/docs/guides/recipes/) cover React, Vue, Alpine, Livewire, a ⌘K palette, plugins and headless rendering with `createSearch`.
+
 ### Caching
 
 Function and endpoint results are cached per query: up to 50 queries for five minutes, least recently used first out. Failures are never cached.
@@ -296,8 +348,13 @@ Searches are debounced, superseded requests are aborted and late responses ignor
 | `search(query?)`, `close()`, `cancel()`                | Run a search now, close the list, cancel pending work.       |
 | `clear()`, `getSelected()`                             | Clear input and selection, or read the selected item.        |
 | `clearCache()`                                         | Forget cached results.                                       |
+| `getState()`, `subscribe(fn)`, `on(event, fn)`         | Read and observe state and events.                           |
+| `setValue(item)`                                       | Prefill the selection without events.                        |
 | `destroy()`                                            | Cleanup.                                                     |
 | `fromEndpoint(options)`                                | Build a reusable endpoint source function.                   |
+| `createSearch(options)`                                | The DOM-free search pipeline, for custom rendering.          |
+| `mount`, `unmount`, `refresh`                          | Enhance `input[data-autocomplete]` declaratively.            |
+| `optionsFromDataset(input)`                            | Read options from data attributes.                           |
 | `highlight`, `renderHighlight`                         | Split a label into matches, and render the parts.            |
 | `filterSuggestions`, `normalizeText`                   | The default local filter and text normalizer.                |
 | `createCache(options?)`, `createRecentStore(options?)` | The per-instance LRU cache, and the recent selections store. |
@@ -328,6 +385,8 @@ All events bubble from the input.
 | `autocomplete:error`     | `{ query, error, section }`                |
 | `autocomplete:select`    | `{ suggestion, label, value, section }`    |
 | `autocomplete:clear`     | `{ query }`                                |
+| `autocomplete:open`      | `{ query }`                                |
+| `autocomplete:close`     | `{ query }`                                |
 
 ```js
 const input = document.querySelector('#city')
@@ -354,14 +413,15 @@ The package includes declarations. Pass your suggestion type to `createAutocompl
 
 Read the [documentation](https://samline.github.io/autocomplete/docs/) for the full guides and API contracts, and explore [working examples](https://samline.github.io/autocomplete/examples/) with complete and separate source files.
 
-| Guide                                                                              | What it covers                                           |
-| ---------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [Installation](https://samline.github.io/autocomplete/docs/getting-started/)       | Package / ESM, HTML / CDN, frameworks and starter files. |
-| [Examples](https://samline.github.io/autocomplete/docs/guides/examples/)           | Live previews with their complete, copyable source.      |
-| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/)    | Every option and its default.                            |
-| [API reference](https://samline.github.io/autocomplete/docs/reference/api/)        | The controller, helpers, browser global, events, types.  |
-| [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides.  |
-| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/)             | The DOM contract and the custom properties.              |
+| Guide                                                                              | What it covers                                                         |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [Installation](https://samline.github.io/autocomplete/docs/getting-started/)       | Package / ESM, HTML / CDN, frameworks and starter files.               |
+| [Examples](https://samline.github.io/autocomplete/docs/guides/examples/)           | Live previews with their complete, copyable source.                    |
+| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/)    | Every option and its default.                                          |
+| [API reference](https://samline.github.io/autocomplete/docs/reference/api/)        | The controller, helpers, browser global, events, types.                |
+| [Recipes](https://samline.github.io/autocomplete/docs/guides/recipes/)             | React, Vue, Alpine, Livewire, a command palette, plugins and headless. |
+| [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides.                |
+| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/)             | The DOM contract and the custom properties.                            |
 
 ## Changelog
 

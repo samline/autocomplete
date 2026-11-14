@@ -1,6 +1,5 @@
 import {
   DEFAULT_DEBOUNCE,
-  DEFAULT_MAX_RESULTS,
   DEFAULT_MIN_LENGTH,
   DEFAULT_POPOVER_OFFSET,
   DEFAULT_RECENT_LABEL,
@@ -15,9 +14,8 @@ import {
   POPUP_ATTRIBUTE,
   STATUS_ATTRIBUTE,
 } from '../constants'
-import { createCache } from '../core/cache'
 import { createRecentStore } from '../core/recent'
-import { fromEndpoint } from '../core/source'
+import { createSearch } from '../core/search'
 import {
   DEFAULT_MESSAGES,
   getDefaultId,
@@ -26,19 +24,20 @@ import {
   resolveMessage,
   validateOptions,
 } from '../core/state'
-import { filterSuggestions, highlight, normalizeText } from '../core/text'
+import { highlight, normalizeText } from '../core/text'
 import type {
-  AutocompleteCache,
-  AutocompleteCacheOptions,
   AutocompleteController,
-  AutocompleteEndpointOptions,
+  AutocompleteEventMap,
   AutocompleteHighlightPart,
+  AutocompleteHooks,
   AutocompleteMessages,
   AutocompleteOptions,
+  AutocompletePluginHooks,
   AutocompleteRecentStore,
   AutocompleteResultsContext,
+  AutocompleteSearchResult,
   AutocompleteSectionResult,
-  AutocompleteSourceFunction,
+  AutocompleteState,
   AutocompleteStatusState,
   AutocompleteTarget,
 } from '../core/types'
@@ -54,20 +53,10 @@ interface NormalizedSuggestion<T> {
   data: T
 }
 
-interface RuntimeSection<T> {
-  /** `null` for a single source or endpoint. */
+interface RenderGroup<T> {
   id: string | null
   label: string | undefined
-  local: readonly T[] | null
-  source: AutocompleteSourceFunction<T> | null
-  filter: ((suggestion: T, query: string) => boolean) | undefined
-  maxResults: number
-  cache: AutocompleteCache<T> | null
-}
-
-interface SectionOutcome<T> {
-  section: RuntimeSection<T>
-  result: readonly T[]
+  items: NormalizedSuggestion<T>[]
 }
 
 const RESTORED_ATTRIBUTES = [
@@ -83,13 +72,8 @@ const RECENT_SECTION = 'recent'
 
 let instanceCount = 0
 
-const isAbortError = (error: unknown): boolean =>
-  error instanceof DOMException && error.name === 'AbortError'
-
-const resolveCache = <T>(
-  setting: boolean | AutocompleteCacheOptions | undefined
-): AutocompleteCache<T> | null =>
-  setting === false ? null : createCache<T>(typeof setting === 'object' ? setting : {})
+const isPromise = <V>(value: V | Promise<V>): value is Promise<V> =>
+  typeof (value as Promise<V> | undefined)?.then === 'function'
 
 /** Turns an existing text input into an accessible combobox. */
 export const autocomplete = <T = unknown>(
@@ -105,40 +89,22 @@ export const autocomplete = <T = unknown>(
   const getValue = options.getValue ?? (getDefaultValue as (suggestion: T) => string)
   const getId = options.getId ?? (getDefaultId as (suggestion: T, index: number) => string | number)
   const normalize = options.normalize ?? normalizeText
-  const maxResults = options.maxResults ?? DEFAULT_MAX_RESULTS
 
-  const sections: RuntimeSection<T>[] = options.sections
-    ? options.sections.map(section => {
-        const local = Array.isArray(section.source) ? (section.source as readonly T[]) : null
-        return {
-          id: section.id,
-          label: section.label,
-          local,
-          source: local ? null : (section.source as AutocompleteSourceFunction<T>),
-          filter: section.filter ?? options.filter,
-          maxResults: section.maxResults ?? maxResults,
-          cache: local ? null : resolveCache<T>(section.cache ?? options.cache),
-        }
-      })
-    : [
-        {
-          id: null,
-          label: undefined,
-          local: Array.isArray(options.source) ? (options.source as readonly T[]) : null,
-          source: Array.isArray(options.source)
-            ? null
-            : typeof options.source === 'function'
-              ? options.source
-              : fromEndpoint(options as AutocompleteEndpointOptions<T>),
-          filter: options.filter,
-          maxResults,
-          cache: Array.isArray(options.source) ? null : resolveCache<T>(options.cache),
-        },
-      ]
+  // Hooks run in order: the options first, then each plugin.
+  const hooks: AutocompletePluginHooks<T>[] = [options]
 
-  const allLocal = sections.every(section => section.local !== null)
-  const minLength = options.minLength ?? (allLocal ? 1 : DEFAULT_MIN_LENGTH)
-  const debounce = options.debounce ?? (allLocal ? 0 : DEFAULT_DEBOUNCE)
+  const engine = createSearch<T>({
+    ...options,
+    transformSuggestions: (suggestions, context) =>
+      hooks.reduce<readonly T[]>(
+        (current, hook) =>
+          hook.transformSuggestions ? hook.transformSuggestions(current, context) : current,
+        suggestions
+      ),
+  })
+  const singleSource = options.sections === undefined
+  const minLength = options.minLength ?? (engine.local ? 1 : DEFAULT_MIN_LENGTH)
+  const debounce = options.debounce ?? (engine.local ? 0 : DEFAULT_DEBOUNCE)
   const searchOnFocus = options.searchOnFocus ?? true
   const highlightEnabled = options.highlight ?? true
 
@@ -179,14 +145,32 @@ export const autocomplete = <T = unknown>(
     offset: options.offset ?? DEFAULT_POPOVER_OFFSET,
   })
 
+  const listeners = new Set<(state: AutocompleteState<T>) => void>()
+  let state: AutocompleteState<T> = {
+    query: '',
+    status: 'idle',
+    open: false,
+    suggestions: [],
+    sections: [],
+    activeIndex: -1,
+    selected: null,
+  }
+
   let suggestions: NormalizedSuggestion<T>[] = []
-  let activeIndex = -1
-  let selected: T | null = null
   let debounceTimer: ReturnType<typeof setTimeout> | undefined
   let abortController: AbortController | null = null
   let requestSequence = 0
   let destroyed = false
   let suppressFocusSearch = false
+
+  const setState = (patch: Partial<AutocompleteState<T>>): void => {
+    const changed = (Object.keys(patch) as (keyof AutocompleteState<T>)[]).some(
+      key => patch[key] !== state[key]
+    )
+    if (!changed) return
+    state = { ...state, ...patch }
+    listeners.forEach(listener => listener(state))
+  }
 
   popup.hidden = true
   popup.setAttribute(POPUP_ATTRIBUTE, '')
@@ -240,8 +224,11 @@ export const autocomplete = <T = unknown>(
     live.insertAdjacentElement('afterend', hidden)
   }
 
-  const dispatch = (name: string, detail: object): void => {
-    input.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }))
+  const dispatch = <K extends keyof AutocompleteEventMap<T>>(
+    name: K,
+    detail: AutocompleteEventMap<T>[K]
+  ): void => {
+    input.dispatchEvent(new CustomEvent(`autocomplete:${name}`, { bubbles: true, detail }))
   }
 
   const announce = (message: string): void => {
@@ -262,32 +249,34 @@ export const autocomplete = <T = unknown>(
     abortController = null
   }
 
-  const updateActiveOption = (): void => {
+  const updateActiveOption = (index: number): void => {
     const elements = list.querySelectorAll<HTMLElement>(`[${OPTION_ATTRIBUTE}]`)
 
-    elements.forEach((element, index) => {
-      const active = index === activeIndex
+    elements.forEach((element, position) => {
+      const active = position === index
       element.dataset.active = String(active)
       element.setAttribute('aria-selected', String(active))
     })
 
-    const active = elements.item(activeIndex)
-    if (!active) {
-      input.removeAttribute('aria-activedescendant')
-      return
-    }
+    const active = elements.item(index)
+    if (active) {
+      input.setAttribute('aria-activedescendant', active.id)
+      active.scrollIntoView({ block: 'nearest' })
+    } else input.removeAttribute('aria-activedescendant')
 
-    input.setAttribute('aria-activedescendant', active.id)
-    active.scrollIntoView({ block: 'nearest' })
+    setState({ activeIndex: active ? index : -1 })
   }
 
   const showPopup = (): void => {
+    const wasOpen = state.open
     popup.hidden = false
     positioner.open()
+    setState({ open: true })
+    if (!wasOpen) dispatch('open', { query: state.query })
   }
 
   const close = (): void => {
-    activeIndex = -1
+    const wasOpen = state.open
     popup.hidden = true
     list.hidden = true
     status.hidden = true
@@ -295,45 +284,56 @@ export const autocomplete = <T = unknown>(
     if (footer) footer.hidden = true
     positioner.close()
     input.setAttribute('aria-expanded', 'false')
-    input.removeAttribute('aria-activedescendant')
-    updateActiveOption()
+    updateActiveOption(-1)
+    setState({ open: false })
+    if (wasOpen) dispatch('close', { query: state.query })
   }
 
   // Closing is a user decision: drop the pending search and abort the request
   // in flight, otherwise its response would reopen the list.
   const dismiss = (): void => {
     cancel()
+    if (state.status === 'loading') setState({ status: 'idle' })
     close()
   }
 
-  const renderStatus = (state: AutocompleteStatusState, query: string, error?: unknown): void => {
+  const renderStatus = (kind: AutocompleteStatusState, query: string, error?: unknown): void => {
     if (destroyed) return
 
-    const message = resolveMessage(messages[state], { query, count: 0 })
+    const message = resolveMessage(messages[kind], { query, count: 0 })
+    suggestions = []
     list.replaceChildren()
     list.hidden = true
     if (header) header.hidden = true
     if (footer) footer.hidden = true
     status.textContent = message
-    status.setAttribute(STATUS_ATTRIBUTE, state)
-    options.renderStatus?.(status, { state, query, ...(state === 'error' ? { error } : {}) })
+    status.setAttribute(STATUS_ATTRIBUTE, kind)
+    options.renderStatus?.(status, { state: kind, query, ...(kind === 'error' ? { error } : {}) })
     status.hidden = false
     input.setAttribute('aria-expanded', 'false')
-    input.removeAttribute('aria-activedescendant')
+    updateActiveOption(-1)
+    setState({ query, status: kind, suggestions: [], sections: [] })
     showPopup()
-    if (state !== 'loading') announce(message)
+    if (kind !== 'loading') announce(message)
+  }
+
+  const applySelection = (suggestion: NormalizedSuggestion<T> | null): void => {
+    input.value = suggestion?.value ?? ''
+    syncHidden(
+      suggestion ? (getHiddenValue ? getHiddenValue(suggestion.data) : suggestion.rawId) : ''
+    )
+    setState({ selected: suggestion?.data ?? null })
   }
 
   const select = (index: number): void => {
     const suggestion = suggestions[index]
     if (!suggestion) return
+    if (hooks.some(hook => hook.beforeSelect?.(suggestion.data, input) === false)) return
 
-    selected = suggestion.data
-    input.value = suggestion.value
-    syncHidden(getHiddenValue ? getHiddenValue(suggestion.data) : suggestion.rawId)
+    applySelection(suggestion)
     recent?.add(suggestion.data)
     dismiss()
-    dispatch('autocomplete:select', {
+    dispatch('select', {
       suggestion: suggestion.data,
       label: suggestion.label,
       value: suggestion.value,
@@ -354,8 +354,7 @@ export const autocomplete = <T = unknown>(
   }
 
   const handleOptionPointerEnter = (event: PointerEvent): void => {
-    activeIndex = Number((event.currentTarget as HTMLElement).dataset.index)
-    updateActiveOption()
+    updateActiveOption(Number((event.currentTarget as HTMLElement).dataset.index))
   }
 
   const createOption = (suggestion: NormalizedSuggestion<T>, index: number, query: string) => {
@@ -383,12 +382,9 @@ export const autocomplete = <T = unknown>(
 
   const renderList = (
     query: string,
-    groups: readonly {
-      id: string | null
-      label: string | undefined
-      items: NormalizedSuggestion<T>[]
-    }[],
-    context: AutocompleteResultsContext<T>
+    groups: readonly RenderGroup<T>[],
+    context: AutocompleteResultsContext<T>,
+    listStatus: 'results' | 'recent'
   ): void => {
     const fragment = document.createDocumentFragment()
     let index = 0
@@ -417,6 +413,7 @@ export const autocomplete = <T = unknown>(
       fragment.append(container)
     }
 
+    suggestions = groups.flatMap(group => group.items)
     list.replaceChildren(fragment)
     list.hidden = false
     status.hidden = true
@@ -433,7 +430,15 @@ export const autocomplete = <T = unknown>(
     }
 
     input.setAttribute('aria-expanded', 'true')
+    updateActiveOption(-1)
+    setState({
+      query,
+      status: listStatus,
+      suggestions: suggestions.map(suggestion => suggestion.data),
+      sections: context.sections,
+    })
     showPopup()
+    announce(resolveMessage(messages.results, { query, count: suggestions.length }))
   }
 
   const normalizeSuggestion = (
@@ -453,41 +458,46 @@ export const autocomplete = <T = unknown>(
     }
   }
 
-  const showResults = (
-    query: string,
-    outcomes: readonly SectionOutcome<T>[],
-    cached: boolean
-  ): void => {
+  const showResults = (result: AutocompleteSearchResult<T>): void => {
     if (destroyed) return
+    const { query } = result
 
-    const groups = outcomes.map(({ section, result }) => ({
-      id: section.id,
-      label: section.label,
-      items: result
-        .slice(0, section.maxResults)
-        .map((suggestion, index) => normalizeSuggestion(suggestion, index, section.id)),
-    }))
-    const results: AutocompleteSectionResult<T>[] = groups.map(group => ({
-      id: group.id ?? 'default',
-      ...(group.label === undefined ? {} : { label: group.label }),
-      suggestions: group.items.map(item => item.data),
-    }))
-
-    suggestions = groups.flatMap(group => group.items)
-    activeIndex = -1
-
-    if (suggestions.length === 0) renderStatus('empty', query)
-    else {
-      renderList(query, groups, { query, count: suggestions.length, sections: results })
-      announce(resolveMessage(messages.results, { query, count: suggestions.length }))
+    if (result.failed) {
+      renderStatus('error', query, result.errors[0]?.error)
+    } else if (result.count === 0) {
+      renderStatus('empty', query)
+    } else {
+      const groups = result.sections.map(section => {
+        const id = singleSource ? null : section.id
+        return {
+          id,
+          label: section.label,
+          items: section.suggestions.map((suggestion, index) =>
+            normalizeSuggestion(suggestion, index, id)
+          ),
+        }
+      })
+      renderList(
+        query,
+        groups,
+        { query, count: result.count, sections: result.sections },
+        'results'
+      )
     }
 
-    dispatch('autocomplete:load', {
-      query,
-      suggestions: suggestions.map(suggestion => suggestion.data),
-      sections: results,
-      cached,
-    })
+    if (!result.failed) {
+      dispatch('load', {
+        query,
+        suggestions: result.sections.flatMap(section => section.suggestions),
+        sections: result.sections,
+        cached: result.cached,
+      })
+    }
+
+    for (const { section, error } of result.errors) {
+      dispatch('error', { query, error, section })
+      options.onError?.(error, input)
+    }
   }
 
   const showRecent = (): boolean => {
@@ -495,117 +505,74 @@ export const autocomplete = <T = unknown>(
     if (destroyed || items.length === 0) return false
 
     cancel()
-    const group = {
-      id: RECENT_SECTION,
-      label: recentLabel,
-      items: items.map((item, index) => normalizeSuggestion(item, index, RECENT_SECTION)),
-    }
-    suggestions = group.items
-    activeIndex = -1
-    renderList('', [group], {
-      query: '',
-      count: suggestions.length,
-      sections: [{ id: RECENT_SECTION, label: recentLabel, suggestions: items }],
-    })
-    announce(resolveMessage(messages.results, { query: '', count: suggestions.length }))
+    const sections: AutocompleteSectionResult<T>[] = [
+      { id: RECENT_SECTION, label: recentLabel, suggestions: items },
+    ]
+    renderList(
+      '',
+      [
+        {
+          id: RECENT_SECTION,
+          label: recentLabel,
+          items: items.map((item, index) => normalizeSuggestion(item, index, RECENT_SECTION)),
+        },
+      ],
+      { query: '', count: items.length, sections },
+      'recent'
+    )
     return true
   }
 
-  const filterLocal = (section: RuntimeSection<T>, items: readonly T[], query: string): T[] => {
-    const filter = section.filter
-    return filter
-      ? items.filter(item => filter(item, query))
-      : filterSuggestions(items, query, { getText: getLabel, normalize })
+  const resolveQuery = (query: string): string | false => {
+    let current = query
+    for (const hook of hooks as AutocompleteHooks<T>[]) {
+      const next = hook.beforeSearch?.(current, input)
+      if (next === false) return false
+      if (typeof next === 'string') current = next
+    }
+    return current
   }
 
-  const search = async (query: string = input.value.trim()): Promise<void> => {
-    if (destroyed || query.length < minLength) {
+  const search = async (requested: string = input.value.trim()): Promise<void> => {
+    if (destroyed || requested.length < minLength) {
       close()
+      return
+    }
+
+    const query = resolveQuery(requested)
+    if (query === false) {
+      dismiss()
       return
     }
 
     cancel()
     const sequence = ++requestSequence
+    const controller = new AbortController()
+    const outcome = engine.run(query, { signal: controller.signal, input })
 
-    // Local arrays and cache hits resolve synchronously; only the rest wait.
-    const outcomes = new Map<RuntimeSection<T>, readonly T[]>()
-    const pending: RuntimeSection<T>[] = []
-    let hits = 0
-
-    for (const section of sections) {
-      if (section.local) {
-        outcomes.set(section, filterLocal(section, section.local, query))
-        continue
-      }
-      const hit = section.cache?.get(query)
-      if (hit) {
-        hits += 1
-        outcomes.set(section, hit)
-      } else pending.push(section)
-    }
-
-    const ordered = (): SectionOutcome<T>[] =>
-      sections
-        .filter(section => outcomes.has(section))
-        .map(section => ({ section, result: outcomes.get(section)! }))
-
-    if (pending.length === 0) {
-      showResults(query, ordered(), hits > 0)
+    if (!isPromise(outcome)) {
+      showResults(outcome)
       return
     }
 
-    const controller = new AbortController()
     abortController = controller
     renderStatus('loading', query)
-    dispatch('autocomplete:loadstart', { query })
+    dispatch('loadstart', { query })
 
-    const settled = await Promise.allSettled(
-      pending.map(async section => {
-        const result = await section.source!(query, { signal: controller.signal, input })
-        if (!Array.isArray(result)) {
-          throw new TypeError('Autocomplete source must return an array.')
-        }
-        return result as readonly T[]
-      })
-    )
-
-    if (sequence !== requestSequence || destroyed) return
+    const result = await outcome
+    if (sequence !== requestSequence || destroyed || result.aborted) return
     abortController = null
-
-    const failures: { section: RuntimeSection<T>; error: unknown }[] = []
-    settled.forEach((outcome, index) => {
-      const section = pending[index]!
-      if (outcome.status === 'fulfilled') {
-        section.cache?.set(query, outcome.value)
-        outcomes.set(section, outcome.value)
-      } else if (!isAbortError(outcome.reason)) {
-        failures.push({ section, error: outcome.reason })
-      }
-    })
-
-    const hasResults = [...outcomes.values()].some(result => result.length > 0)
-    if (failures.length > 0 && failures.length === pending.length && !hasResults) {
-      suggestions = []
-      activeIndex = -1
-      renderStatus('error', query, failures[0]!.error)
-    } else {
-      showResults(query, ordered(), false)
-    }
-
-    for (const { section, error } of failures) {
-      dispatch('autocomplete:error', { query, error, section: section.id })
-      options.onError?.(error, input)
-    }
+    showResults(result)
   }
 
   const scheduleSearch = (): void => {
     clearTimeout(debounceTimer)
     const query = input.value.trim()
 
-    if (selected !== null) {
-      selected = null
+    if (state.selected !== null) {
+      setState({ selected: null })
       syncHidden('')
-      dispatch('autocomplete:clear', { query })
+      dispatch('clear', { query })
     }
 
     if (query.length < minLength) {
@@ -623,29 +590,31 @@ export const autocomplete = <T = unknown>(
   }
 
   const clear = (): void => {
-    const hadSelection = selected !== null
+    const hadSelection = state.selected !== null
     cancel()
     suggestions = []
-    activeIndex = -1
-    selected = null
-    input.value = ''
-    syncHidden('')
+    applySelection(null)
     close()
+    setState({ query: '', status: 'idle', suggestions: [], sections: [] })
     announce('')
-    if (hadSelection) dispatch('autocomplete:clear', { query: '' })
+    if (hadSelection) dispatch('clear', { query: '' })
+  }
+
+  const setValue = (suggestion: T | null): void => {
+    applySelection(suggestion === null ? null : normalizeSuggestion(suggestion, 0, null))
   }
 
   const moveActiveOption = (direction: number): void => {
     if (list.hidden || suggestions.length === 0) return
+    const current = state.activeIndex
 
-    activeIndex =
-      activeIndex === -1
+    updateActiveOption(
+      current === -1
         ? direction > 0
           ? 0
           : suggestions.length - 1
-        : (activeIndex + direction + suggestions.length) % suggestions.length
-
-    updateActiveOption()
+        : (current + direction + suggestions.length) % suggestions.length
+    )
   }
 
   const handleInput = (event: Event): void => {
@@ -677,16 +646,15 @@ export const autocomplete = <T = unknown>(
       return
     }
 
-    if (event.key === 'Enter' && listOpen && activeIndex >= 0) {
+    if (event.key === 'Enter' && listOpen && state.activeIndex >= 0) {
       event.preventDefault()
-      select(activeIndex)
+      select(state.activeIndex)
       return
     }
 
     if ((event.key === 'Home' || event.key === 'End') && listOpen) {
       event.preventDefault()
-      activeIndex = event.key === 'Home' ? 0 : suggestions.length - 1
-      updateActiveOption()
+      updateActiveOption(event.key === 'Home' ? 0 : suggestions.length - 1)
       return
     }
 
@@ -703,6 +671,23 @@ export const autocomplete = <T = unknown>(
     if (event.target !== input && !popup.contains(event.target as Node)) dismiss()
   }
 
+  const on = <K extends keyof AutocompleteEventMap<T>>(
+    event: K,
+    listener: (detail: AutocompleteEventMap<T>[K]) => void
+  ): (() => void) => {
+    const handler = (domEvent: Event): void =>
+      listener((domEvent as CustomEvent<AutocompleteEventMap<T>[K]>).detail)
+    input.addEventListener(`autocomplete:${event}`, handler)
+    return () => input.removeEventListener(`autocomplete:${event}`, handler)
+  }
+
+  const subscribe = (listener: (state: AutocompleteState<T>) => void): (() => void) => {
+    listeners.add(listener)
+    return () => {
+      listeners.delete(listener)
+    }
+  }
+
   const destroy = (): void => {
     if (destroyed) return
     destroyed = true
@@ -716,10 +701,15 @@ export const autocomplete = <T = unknown>(
     popup.remove()
     live.remove()
     if (hidden && !providedHidden) hidden.remove()
-    for (const section of sections) section.cache?.clear()
+    engine.clearCache()
 
     originalAttributes.forEach((value, name) => restoreAttribute(input, name, value))
     if (label) restoreAttribute(label, 'id', originalLabelId)
+
+    for (const hook of hooks) {
+      if (hook !== options) (hook as AutocompletePluginHooks<T>).destroy?.()
+    }
+    listeners.clear()
   }
 
   input.addEventListener('input', handleInput)
@@ -728,7 +718,7 @@ export const autocomplete = <T = unknown>(
   input.addEventListener('keydown', handleKeydown)
   document.addEventListener('pointerdown', handleDocumentPointerDown)
 
-  return {
+  const controller: AutocompleteController<T> = {
     element: input,
     popupElement: popup,
     listElement: list,
@@ -741,10 +731,21 @@ export const autocomplete = <T = unknown>(
     close: dismiss,
     clear,
     cancel,
-    clearCache: () => sections.forEach(section => section.cache?.clear()),
-    getSelected: () => selected,
+    clearCache: engine.clearCache,
+    getSelected: () => state.selected,
+    setValue,
+    getState: () => state,
+    subscribe,
+    on,
     destroy,
   }
+
+  for (const plugin of options.plugins ?? []) {
+    const pluginHooks = plugin.setup(controller)
+    if (pluginHooks) hooks.push(pluginHooks)
+  }
+
+  return controller
 }
 
 export const createAutocomplete = autocomplete

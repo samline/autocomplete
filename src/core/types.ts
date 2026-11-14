@@ -135,7 +135,103 @@ export interface AutocompleteResultsContext<T = unknown> {
   sections: readonly AutocompleteSectionResult<T>[]
 }
 
-export interface AutocompleteOptions<T = unknown> {
+export interface AutocompleteTransformContext {
+  query: string
+  /** The section id, or `null` for a single source. */
+  section: string | null
+}
+
+export interface AutocompleteHooks<T = unknown> {
+  /** Return a new query, `false` to skip the search, or nothing to keep it. */
+  beforeSearch?: (query: string, input: HTMLInputElement) => string | false | void
+  /** Reorder, dedupe or enrich each section's results before `maxResults` applies. */
+  transformSuggestions?: (
+    suggestions: readonly T[],
+    context: AutocompleteTransformContext
+  ) => readonly T[]
+  /** Return `false` to keep the list open and ignore the selection. */
+  beforeSelect?: (suggestion: T, input: HTMLInputElement) => boolean | void
+}
+
+export interface AutocompletePluginHooks<T = unknown> extends AutocompleteHooks<T> {
+  /** Runs when the controller is destroyed. */
+  destroy?: () => void
+}
+
+export interface AutocompletePlugin<T = unknown> {
+  name: string
+  /** Runs once the controller exists; may return hooks and a destroy callback. */
+  setup: (controller: AutocompleteController<T>) => AutocompletePluginHooks<T> | void
+}
+
+export type AutocompleteStatus = 'idle' | 'loading' | 'results' | 'empty' | 'error' | 'recent'
+
+export interface AutocompleteState<T = unknown> {
+  /** The query of the last search, or `''` for recent selections. */
+  query: string
+  status: AutocompleteStatus
+  open: boolean
+  /** Rendered suggestions in keyboard order. */
+  suggestions: readonly T[]
+  sections: readonly AutocompleteSectionResult<T>[]
+  activeIndex: number
+  selected: T | null
+}
+
+export interface AutocompleteEventMap<T = unknown> {
+  loadstart: { query: string }
+  load: AutocompleteLoadDetail<T>
+  error: AutocompleteErrorDetail
+  select: AutocompleteSelectDetail<T>
+  clear: { query: string }
+  open: { query: string }
+  close: { query: string }
+}
+
+export type AutocompleteSearchOptions<T = unknown> = Pick<
+  AutocompleteOptions<T>,
+  | 'source'
+  | 'endpoint'
+  | 'queryParam'
+  | 'requestInit'
+  | 'parseResponse'
+  | 'mapResponse'
+  | 'sections'
+  | 'cache'
+  | 'filter'
+  | 'normalize'
+  | 'getLabel'
+  | 'maxResults'
+  | 'transformSuggestions'
+>
+
+export interface AutocompleteSearchResult<T = unknown> {
+  query: string
+  /** Results per section in order, already transformed and limited. */
+  sections: readonly AutocompleteSectionResult<T>[]
+  count: number
+  /** True when results came from the cache and no source was called. */
+  cached: boolean
+  errors: readonly { section: string | null; error: unknown }[]
+  /** Every called source failed and nothing matched. */
+  failed: boolean
+  /** The signal aborted while sources were pending; ignore this result. */
+  aborted?: boolean
+}
+
+export interface AutocompleteSearch<T = unknown> {
+  /** Synchronous for local arrays and cache hits, a promise when a source is called. */
+  run: (
+    query: string,
+    context: AutocompleteSourceContext
+  ) => AutocompleteSearchResult<T> | Promise<AutocompleteSearchResult<T>>
+  clearCache: () => void
+  readonly sections: readonly { id: string | null; label?: string }[]
+  /** True when every section is a local array. */
+  readonly local: boolean
+}
+
+export interface AutocompleteOptions<T = unknown> extends AutocompleteHooks<T> {
   /** Suggestions as an array or a function. Use one of `source`, `endpoint` or `sections`. */
   source?: AutocompleteSource<T>
   endpoint?: AutocompleteEndpoint
@@ -180,6 +276,8 @@ export interface AutocompleteOptions<T = unknown> {
   messages?: Partial<AutocompleteMessages>
   onSelect?: (suggestion: T, input: HTMLInputElement) => void
   onError?: (error: unknown, input: HTMLInputElement) => void
+  /** Extensions set up after the controller is created, in order. */
+  plugins?: readonly AutocompletePlugin<T>[]
 }
 
 export interface AutocompleteController<T = unknown> {
@@ -201,6 +299,17 @@ export interface AutocompleteController<T = unknown> {
   cancel: () => void
   clearCache: () => void
   getSelected: () => T | null
+  /** Select a suggestion programmatically, e.g. to prefill an edit form. Dispatches no event. */
+  setValue: (suggestion: T | null) => void
+  /** A snapshot of the current state. */
+  getState: () => AutocompleteState<T>
+  /** Called with a new snapshot on every state change; returns an unsubscribe function. */
+  subscribe: (listener: (state: AutocompleteState<T>) => void) => () => void
+  /** Listen to an `autocomplete:*` event detail; returns an unsubscribe function. */
+  on: <K extends keyof AutocompleteEventMap<T>>(
+    event: K,
+    listener: (detail: AutocompleteEventMap<T>[K]) => void
+  ) => () => void
   destroy: () => void
 }
 

@@ -2,6 +2,25 @@
 
 All notable changes to `@samline/autocomplete` are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - Unreleased
+
+Observable state, hooks, plugins, a headless search pipeline and a no-JavaScript setup. No breaking changes.
+
+### Added
+
+- Controller `getState()`, `subscribe(listener)` and `on(event, listener)`, each returning an unsubscribe function where it applies. The state holds `query`, `status`, `open`, `suggestions`, `sections`, `activeIndex` and `selected`.
+- `controller.setValue(item)` to prefill the selection, input text and hidden input without events.
+- `autocomplete:open` and `autocomplete:close` events.
+- Hooks `beforeSearch` (rewrite or skip a query), `transformSuggestions` (before `maxResults`) and `beforeSelect` (veto).
+- `plugins`: `{ name, setup(controller) }` returning hooks and a `destroy` callback.
+- `createSearch(options)`: the DOM-free pipeline (sources, sections, filtering, cache, partial failures) for custom rendering, synchronous for local arrays and cache hits. `DEFAULT_SECTION_ID`.
+- Declarative `mount({ defaults })`, `refresh()`, `unmount()` and `getMounted()` for `input[data-autocomplete]`, configured through `data-autocomplete-*` attributes; `optionsFromDataset(input)`. The standalone script mounts on load, and mounted inputs with an id join the registry.
+- A "Recipes" guide (React, Vue, Alpine, Livewire, command palette, plugins, headless) and a "No JavaScript" example.
+
+### Changed
+
+- The search pipeline moved into `createSearch`, which the controller now uses; behavior is unchanged.
+
 ## [2.1.0] - 2026-11-14
 
 Sections, recent selections, form fields, smarter placement and custom popup content. No breaking changes.
@@ -69,6 +88,7 @@ First public release.
 - Escape, Tab, clicking outside, selecting a suggestion and `close()` cancel the pending debounced search and abort the request in flight. Before, a late response reopened the list after it was dismissed.
 - The standalone script defines `window.Autocomplete` with its documented members. Before, the global was wrapped as `{ default }`.
 
+[2.2.0]: https://github.com/samline/autocomplete/compare/v2.1.0...HEAD
 [2.1.0]: https://github.com/samline/autocomplete/releases/tag/v2.1.0
 [2.0.0]: https://github.com/samline/autocomplete/releases/tag/v2.0.0
 [1.0.0]: https://github.com/samline/autocomplete/releases/tag/v1.0.0

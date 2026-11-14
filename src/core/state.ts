@@ -98,6 +98,17 @@ export const validateOptions = <T>(options: AutocompleteOptions<T>): void => {
     }
   }
 
+  if (options.plugins !== undefined) {
+    if (!Array.isArray(options.plugins)) {
+      throw new TypeError('Autocomplete plugins must be an array.')
+    }
+    for (const plugin of options.plugins) {
+      if (!plugin || typeof plugin.name !== 'string' || typeof plugin.setup !== 'function') {
+        throw new TypeError('Autocomplete plugins need a name and a setup function.')
+      }
+    }
+  }
+
   assertNonNegativeInteger(options.minLength, 'minLength')
   assertNonNegativeInteger(options.debounce, 'debounce')
   assertPositiveInteger(options.maxResults, 'maxResults')

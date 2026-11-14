@@ -11,13 +11,19 @@ const expected = [
   'createAutocomplete',
   'createCache',
   'createRecentStore',
+  'createSearch',
   'filterSuggestions',
   'fromEndpoint',
+  'getMounted',
   'highlight',
   'mapCommonResponse',
+  'mount',
   'normalizeText',
+  'optionsFromDataset',
   'parseJsonResponse',
+  'refresh',
   'renderHighlight',
+  'unmount',
 ]
 const registry = [
   'autocomplete',
@@ -26,7 +32,11 @@ const registry = [
   'destroyAutocompletes',
   'getAutocomplete',
   'getAutocompletes',
+  'getMounted',
+  'mount',
   'newAutocomplete',
+  'refresh',
+  'unmount',
 ]
 const functionsOf = api =>
   Object.keys(api)

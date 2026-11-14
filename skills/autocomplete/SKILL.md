@@ -3,12 +3,12 @@ name: autocomplete
 description: Integrate @samline/autocomplete to turn a text input into an accessible combobox in vanilla JavaScript, TypeScript or plain HTML. Use it when suggestions come from an HTTP endpoint, an async function or a local array; do not use it for static select menus.
 metadata:
   package: '@samline/autocomplete'
-  package-version: '2.1.0'
+  package-version: '2.2.0'
 ---
 
 # @samline/autocomplete
 
-Build against the installed `@samline/autocomplete` version. This skill describes **2.1.0**. Check the dependency version before applying it, and preserve the host project's markup, components and design.
+Build against the installed `@samline/autocomplete` version. This skill describes **2.2.0**. Check the dependency version before applying it, and preserve the host project's markup, components and design.
 
 ## The one contract
 
@@ -31,7 +31,9 @@ Keep the host's `<label for>` and `<input>`; wrap the input in an element with `
 ## Choose a loading mode
 
 - **Package / ESM:** `npm install @samline/autocomplete`, import `createAutocomplete` (ESM or CommonJS) and optionally `@samline/autocomplete/styles.css`.
-- **HTML / CDN:** load `https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/styles.css` and `.../dist/browser/global.global.js`, then `window.Autocomplete.newAutocomplete({ id: 'city', options })`. Read it back with `getAutocomplete(id)` and remove it with `destroyAutocomplete(id)`.
+- **HTML / CDN:** load `https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/styles.css` and `.../dist/browser/global.global.js`, then `window.Autocomplete.newAutocomplete({ id: 'city', options })`. Read it back with `getAutocomplete(id)` and remove it with `destroyAutocomplete(id)`.
+
+- **No JavaScript:** the browser bundle mounts `input[data-autocomplete="/api/url"]` or `input[data-autocomplete][data-autocomplete-source="#json-script"]`, configured with `data-autocomplete-*` attributes. Prefer it in CMS templates.
 
 ## Choose a source
 
@@ -54,6 +56,13 @@ Function and endpoint results are cached per query (`cache: { max: 50, ttl: 3000
 Prefer `hiddenInput: 'field_name'` (or `{ element, getValue }`) over a manual hidden field: it holds the selected id, empties when the text changes and dispatches `change`. `recent: true` shows recent selections on an empty input. Use `popover: true` when a parent has `overflow: hidden`.
 
 Listen to bubbling events on the input: `autocomplete:select` (`{ suggestion, label, value }`), `autocomplete:clear`, `autocomplete:load` (`{ query, suggestions, cached }`), `autocomplete:loadstart` and `autocomplete:error`. Store ids in a hidden field on select and empty it on clear.
+
+## Integrate with frameworks and extensions
+
+- Bind state with `controller.getState()` and `controller.subscribe(fn)` (React `useSyncExternalStore`, Vue refs); listen with `controller.on('select', fn)`, which returns an unsubscribe function.
+- Prefill edit forms with `controller.setValue(item)`; it dispatches no event.
+- Shape behavior with `beforeSearch`, `transformSuggestions` and `beforeSelect`, or package them as `plugins: [{ name, setup(controller) }]`.
+- For fully custom rendering, use `createSearch(options).run(query, { signal, input })`; you then own ARIA and keyboard support.
 
 ## Do not
 

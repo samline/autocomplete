@@ -70,6 +70,15 @@ The chosen side is written to `data-placement`. Without Popover API support, `po
 | `maxResults`    | `8`                   | Maximum rendered suggestions.                                   |
 | `searchOnFocus` | `true`                | Search again on focus when the input already has a valid query. |
 
+## Hooks and plugins
+
+| Option                 | Default | Description                                                                              |
+| ---------------------- | ------- | ---------------------------------------------------------------------------------------- |
+| `beforeSearch`         | none    | `(query, input)`; return a new query, `false` to skip the search, or nothing to keep it. |
+| `transformSuggestions` | none    | `(items, { query, section })`; reorder, dedupe or enrich before `maxResults` applies.    |
+| `beforeSelect`         | none    | `(item, input)`; return `false` to ignore the selection and keep the list open.          |
+| `plugins`              | `[]`    | `{ name, setup(controller) }[]`; see the [recipes](../../guides/recipes/#plugins).       |
+
 ## Messages and callbacks
 
 | Option     | Default | Description                                                                                    |

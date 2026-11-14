@@ -21,6 +21,7 @@ export default {
     'guides/examples': 'Examples',
     'guides/accessibility': 'Accessibility',
     'guides/styling': 'Styling',
+    'guides/recipes': 'Recipes',
     'reference/configuration': 'Options',
     'reference/api': 'API reference',
     changelog: 'Changelog',

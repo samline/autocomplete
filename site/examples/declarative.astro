@@ -1,0 +1,27 @@
+---
+import '../../dist/styles.css'
+import './_shared.css'
+---
+
+<div class="preview" data-preview="declarative">
+  <script is:inline type="application/json" id="preview-fruits">
+    ["Aguacate", "Guayaba", "Limón", "Mamey", "Mango", "Papaya", "Pitahaya", "Tamarindo"]
+  </script>
+  <div class="field">
+    <label for="preview-fruit">Fruit</label>
+    <input
+      id="preview-fruit"
+      type="text"
+      placeholder="Try “limon” or “ma”"
+      data-autocomplete
+      data-autocomplete-source="#preview-fruits"
+      data-autocomplete-empty="No fruit matches"
+    />
+  </div>
+</div>
+
+<script>
+  // The standalone script mounts on its own; the package entry needs one call.
+  import { mount } from '@samline/autocomplete'
+  mount()
+</script>

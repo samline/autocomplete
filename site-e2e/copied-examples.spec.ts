@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
 const open = async (page: import('@playwright/test').Page, id: string) => {
   const example = examples.find(item => item.id === id)!
   await page.setContent(
-    `<!doctype html><html><head><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/styles.css"><style>${example.files.css}</style></head><body><main>${example.files.html}</main><script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/browser/global.global.js"></script><script>${example.files.js}</script></body></html>`
+    `<!doctype html><html><head><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/styles.css"><style>${example.files.css}</style></head><body><main>${example.files.html}</main><script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/browser/global.global.js"></script><script>${example.files.js}</script></body></html>`
   )
 }
 
@@ -98,4 +98,23 @@ test('form: submits the hidden id from a popover list', async ({ page }) => {
   await input.press('Enter')
   await page.locator('#trip button').click()
   await expect(page.locator('#submitted')).toHaveText('Submitted city_id=pt-lis.')
+})
+
+test('declarative: mounts from data attributes without JavaScript', async ({ page }) => {
+  await open(page, 'declarative')
+  const input = page.locator('#fruit')
+  await input.pressSequentially('limon', { delay: 20 })
+  await expect(page.locator('[data-autocomplete-option]')).toHaveText(['Limón'])
+  await input.press('ArrowDown')
+  await input.press('Enter')
+  await expect(input).toHaveValue('Limón')
+  const mounted = await page.evaluate(() => {
+    const api = (
+      window as unknown as { Autocomplete: { getAutocomplete: (id: string) => unknown } }
+    ).Autocomplete
+    return Boolean(api.getAutocomplete('fruit'))
+  })
+  expect(mounted).toBe(true)
+  await input.fill('zzz')
+  await expect(page.locator('[data-autocomplete-status]')).toHaveText('No fruit matches')
 })

@@ -3,6 +3,8 @@
 export * from './core'
 export * from './vanilla'
 export { Autocomplete, browser } from './browser/registry'
+export { mount, refresh, unmount, getMounted } from './browser/mount'
+export type { MountAutocompleteOptions } from './browser/mount'
 export type {
   AutocompleteApi,
   AutocompleteAvailable,
