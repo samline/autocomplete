@@ -23,4 +23,5 @@
 - Never render endpoint content with `innerHTML`; use `textContent` or consumer-owned DOM callbacks.
 - Preserve WAI-ARIA combobox/listbox behavior and keyboard operation.
 - Any public API change must update tests, README, and `docs/` in the same change.
+- One license file: `LICENSE.md` (MIT, `Copyright (c) 2026 Samuel Olvera (samline)`), covering the package and the website. Add `SITE-LICENSE.md` only if the site theme ever uses a different license.
 - Run `bun run build`, `bun run typecheck`, `bun run test`, `bun run format:check`, and `npm pack --dry-run` before release. Use `bun run test`, not Bun's native `bun test`, because the suite depends on Vitest's jsdom configuration.

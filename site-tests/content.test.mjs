@@ -161,6 +161,11 @@ for (const [name, changes, message] of [
   ],
   ['a bare LICENSE file', { LICENSE: 'MIT' }, /Rename LICENSE/],
   [
+    'a SITE-LICENSE.md that duplicates LICENSE.md',
+    { 'SITE-LICENSE.md': 'MIT' },
+    /Remove SITE-LICENSE\.md/,
+  ],
+  [
     'a merged site postinstall',
     {
       'package.json': JSON.stringify({
@@ -186,4 +191,18 @@ test('an explicitly reviewed default icon may stay', async () => {
     'landing/src/sections/Features.astro': `<path d="${DEFAULT_ICONS.eye}"></path>`,
   }
   assert.deepEqual(await run(changes, { audit: { iconReview: { kept: ['eye'] } } }), [])
+})
+
+test('LICENSE.md names the configured package author', async () => {
+  const author = 'Ada Lovelace (ada)'
+  const license = holder =>
+    `MIT License\n\nCopyright (c) 2026 ${holder}\n\nPermission is hereby granted.\n`
+  const withAuthor = { project: { ...project, author } }
+  assert.deepEqual(await run({ 'LICENSE.md': license(author) }, withAuthor), [])
+  const problems = await run({ 'LICENSE.md': license('ada') }, withAuthor)
+  assert.ok(problems.some(problem => /must name the package author/.test(problem)))
+})
+
+test('a SITE-LICENSE.md with a different license is allowed', async () => {
+  assert.deepEqual(await run({ 'SITE-LICENSE.md': 'Apache License 2.0' }), [])
 })
