@@ -49,10 +49,10 @@ describe('createAutocomplete', () => {
   it('requires a valid input and endpoint', () => {
     expect(() => createAutocomplete('#missing', { endpoint: '/api' })).toThrow(TypeError)
     expect(() => createAutocomplete('#place', { endpoint: '' })).toThrow(
-      'Autocomplete requires a source or an endpoint.'
+      'Autocomplete requires a source, an endpoint or sections.'
     )
     expect(() => createAutocomplete('#place', { endpoint: '/api', source: [] })).toThrow(
-      'Autocomplete accepts either a source or an endpoint, not both.'
+      'Autocomplete accepts one of source, endpoint or sections.'
     )
   })
 
@@ -392,6 +392,7 @@ describe('createAutocomplete', () => {
     expect(loaded.mock.calls[0]![0].detail).toEqual({
       query: 'MER',
       suggestions: ['Mérida'],
+      sections: [{ id: 'default', suggestions: ['Mérida'] }],
       cached: false,
     })
 

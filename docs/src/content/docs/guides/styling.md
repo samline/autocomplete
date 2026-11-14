@@ -18,28 +18,39 @@ import '@samline/autocomplete/styles.css'
 
 ```html
 <input role="combobox" … />
-<div data-autocomplete-popup>
+<div data-autocomplete-popup data-placement="bottom">
+  <div data-autocomplete-header>…</div>
   <div role="listbox" data-autocomplete-list>
-    <div role="option" data-autocomplete-option data-active="true">
-      <mark data-autocomplete-highlight>Mér</mark>ida
+    <div role="group" data-autocomplete-group="cities" aria-labelledby="…">
+      <div role="presentation" data-autocomplete-group-label>Cities</div>
+      <div role="option" data-autocomplete-option data-active="true">
+        <mark data-autocomplete-highlight>Mér</mark>ida
+      </div>
     </div>
   </div>
+  <div data-autocomplete-footer>…</div>
   <div data-autocomplete-status="empty">No results</div>
 </div>
 <div role="status" data-autocomplete-live>1 result available</div>
+<input type="hidden" name="city_id" data-autocomplete-hidden />
 ```
 
 | Selector                                                     | What it is                                             |
 | ------------------------------------------------------------ | ------------------------------------------------------ |
 | `[data-autocomplete-popup]`                                  | The positioned container, placed right after the input |
 | `[data-autocomplete-list]`                                   | The listbox inside the popup                           |
+| `[data-placement='bottom' \| 'top']`                         | The side the popup opened on                           |
+| `[data-autocomplete-group]`                                  | A section group (its value is the section id)          |
+| `[data-autocomplete-group-label]`                            | A section heading                                      |
+| `[data-autocomplete-header]`, `[data-autocomplete-footer]`   | `renderHeader` and `renderFooter` containers           |
+| `[data-autocomplete-hidden]`                                 | A hidden input created by `hiddenInput`                |
 | `[data-autocomplete-option]`                                 | One suggestion                                         |
 | `[data-active='true']`                                       | The keyboard or pointer highlighted option             |
 | `[data-autocomplete-highlight]`                              | A matching part of the label (a `<mark>`)              |
 | `[data-autocomplete-status='loading' \| 'empty' \| 'error']` | The visible request state, outside the listbox         |
 | `[data-autocomplete-live]`                                   | The visually hidden live region, styled inline         |
 
-The popup, list and status use the native `hidden` attribute while closed.
+The popup, list, status, header and footer use the native `hidden` attribute while closed. With `popover: true` the popup also gets `popover="manual"` and inline fixed coordinates.
 
 ## Custom properties
 
@@ -54,7 +65,7 @@ The popup, list and status use the native `hidden` attribute while closed.
 }
 ```
 
-Also available: `--autocomplete-z-index`, `--autocomplete-offset`, `--autocomplete-shadow`, `--autocomplete-option-padding`, `--autocomplete-active-color`, `--autocomplete-muted-color`, `--autocomplete-error-color`, `--autocomplete-highlight-background` (`transparent`), `--autocomplete-highlight-color` (`inherit`) and `--autocomplete-highlight-weight` (`600`). In forced-colors mode the active option gets a system-color outline.
+Also available: `--autocomplete-z-index`, `--autocomplete-offset`, `--autocomplete-shadow`, `--autocomplete-option-padding`, `--autocomplete-active-color`, `--autocomplete-muted-color`, `--autocomplete-error-color`, `--autocomplete-highlight-background` (`transparent`), `--autocomplete-highlight-color` (`inherit`) `--autocomplete-highlight-weight` (`600`), `--autocomplete-group-padding` and `--autocomplete-group-font-size`. In forced-colors mode the active option gets a system-color outline.
 
 ## Richer options
 

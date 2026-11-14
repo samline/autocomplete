@@ -80,9 +80,9 @@ Choose **Package / ESM** when installing with npm, pnpm or bun and importing Aut
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/styles.css"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/styles.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/browser/global.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/browser/global.global.js"></script>
 ```
 
 > Pin the version in production, or self-host the same files.
@@ -123,17 +123,22 @@ The global follows the same registry shape as the other `@samline` packages:
 - Accent- and case-insensitive matching: `merida` finds `Mérida`.
 - Highlighted matches rendered as `<mark>` elements, never HTML strings.
 - A per-query LRU cache with expiry for function and endpoint sources.
+- Labelled sections that search several sources in parallel.
+- Recent selections shown on an empty input, stored in `localStorage`.
+- A hidden form field that holds the selected id.
+- Placement that flips above when there is no room, and an optional top-layer popup through the Popover API.
+- Custom status, header and footer content.
 - WAI-ARIA combobox and listbox with full keyboard operation and a polite live region.
 - Debounced searches, aborted superseded requests and ignored late responses.
 - Bubbling DOM events that keep hidden fields and other UI in sync.
 - An optional stylesheet themed with `--autocomplete-*` custom properties.
 - React, Vue, Svelte, Shopify and WordPress through the same API, with no adapter.
 
-[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, events and local data, each with copyable files.
+[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, events, local data, sections and forms, each with copyable files.
 
 ### Any source
 
-Pass exactly one of `source` or `endpoint`.
+Pass exactly one of `source`, `endpoint` or `sections`.
 
 ```js
 // A local array, filtered in the browser (minLength 1, no debounce by default).
@@ -161,6 +166,72 @@ createAutocomplete('#city', {
   getLabel: item => item.title,
 })
 ```
+
+### Sections
+
+`sections` searches several sources in parallel and renders each under a `role="group"` heading. Arrow keys move through every option; events carry the section id.
+
+```js
+import { createAutocomplete, fromEndpoint } from '@samline/autocomplete'
+
+createAutocomplete('#search', {
+  sections: [
+    { id: 'pages', label: 'Pages', source: ['Pricing', 'Docs', 'Blog'] },
+    { id: 'users', label: 'People', source: (query, { signal }) => api.users(query, { signal }) },
+    {
+      id: 'products',
+      label: 'Products',
+      source: fromEndpoint({ endpoint: '/api/products' }),
+      maxResults: 4,
+    },
+  ],
+})
+```
+
+A failing section is dropped and reported through `autocomplete:error`; the error state appears only when every pending section fails and nothing else matched.
+
+### Recent selections and forms
+
+```html
+<form>
+  <label for="city">City</label>
+  <input id="city" type="text" />
+</form>
+```
+
+```js
+createAutocomplete('#city', {
+  endpoint: '/api/cities',
+  getId: city => city.id,
+  recent: { label: 'Recent', max: 5 }, // shown on focus or ArrowDown while empty
+  hiddenInput: 'city_id', // <input type="hidden" name="city_id"> holds the id
+})
+```
+
+Recent selections are stored as JSON in `localStorage` under `autocomplete:recent:<input id>` and fall back to memory. Pass `recent: { store: createRecentStore({ ... }) }` to control storage. The hidden input empties when the text changes and dispatches `change`; pass `{ element: '#existing', getValue }` to fill a field you already have.
+
+### Placement and the top layer
+
+The popup opens below the input and flips above when there is no room (`placement: 'auto' | 'bottom' | 'top'`). Inside cards with `overflow: hidden` or tricky stacking contexts, `popover: true` renders it in the top layer with the Popover API and keeps it pinned to the input on scroll and resize.
+
+### Status, header and footer
+
+```js
+createAutocomplete('#city', {
+  endpoint: '/api/cities',
+  renderStatus: (element, { state, query }) => {
+    if (state === 'empty') element.textContent = `Nothing for “${query}”. Try another spelling.`
+  },
+  renderFooter: (element, { query, count }) => {
+    const link = document.createElement('a')
+    link.href = `/search?q=${encodeURIComponent(query)}`
+    link.textContent = `See all results (${count} shown)`
+    element.append(link)
+  },
+})
+```
+
+Header and footer content sits outside the listbox and is not reached with the arrow keys.
 
 ### Caching
 
@@ -219,21 +290,21 @@ Searches are debounced, superseded requests are aborted and late responses ignor
 
 ## API at a glance
 
-| API                                      | Purpose                                                |
-| ---------------------------------------- | ------------------------------------------------------ |
-| `createAutocomplete(input, options)`     | Controller factory (`autocomplete` is an alias).       |
-| `search(query?)`, `close()`, `cancel()`  | Run a search now, close the list, cancel pending work. |
-| `clear()`, `getSelected()`               | Clear input and selection, or read the selected item.  |
-| `clearCache()`                           | Forget cached results.                                 |
-| `destroy()`                              | Cleanup.                                               |
-| `fromEndpoint(options)`                  | Build a reusable endpoint source function.             |
-| `highlight`, `renderHighlight`           | Split a label into matches, and render the parts.      |
-| `filterSuggestions`, `normalizeText`     | The default local filter and text normalizer.          |
-| `createCache(options?)`                  | The LRU cache used per instance.                       |
-| `mapCommonResponse`, `parseJsonResponse` | The default response mapper and parser.                |
-| `Autocomplete`, `browser`                | Importable equivalent of `window.Autocomplete`.        |
+| API                                                    | Purpose                                                      |
+| ------------------------------------------------------ | ------------------------------------------------------------ |
+| `createAutocomplete(input, options)`                   | Controller factory (`autocomplete` is an alias).             |
+| `search(query?)`, `close()`, `cancel()`                | Run a search now, close the list, cancel pending work.       |
+| `clear()`, `getSelected()`                             | Clear input and selection, or read the selected item.        |
+| `clearCache()`                                         | Forget cached results.                                       |
+| `destroy()`                                            | Cleanup.                                                     |
+| `fromEndpoint(options)`                                | Build a reusable endpoint source function.                   |
+| `highlight`, `renderHighlight`                         | Split a label into matches, and render the parts.            |
+| `filterSuggestions`, `normalizeText`                   | The default local filter and text normalizer.                |
+| `createCache(options?)`, `createRecentStore(options?)` | The per-instance LRU cache, and the recent selections store. |
+| `mapCommonResponse`, `parseJsonResponse`               | The default response mapper and parser.                      |
+| `Autocomplete`, `browser`                              | Importable equivalent of `window.Autocomplete`.              |
 
-The controller also exposes `element` (the input), `popupElement`, `listElement` (the listbox), `statusElement`, `liveElement` and `options`.
+The controller also exposes `element` (the input), `popupElement`, `listElement` (the listbox), `statusElement`, `liveElement`, `hiddenElement`, `recent` and `options`.
 
 ### Entrypoints
 
@@ -250,13 +321,13 @@ The controller also exposes `element` (the input), `popupElement`, `listElement`
 
 All events bubble from the input.
 
-| Event                    | `detail`                         |
-| ------------------------ | -------------------------------- |
-| `autocomplete:loadstart` | `{ query }`                      |
-| `autocomplete:load`      | `{ query, suggestions, cached }` |
-| `autocomplete:error`     | `{ query, error }`               |
-| `autocomplete:select`    | `{ suggestion, label, value }`   |
-| `autocomplete:clear`     | `{ query }`                      |
+| Event                    | `detail`                                   |
+| ------------------------ | ------------------------------------------ |
+| `autocomplete:loadstart` | `{ query }`                                |
+| `autocomplete:load`      | `{ query, suggestions, sections, cached }` |
+| `autocomplete:error`     | `{ query, error, section }`                |
+| `autocomplete:select`    | `{ suggestion, label, value, section }`    |
+| `autocomplete:clear`     | `{ query }`                                |
 
 ```js
 const input = document.querySelector('#city')

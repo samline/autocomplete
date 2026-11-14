@@ -10,7 +10,7 @@ description: 'createAutocomplete, the controller members, the source, cache, fil
 
 ## `createAutocomplete(target, options)`
 
-`target` is an `HTMLInputElement` or a selector. Returns an `AutocompleteController<T>`. `autocomplete` is an alias. Throws a `TypeError` when the target is not an input, when neither or both of `source` and `endpoint` are given, or when an option is invalid.
+`target` is an `HTMLInputElement` or a selector. Returns an `AutocompleteController<T>`. `autocomplete` is an alias. Throws a `TypeError` when the target is not an input, when not exactly one of `source`, `endpoint` and `sections` is given, or when an option is invalid.
 
 ## Controller
 
@@ -21,6 +21,8 @@ description: 'createAutocomplete, the controller members, the source, cache, fil
 | `listElement`    | The generated listbox inside the popup.                            |
 | `statusElement`  | The visible loading, empty or error message inside the popup.      |
 | `liveElement`    | The visually hidden polite live region after the popup.            |
+| `hiddenElement`  | The synced hidden input, or `null` without `hiddenInput`.          |
+| `recent`         | The recent selections store, or `null` without `recent`.           |
 | `options`        | The options object you passed.                                     |
 | `search(query?)` | Runs a search now, without debounce.                               |
 | `close()`        | Closes the list and cancels the pending or in-flight search.       |
@@ -40,6 +42,7 @@ All helpers are exported from `@samline/autocomplete`; the DOM-free ones also fr
 - `highlight(text, query, normalize?)`: returns `{ text, match }[]` parts that keep the original characters.
 - `renderHighlight(element, parts)`: appends parts as text nodes and `<mark data-autocomplete-highlight>` elements (from `@samline/autocomplete/vanilla`).
 - `createCache({ max?, ttl? })`: the LRU cache with `get`, `set`, `clear` and `size`.
+- `createRecentStore({ key?, max?, getKey?, storage? })`: a most-recent-first list with `get`, `add`, `remove` and `clear`, stored as JSON in `localStorage` (or the `storage` you pass) and in memory as a fallback.
 - `mapCommonResponse(payload)`: reads a root array or `suggestions`, `items` or `data` arrays.
 - `parseJsonResponse(response)`: the default JSON parser.
 - `DEFAULT_MESSAGES`: the English messages.
@@ -64,16 +67,16 @@ Registering an id again destroys the previous controller. Calling `destroy()` on
 
 All events bubble from the input.
 
-| Event                    | `detail`                         |
-| ------------------------ | -------------------------------- |
-| `autocomplete:loadstart` | `{ query }`                      |
-| `autocomplete:load`      | `{ query, suggestions, cached }` |
-| `autocomplete:error`     | `{ query, error }`               |
-| `autocomplete:select`    | `{ suggestion, label, value }`   |
-| `autocomplete:clear`     | `{ query }`                      |
+| Event                    | `detail`                                   |
+| ------------------------ | ------------------------------------------ |
+| `autocomplete:loadstart` | `{ query }`                                |
+| `autocomplete:load`      | `{ query, suggestions, sections, cached }` |
+| `autocomplete:error`     | `{ query, error, section }`                |
+| `autocomplete:select`    | `{ suggestion, label, value, section }`    |
+| `autocomplete:clear`     | `{ query }`                                |
 
-`autocomplete:loadstart` fires only when the source is called; array sources and cache hits go straight to `autocomplete:load`.
+`autocomplete:loadstart` fires only when a source is called; array sources and cache hits go straight to `autocomplete:load`. `sections` lists `{ id, label?, suggestions }` in order; a single source reports one entry with the id `default`. `section` is the section id, `recent` for a recent selection, or `null` for a single source.
 
 ## Types
 
-`AutocompleteOptions<T>`, `AutocompleteController<T>`, `AutocompleteTarget`, `AutocompleteSource<T>`, `AutocompleteSourceFunction<T>`, `AutocompleteSourceContext`, `AutocompleteEndpoint`, `AutocompleteEndpointOptions<T>`, `AutocompleteRequestInit`, `AutocompleteParser`, `AutocompleteResponseMapper<T>`, `AutocompleteCacheOptions`, `AutocompleteCache<T>`, `AutocompleteMessages`, `AutocompleteMessage`, `AutocompleteMessageContext`, `AutocompleteHighlightPart`, `AutocompleteRenderContext`, `AutocompleteNormalizer`, `FilterSuggestionsOptions<T>`, `AutocompleteSelectDetail<T>`, `AutocompleteLoadDetail<T>`, `AutocompleteErrorDetail`, `AutocompleteApi`, `AutocompleteAvailable` and `NewAutocompleteInput<T>`.
+`AutocompleteOptions<T>`, `AutocompleteController<T>`, `AutocompleteTarget`, `AutocompleteSource<T>`, `AutocompleteSourceFunction<T>`, `AutocompleteSourceContext`, `AutocompleteEndpoint`, `AutocompleteEndpointOptions<T>`, `AutocompleteRequestInit`, `AutocompleteParser`, `AutocompleteResponseMapper<T>`, `AutocompleteCacheOptions`, `AutocompleteCache<T>`, `AutocompleteSection<T>`, `AutocompleteSectionResult<T>`, `AutocompleteRecentOptions<T>`, `AutocompleteRecentStore<T>`, `AutocompleteStorage`, `CreateRecentStoreOptions<T>`, `AutocompleteHiddenInputOptions<T>`, `AutocompletePlacement`, `AutocompleteStatusState`, `AutocompleteStatusContext`, `AutocompleteResultsContext<T>`, `AutocompleteMessages`, `AutocompleteMessage`, `AutocompleteMessageContext`, `AutocompleteHighlightPart`, `AutocompleteRenderContext`, `AutocompleteNormalizer`, `FilterSuggestionsOptions<T>`, `AutocompleteSelectDetail<T>`, `AutocompleteLoadDetail<T>`, `AutocompleteErrorDetail`, `AutocompleteApi`, `AutocompleteAvailable` and `NewAutocompleteInput<T>`.

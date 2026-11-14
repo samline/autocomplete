@@ -48,3 +48,11 @@
 .preview [data-autocomplete-popup] {
   position: static;
 }
+.preview .card {
+  display: grid;
+  gap: 0.75rem;
+  overflow: hidden;
+  padding: 1rem;
+  border: 0.0625rem solid var(--color-border);
+  border-radius: var(--radius-control);
+}

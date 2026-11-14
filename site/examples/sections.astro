@@ -1,0 +1,41 @@
+---
+import '../../dist/styles.css'
+import './_shared.css'
+const endpoint = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`
+---
+
+<div class="preview" data-preview="sections" data-endpoint={endpoint}>
+  <div class="field">
+    <label for="preview-place">Country or city</label>
+    <input id="preview-place" type="text" placeholder="Try “sp” or “ja”" />
+  </div>
+</div>
+
+<script>
+  import { createAutocomplete } from '@samline/autocomplete'
+  type City = { key: string; name: string; country: string }
+  const root = document.querySelector<HTMLElement>('[data-preview="sections"]')!
+  createAutocomplete<string>('#preview-place', {
+    sections: [
+      {
+        id: 'countries',
+        label: 'Countries',
+        source: ['Argentina', 'Canada', 'Japan', 'Mexico', 'Portugal', 'Spain'],
+      },
+      {
+        id: 'cities',
+        label: 'Cities',
+        maxResults: 4,
+        source: async (query, { signal }) => {
+          const response = await fetch(root.dataset.endpoint!, { signal })
+          const payload = (await response.json()) as { results: City[] }
+          return payload.results
+            .filter(city => city.name.toLowerCase().includes(query.toLowerCase()))
+            .map(city => city.name)
+        },
+      },
+    ],
+    minLength: 2,
+    recent: { label: 'Recent' },
+  })
+</script>

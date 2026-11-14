@@ -135,4 +135,83 @@ document.querySelector('#reset').addEventListener('click', () => controller.clea
 })`,
     },
   },
+  {
+    id: 'sections',
+    tab: 'Sections',
+    title: 'Group several sources and remember recent picks',
+    description:
+      'sections searches a local list and a remote endpoint in parallel and renders each under its own heading. With recent, the last selections appear when the empty input gets focus or ArrowDown.',
+    files: {
+      html: `<div class="field">
+  <label for="place">Country or city</label>
+  <input id="place" type="text" placeholder="Try “sp” or “ja”" />
+</div>`,
+      css: baseCss,
+      js: `window.Autocomplete.newAutocomplete({
+  id: 'place',
+  options: {
+    sections: [
+      {
+        id: 'countries',
+        label: 'Countries',
+        source: ['Argentina', 'Canada', 'Japan', 'Mexico', 'Portugal', 'Spain'],
+      },
+      {
+        id: 'cities',
+        label: 'Cities',
+        maxResults: 4,
+        source: async (query, { signal }) => {
+          const response = await fetch('${endpoint}', { signal })
+          const payload = await response.json()
+          return payload.results
+            .filter(city => city.name.toLowerCase().includes(query.toLowerCase()))
+            .map(city => city.name)
+        },
+      },
+    ],
+    minLength: 2,
+    recent: { label: 'Recent' },
+  },
+})`,
+    },
+  },
+  {
+    id: 'form',
+    tab: 'Forms',
+    title: 'Submit an id with a form',
+    description:
+      'hiddenInput creates a named hidden field that holds the selected id and empties when the text changes. popover renders the list in the top layer, so it escapes the card’s overflow: hidden.',
+    files: {
+      html: `<form id="trip" class="card">
+  <div class="field">
+    <label for="destination-city">Destination</label>
+    <input id="destination-city" type="text" />
+  </div>
+  <button type="submit">Submit</button>
+</form>
+<p id="submitted" aria-live="polite">Nothing submitted yet.</p>`,
+      css: `${baseCss}
+.card { overflow: hidden; max-width: 28rem; padding: 1rem; border: 1px solid #aaa; border-radius: 0.75rem; }
+.card button { margin-top: 0.75rem; }`,
+      js: `window.Autocomplete.newAutocomplete({
+  id: 'destination-city',
+  options: {
+    endpoint: '${endpoint}',
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => city.name,
+    hiddenInput: 'city_id',
+    popover: true,
+  },
+})
+
+document.querySelector('#trip').addEventListener('submit', event => {
+  event.preventDefault()
+  const cityId = new FormData(event.currentTarget).get('city_id')
+  document.querySelector('#submitted').textContent = cityId
+    ? \`Submitted city_id=\${cityId}.\`
+    : 'Pick a city first.'
+})`,
+    },
+  },
 ] as const

@@ -10,6 +10,7 @@ const expected = [
   'autocomplete',
   'createAutocomplete',
   'createCache',
+  'createRecentStore',
   'filterSuggestions',
   'fromEndpoint',
   'highlight',

@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
 const open = async (page: import('@playwright/test').Page, id: string) => {
   const example = examples.find(item => item.id === id)!
   await page.setContent(
-    `<!doctype html><html><head><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/styles.css"><style>${example.files.css}</style></head><body><main>${example.files.html}</main><script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/browser/global.global.js"></script><script>${example.files.js}</script></body></html>`
+    `<!doctype html><html><head><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/styles.css"><style>${example.files.css}</style></head><body><main>${example.files.html}</main><script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.1.0/dist/browser/global.global.js"></script><script>${example.files.js}</script></body></html>`
   )
 }
 
@@ -68,4 +68,34 @@ test('local: filters an array ignoring accents and highlights the match', async 
   await page.locator('#state').fill('zzz')
   await page.locator('#state').dispatchEvent('input')
   await expect(page.locator('[data-autocomplete-status]')).toHaveText('No state matches “zzz”')
+})
+
+test('sections: groups sources and shows recent picks on focus', async ({ page }) => {
+  await open(page, 'sections')
+  const input = page.locator('#place')
+  await input.pressSequentially('sp', { delay: 20 })
+  await expect(page.locator('[data-autocomplete-group="countries"] [role="option"]')).toHaveText([
+    'Spain',
+  ])
+  await expect(page.locator('[data-autocomplete-group-label]').first()).toHaveText('Countries')
+  await input.press('ArrowDown')
+  await input.press('Enter')
+  await expect(input).toHaveValue('Spain')
+  await input.fill('')
+  await expect(page.locator('[data-autocomplete-group="recent"] [role="option"]')).toHaveText([
+    'Spain',
+  ])
+})
+
+test('form: submits the hidden id from a popover list', async ({ page }) => {
+  await open(page, 'form')
+  const input = page.locator('#destination-city')
+  await input.pressSequentially('lis', { delay: 20 })
+  const popup = page.locator('[data-autocomplete-popup]')
+  await expect(popup).toHaveAttribute('popover', 'manual')
+  await expect(popup).toBeVisible()
+  await input.press('ArrowDown')
+  await input.press('Enter')
+  await page.locator('#trip button').click()
+  await expect(page.locator('#submitted')).toHaveText('Submitted city_id=pt-lis.')
 })

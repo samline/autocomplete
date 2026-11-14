@@ -49,26 +49,70 @@ const assertPositiveInteger = (value: number | undefined, name: string): void =>
   }
 }
 
-export const validateOptions = <T>(options: AutocompleteOptions<T>): void => {
-  const hasSource = options.source !== undefined
-  const hasEndpoint = options.endpoint !== undefined
+const SECTION_ID = /^[A-Za-z0-9_-]+$/
 
-  if (hasSource && hasEndpoint) {
-    throw new TypeError('Autocomplete accepts either a source or an endpoint, not both.')
+const assertSource = (source: unknown, name: string): void => {
+  if (!Array.isArray(source) && typeof source !== 'function') {
+    throw new TypeError(`Autocomplete ${name} must be an array or a function.`)
   }
-  if (!hasSource && !options.endpoint) {
-    throw new TypeError('Autocomplete requires a source or an endpoint.')
+}
+
+const assertCache = (cache: AutocompleteOptions['cache'], name: string): void => {
+  if (typeof cache !== 'object') return
+  assertPositiveInteger(cache.max, `${name}.max`)
+  assertNonNegativeInteger(cache.ttl, `${name}.ttl`)
+}
+
+export const validateOptions = <T>(options: AutocompleteOptions<T>): void => {
+  const kinds = [options.source, options.endpoint, options.sections].filter(
+    value => value !== undefined
+  )
+
+  if (kinds.length > 1) {
+    throw new TypeError('Autocomplete accepts one of source, endpoint or sections.')
   }
-  if (hasSource && !Array.isArray(options.source) && typeof options.source !== 'function') {
-    throw new TypeError('Autocomplete source must be an array or a function.')
+  if (kinds.length === 0 || (options.endpoint !== undefined && !options.endpoint)) {
+    throw new TypeError('Autocomplete requires a source, an endpoint or sections.')
+  }
+  if (options.source !== undefined) assertSource(options.source, 'source')
+
+  if (options.sections !== undefined) {
+    if (!Array.isArray(options.sections) || options.sections.length === 0) {
+      throw new TypeError('Autocomplete sections must be a non-empty array.')
+    }
+    const ids = new Set<string>()
+    for (const section of options.sections) {
+      if (!section || !SECTION_ID.test(section.id ?? '')) {
+        throw new TypeError('Autocomplete section ids must use letters, digits, - or _.')
+      }
+      if (ids.has(section.id)) {
+        throw new TypeError(`Autocomplete section id "${section.id}" is repeated.`)
+      }
+      if (options.recent && section.id === 'recent') {
+        throw new TypeError('Autocomplete section id "recent" is reserved when recent is enabled.')
+      }
+      ids.add(section.id)
+      assertSource(section.source, `section "${section.id}" source`)
+      assertPositiveInteger(section.maxResults, `section "${section.id}" maxResults`)
+      assertCache(section.cache, `section "${section.id}" cache`)
+    }
   }
 
   assertNonNegativeInteger(options.minLength, 'minLength')
   assertNonNegativeInteger(options.debounce, 'debounce')
   assertPositiveInteger(options.maxResults, 'maxResults')
+  assertNonNegativeInteger(options.offset, 'offset')
+  assertCache(options.cache, 'cache')
 
-  if (typeof options.cache === 'object') {
-    assertPositiveInteger(options.cache.max, 'cache.max')
-    assertNonNegativeInteger(options.cache.ttl, 'cache.ttl')
+  if (typeof options.recent === 'object') assertPositiveInteger(options.recent.max, 'recent.max')
+  if (options.placement !== undefined && !['auto', 'bottom', 'top'].includes(options.placement)) {
+    throw new TypeError("Autocomplete placement must be 'auto', 'bottom' or 'top'.")
+  }
+  if (
+    typeof options.hiddenInput === 'object' &&
+    !options.hiddenInput.name &&
+    !options.hiddenInput.element
+  ) {
+    throw new TypeError('Autocomplete hiddenInput needs a name or an element.')
   }
 }

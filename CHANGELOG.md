@@ -2,6 +2,27 @@
 
 All notable changes to `@samline/autocomplete` are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - Unreleased
+
+Sections, recent selections, form fields, smarter placement and custom popup content. No breaking changes.
+
+### Added
+
+- `sections`: labelled groups (`role="group"`) searched in parallel, each with its own `source`, `maxResults`, `filter` and `cache`. A failing section is dropped and reported; the error state shows only when every pending section fails and nothing matched.
+- `recent`: recent selections shown when the empty input gets focus or ArrowDown, stored in `localStorage` with a memory fallback. `createRecentStore()` and `controller.recent`.
+- `hiddenInput`: a named hidden field (or an existing one) that holds the selected id, empties when the text changes and dispatches `change`. `controller.hiddenElement`.
+- `placement` (`auto`, `bottom`, `top`) with `data-placement`; `auto` flips above when there is no room below.
+- `popover` and `offset`: render the popup in the top layer with the Popover API, pinned to the input on scroll and resize.
+- `renderStatus`, `renderHeader` and `renderFooter`.
+- Event details: `sections` on `autocomplete:load`, `section` on `autocomplete:select` and `autocomplete:error`.
+- Stylesheet rules for groups, header, footer, top placement and popovers.
+- "Sections" and "Forms" examples.
+
+### Changed
+
+- The popup flips above the input when there is no room below. Set `placement: 'bottom'` to keep it below.
+- Validation messages mention `sections` alongside `source` and `endpoint`.
+
 ## [2.0.0] - 2026-11-14
 
 Sources beyond HTTP, caching, highlighting, a stricter listbox and the registry shared by the other `@samline` packages.
@@ -48,5 +69,6 @@ First public release.
 - Escape, Tab, clicking outside, selecting a suggestion and `close()` cancel the pending debounced search and abort the request in flight. Before, a late response reopened the list after it was dismissed.
 - The standalone script defines `window.Autocomplete` with its documented members. Before, the global was wrapped as `{ default }`.
 
+[2.1.0]: https://github.com/samline/autocomplete/compare/v2.0.0...HEAD
 [2.0.0]: https://github.com/samline/autocomplete/releases/tag/v2.0.0
 [1.0.0]: https://github.com/samline/autocomplete/releases/tag/v1.0.0

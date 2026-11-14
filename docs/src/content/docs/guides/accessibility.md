@@ -13,8 +13,11 @@ description: 'The ARIA combobox pattern, keyboard support, status messages and w
 - The input becomes `role="combobox"` with `aria-autocomplete="list"`, `aria-controls` pointing to the generated `role="listbox"`, and `aria-expanded` kept in sync.
 - The listbox is named by the input's `<label>` through `aria-labelledby`; a label without an id gets one, removed again on `destroy()`.
 - Focus stays on the input. The active option is announced through `aria-activedescendant` and marked with `aria-selected`, as in the WAI-ARIA editable combobox pattern. Options are non-focusable `role="option"` elements, so they never become Tab stops.
-- The listbox only ever contains options. Loading, empty and error messages are shown in a separate element outside it.
+- Sections render as `role="group"` elements named by their heading through `aria-labelledby`; arrow keys move through every option across groups.
+- The listbox only ever contains options and groups. Loading, empty and error messages are shown in a separate element outside it.
 - A visually hidden polite live region (`role="status"`) announces the result count, the empty message and errors. Loading is shown but not announced, so fast typing stays quiet.
+- Header and footer content (`renderHeader`, `renderFooter`) sits outside the listbox and is not part of arrow-key navigation, so focus stays on the input. Put keyboard-reachable actions in an option, or keep them reachable elsewhere on the page.
+- ArrowDown on an empty input opens the recent selections when `recent` is enabled.
 - Matches are marked with `<mark>`, which keeps the label text intact for screen readers.
 - Keys: ArrowUp/ArrowDown move, Home/End jump to the first and last option, Enter selects, Escape and Tab close the list.
 - IME composition (Japanese, Chinese, Korean) is respected: the search waits until the composition ends.

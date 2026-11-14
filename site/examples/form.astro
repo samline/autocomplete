@@ -1,0 +1,43 @@
+---
+import '../../dist/styles.css'
+import './_shared.css'
+const endpoint = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`
+---
+
+<div class="preview" data-preview="form" data-endpoint={endpoint}>
+  <form class="card">
+    <div class="field">
+      <label for="preview-destination-city">Destination</label>
+      <input id="preview-destination-city" type="text" />
+    </div>
+    <button type="submit" class="reset">
+      Submit
+    </button>
+  </form>
+  <p class="note" aria-live="polite">
+    Nothing submitted yet.
+  </p>
+</div>
+
+<script>
+  import { createAutocomplete } from '@samline/autocomplete'
+  type City = { key: string; name: string; country: string }
+  const root = document.querySelector<HTMLElement>('[data-preview="form"]')!
+  const note = root.querySelector('.note')!
+  createAutocomplete<City>('#preview-destination-city', {
+    endpoint: root.dataset.endpoint!,
+    mapResponse: (payload, _response, query) =>
+      (payload as { results: City[] }).results.filter(city =>
+        city.name.toLowerCase().includes(query.toLowerCase())
+      ),
+    getId: city => city.key,
+    getLabel: city => city.name,
+    hiddenInput: 'city_id',
+    popover: true,
+  })
+  root.querySelector('form')!.addEventListener('submit', event => {
+    event.preventDefault()
+    const cityId = new FormData(event.currentTarget as HTMLFormElement).get('city_id')
+    note.textContent = cityId ? `Submitted city_id=${cityId}.` : 'Pick a city first.'
+  })
+</script>
