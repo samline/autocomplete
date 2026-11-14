@@ -4,34 +4,70 @@
     "integrations": [
       {
         "name": "Package / ESM and CommonJS",
-        "evidence": "package.json exports and scripts/test-package.mjs",
+        "evidence": "package.json exports; src/index.ts; scripts/test-package.mjs",
         "destination": "docs/src/content/docs/getting-started.md",
         "reviewed": true
       },
       {
-        "name": "HTML / CDN (window.Autocomplete)",
-        "evidence": "src/browser/global.ts and the IIFE smoke test",
-        "destination": "docs/src/content/docs/getting-started.md",
+        "name": "HTML / CDN and declarative mounting",
+        "evidence": "src/browser/global.ts; src/browser/mount.ts; src/vanilla/dataset.ts; test/vanilla/phase-three.test.ts",
+        "destination": "docs/src/content/docs/guides/recipes.md",
+        "reviewed": true
+      },
+      {
+        "name": "Framework lifecycle and observable state",
+        "evidence": "src/core/types.ts; src/vanilla/render.ts subscribe/getState/on; test/vanilla/phase-three.test.ts",
+        "destination": "docs/src/content/docs/guides/recipes.md",
         "reviewed": true
       }
     ],
     "scenarios": [
       {
         "name": "Remote search with keyboard selection",
-        "evidence": "test/core/controller.test.ts",
+        "evidence": "src/vanilla/render.ts; test/vanilla/render.test.ts",
         "destination": "site/examples/basic.astro",
         "reviewed": true
       },
       {
-        "name": "Custom option rendering",
-        "evidence": "renderOption in src/core/controller.ts",
+        "name": "Custom option rendering and highlighting",
+        "evidence": "src/vanilla/dom.ts; src/vanilla/render.ts renderOption context",
         "destination": "site/examples/render.astro",
         "reviewed": true
       },
       {
-        "name": "Events with a hidden id field",
-        "evidence": "dispatch() events in src/core/controller.ts",
+        "name": "Selection and clear events",
+        "evidence": "src/vanilla/render.ts dispatch; test/vanilla/render.test.ts",
         "destination": "site/examples/events.astro",
+        "reviewed": true
+      },
+      {
+        "name": "Local filtering and cache",
+        "evidence": "src/core/text.ts; src/core/cache.ts; test/core/text.test.ts; test/core/cache.test.ts",
+        "destination": "site/examples/local.astro",
+        "reviewed": true
+      },
+      {
+        "name": "Parallel sections and recent selections",
+        "evidence": "src/core/search.ts; src/core/recent.ts; test/vanilla/phase-two.test.ts",
+        "destination": "site/examples/sections.astro",
+        "reviewed": true
+      },
+      {
+        "name": "Hidden form fields and popover placement",
+        "evidence": "src/vanilla/render.ts; src/vanilla/position.ts; test/vanilla/phase-two.test.ts",
+        "destination": "site/examples/form.astro",
+        "reviewed": true
+      },
+      {
+        "name": "Declarative input lifecycle",
+        "evidence": "src/browser/mount.ts; src/vanilla/dataset.ts; test/vanilla/phase-three.test.ts",
+        "destination": "site/examples/declarative.astro",
+        "reviewed": true
+      },
+      {
+        "name": "State bindings, hooks, plugins and headless search",
+        "evidence": "src/core/search.ts; src/vanilla/render.ts; test/vanilla/phase-three.test.ts",
+        "destination": "docs/src/content/docs/guides/recipes.md",
         "reviewed": true
       }
     ],
@@ -46,134 +82,222 @@
     "accentDark": "#8cc2bd"
   },
   "status": "verified",
-  "packageVersion": "1.0.0",
+  "packageVersion": "2.2.0",
   "sources": [
     {
       "source": "README.md",
-      "sha256": "ab3f736517d823dc30bf501581f66a92b9724d89159e20b522b1da714db70065",
+      "sha256": "b2a879d186b71f4a257a7f92f9a58b052e68b858999872ada1a92a02f3124e83",
       "destination": "README.md",
       "reviewed": true
     },
     {
       "source": "CHANGELOG.md",
-      "sha256": "d8aa99aeaa687abbfad7ce6732ab572aba846d65190cc5f792df53e87f8296bd",
+      "sha256": "d6d0e45afd5a1bd65d4845192173d883486555de13cfce8def592ad95c95846a",
       "destination": "CHANGELOG.md",
       "reviewed": true
     },
     {
-      "source": "src/api/create-autocomplete.ts",
-      "sha256": "a260845430e6b8f6a886d75d4f76c8c17784db8ed68199969797037a8d8b8a23",
+      "source": "src/browser/available.ts",
+      "sha256": "78b95e9685c006bc755faafd6c3dee6ce040fc07ca63897e4f3cedccfbd6002e",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
       "source": "src/browser/global.ts",
-      "sha256": "2f401ccf2b29c89bf3e617204077c05f7a8cfb83c4ad89998bd0f1269facf6d2",
+      "sha256": "b75dbea16a280812f14f5ce1bb675694509a220505a42edaf4733f45113068c9",
+      "destination": "docs/src/content/docs/getting-started.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/browser/index.ts",
+      "sha256": "3efa26da3f3435cb669f225886e9ac0893caad768fd5a368503f720a8373cadf",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/browser/mount.ts",
+      "sha256": "e9c15d8fcfe8060ee6c0fc39aeca040aa8837c2e1b9cf1703027d2dc1dfc5076",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
       "source": "src/browser/registry.ts",
-      "sha256": "b144b8f3069d2cd4acd2ed7ad79b13f60a25ee48bae412673e8e6dabeb517546",
+      "sha256": "ca6ff97eaf292037ffd55fee90d1dc7b7d11fbba4a5112081b8c221ce31e8515",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
-      "source": "src/core/controller.ts",
-      "sha256": "fca126e9e9796fce5e37a1c58abafb3727ae88946e5885feb697d1564b6f20fd",
-      "destination": "docs/src/content/docs/guides/accessibility.md",
-      "reviewed": true
-    },
-    {
-      "source": "src/core/defaults.ts",
-      "sha256": "59fcaa807c57d31526815e1833be7d8e988f52a8598b2f57d94338f8eebd4133",
+      "source": "src/constants.ts",
+      "sha256": "3fcc492fbe1d5eddf7a2eff7979ed7d20fd177b1c0ebcd7b78a0767faa14ba2a",
       "destination": "docs/src/content/docs/reference/configuration.md",
       "reviewed": true
     },
     {
-      "source": "src/core/dom.ts",
-      "sha256": "36925af57b07b7f3c5587332a59fe2eec9a08f48bbbafeb6cb54da221cc411a6",
-      "destination": "docs/src/content/docs/guides/accessibility.md",
+      "source": "src/core/cache.ts",
+      "sha256": "8ee88480f8427c935f0cc7025e08fac2e5dfaa141ee278a0336e892505a96de0",
+      "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
       "source": "src/core/index.ts",
-      "sha256": "b6f10c161027ff41ea40fe3c32f5bd81a3e7dec37e6fbf8cb000a39a4617dc45",
+      "sha256": "5673489e0109888ce54ebb665f0fc2d203cdfb1b7cae3873a6e823c5c9347b4d",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/recent.ts",
+      "sha256": "c9e61c8f26334e9b80e56d8b0ed02674bfc099d2fd31ba4d21258fd409a6836d",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/search.ts",
+      "sha256": "375e42243a7a3371e37b56d24b8f9c3aa984aba78a10ab78a977c630f4d93fc4",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/source.ts",
+      "sha256": "0ba0148fd69cf9d7af11d88639a3d1a22d297f84a2106f7bda795046c73c5fc9",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/state.ts",
+      "sha256": "180dc440bcbdc052618084a84349554e58e1ae733c908b4c0095834146592955",
+      "destination": "docs/src/content/docs/reference/configuration.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/core/text.ts",
+      "sha256": "bd15b11902e0ed6fc5d8d5a3060e9c82176b2f04178d27746e5faafe690e58c5",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
       "source": "src/core/types.ts",
-      "sha256": "dda14c5602937d7adc8c9f5115aec674d37751fef1e5c4a0fc9f4937a0becd07",
-      "destination": "docs/src/content/docs/reference/configuration.md",
+      "sha256": "c7282f811efa55eb8e3044e1016a33a256d7d0e0dc46215160167209db9bfc40",
+      "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
       "source": "src/index.ts",
-      "sha256": "7df2a7db84e8caccb8a44e0df4a5af567a4b8b78e14230ed418b2db187cdfe60",
+      "sha256": "ed191ffe5dd4dc41def45c2552b354d728b98885396d8970b601198774bc2922",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
       "source": "src/styles.css",
-      "sha256": "5040e207553f31decedc1b707dc0a4c571e0db0490ee25ea8abd9681fba9443f",
+      "sha256": "0451f29b2685c595c5231a2c219b32bc96325da0edb94640e76cfac261fc12bc",
       "destination": "docs/src/content/docs/guides/styling.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/vanilla/dataset.ts",
+      "sha256": "f33fa45b3e3a194cf5aeb62b19f5f17ce0f56b2460aa355f564f3699b7e04997",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/vanilla/dom.ts",
+      "sha256": "b850b04facf6a787792519c005eecb072e8921c48ef3ef1118fdc0a55118c6ea",
+      "destination": "docs/src/content/docs/guides/styling.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/vanilla/index.ts",
+      "sha256": "7630e06652385623623f1645847e108d84cb4c39eda11573f522bb8eb469ec30",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/vanilla/position.ts",
+      "sha256": "ccc15be8f606c1bb798a1a9a8efdc0a7ae20cd7a255b4919bd019e0c0521de09",
+      "destination": "docs/src/content/docs/guides/styling.md",
+      "reviewed": true
+    },
+    {
+      "source": "src/vanilla/render.ts",
+      "sha256": "bd2b7ff33dd349cf6bd875d4d979ee99f447f3a888c17e0a651a84cedf0f16c6",
+      "destination": "docs/src/content/docs/guides/accessibility.md",
+      "reviewed": true
+    },
+    {
+      "source": "site/examples.ts",
+      "sha256": "b51a6b9318803a9a62877a35d09c0be3820f6c08f89adf83d6779765b17c5dcc",
+      "destination": "docs/src/content/docs/guides/examples.mdx",
+      "reviewed": true
+    },
+    {
+      "source": "skills/autocomplete/SKILL.md",
+      "sha256": "a2af1ba6a9c3702c8b9816a23175f3691a3af5fa88f001fbb6ec8fada3cb7801",
+      "destination": "skills/autocomplete/SKILL.md",
       "reviewed": true
     }
   ],
   "publicExports": [
     {
-      "source": "createAutocomplete",
+      "source": "autocomplete / createAutocomplete and controller",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
-      "source": "autocomplete (alias)",
+      "source": "createSearch / DEFAULT_SECTION_ID",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
-      "source": "createAutocompleteController",
+      "source": "createCache / createRecentStore",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
-      "source": "mapCommonResponse",
+      "source": "fromEndpoint / mapCommonResponse / parseJsonResponse",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
-      "source": "parseJsonResponse",
+      "source": "filterSuggestions / normalizeText / highlight / renderHighlight",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
-      "source": "browser registry",
-      "destination": "docs/src/content/docs/reference/api.md",
-      "reviewed": true
-    },
-    {
-      "source": "window.Autocomplete",
-      "destination": "docs/src/content/docs/getting-started.md",
-      "reviewed": true
-    },
-    {
-      "source": "AutocompleteOptions and option types",
+      "source": "DEFAULT_MESSAGES and exported constants",
       "destination": "docs/src/content/docs/reference/configuration.md",
       "reviewed": true
     },
     {
-      "source": "Event detail types",
+      "source": "Autocomplete / browser and registry members",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
     {
-      "source": "styles.css and --autocomplete-* properties",
+      "source": "mount / refresh / unmount / getMounted / MOUNT_SELECTOR",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "optionsFromDataset",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "window.Autocomplete and automatic mount",
+      "destination": "docs/src/content/docs/getting-started.md",
+      "reviewed": true
+    },
+    {
+      "source": "Core, vanilla, browser, mount and registry types",
+      "destination": "docs/src/content/docs/reference/api.md",
+      "reviewed": true
+    },
+    {
+      "source": "styles.css / style.css and --autocomplete-* properties",
       "destination": "docs/src/content/docs/guides/styling.md",
       "reviewed": true
     }
   ],
-  "notes": "Reviewed 2026-11-13 against src at 1.0.0. The 0.1.0 Markdown docs and example/ page were migrated into docs/src/content/docs and site/ and removed.",
+  "notes": "Reviewed 2026-11-13 against 2.2.0 source, entrypoints, tests, current reference, recipes and seven browser examples. Covers the 2.0 registry/rendering migration, 2.1 sections/recents/forms/placement and 2.2 state/hooks/plugins/headless/declarative APIs. Removed obsolete v1 source paths and createAutocompleteController export; refreshed SHA-256 evidence. Existing maintainer theme preference is unchanged.",
   "iconReview": {
     "kept": ["package", "eye", "refresh", "branch", "layers", "wrench"],
     "reason": "The template icons read as endpoint, accessibility, cancellation, entry points, events and styling for these cards; reviewed 2026-11-13."
