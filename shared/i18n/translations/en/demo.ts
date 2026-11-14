@@ -165,14 +165,10 @@ export const loadingModes = {
   cdn: {
     label: 'HTML / CDN',
     importLine: null as string | null,
-    note: 'Save these files in one folder and open index.html. The CDN script loads before main.js; no build step is needed.',
   },
   esm: {
     label: 'Package / ESM',
     importLine: null as string | null,
-    note: project.template
-      ? 'Template scenario with no dependency. Serve the folder with any static server (module scripts do not run from file://). An adaptation adds the real package import here.'
-      : `Install ${project.npmName} and serve these files with your bundler or dev server. The package import replaces the CDN script.`,
   },
 }
 export type DemoMode = keyof typeof loadingModes
