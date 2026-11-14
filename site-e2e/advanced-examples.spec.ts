@@ -10,6 +10,12 @@ test.beforeEach(async ({ page }) => {
     const file = new URL(route.request().url()).pathname.replace(/^.*\/dist\//, 'dist/')
     await route.fulfill({ path: local(file), headers: { 'Access-Control-Allow-Origin': '*' } })
   })
+  await page.route('https://samline.github.io/autocomplete/cities.json*', async route =>
+    route.fulfill({
+      body: await readFile(local('landing/public/cities.json'), 'utf8'),
+      contentType: 'application/json',
+    })
+  )
 })
 
 const choose = async (root: Locator, query: string) => {
@@ -47,9 +53,9 @@ for (const mode of [
       return root
     }
 
-    for (const id of ['pills-external', 'pills-inline']) {
-      test(`${id}: adds, excludes duplicates, removes, submits and resets`, async ({ page }) => {
-        const root = await open(page, id)
+    {
+      test('pills: adds, excludes duplicates, removes, submits and resets', async ({ page }) => {
+        const root = await open(page, 'pills')
         await choose(root, 'des')
         await expect(root.locator('input[type="text"]')).toHaveValue('')
         await expect(root.locator('[data-pills] li')).toHaveCount(1)
@@ -75,8 +81,8 @@ for (const mode of [
       })
     }
 
-    test('inline pills: keyboard navigation and intentional deletion', async ({ page }) => {
-      const root = await open(page, 'pills-inline')
+    test('pills: keyboard navigation and intentional deletion', async ({ page }) => {
+      const root = await open(page, 'pills')
       await choose(root, 'des')
       await choose(root, 'eng')
       const input = root.locator('input[type="text"]')
@@ -185,12 +191,75 @@ for (const mode of [
       await expect(root.locator('[data-results] button')).toHaveCount(0)
       await expect(root.locator('[data-note]')).toContainText('0 teams available')
     })
+
+    test('palette: matches keywords, reports sections and remembers recent commands', async ({
+      page,
+    }) => {
+      const root = await open(page, 'palette')
+      const input = root.locator('input[type="text"]')
+      await input.fill('invoice')
+      await expect(root.locator('[data-autocomplete-group="pages"] [role="option"]')).toHaveCount(1)
+      await expect(root.locator('[data-autocomplete-option] small')).toContainText(
+        'Matches “invoice”'
+      )
+      await input.press('ArrowDown')
+      await input.press('Enter')
+      await expect(root.locator('[data-output]')).toHaveText('Opened “Billing” from pages.')
+      await expect(input).toHaveValue('')
+      await input.fill('new')
+      await expect(root.locator('[data-autocomplete-option] kbd')).toHaveText('N')
+      await expect(root.locator('[data-autocomplete-footer]')).toContainText('Enter to run')
+      await input.press('ArrowDown')
+      await input.press('Enter')
+      await expect(root.locator('[data-output]')).toHaveText('Ran “New document” from actions.')
+      await input.press('ArrowDown')
+      await expect(root.locator('[data-autocomplete-group="recent"] [role="option"]')).toHaveText([
+        'NNew document',
+        'Billing',
+      ])
+      await input.press('ArrowDown')
+      await input.press('Enter')
+      await expect(root.locator('[data-output]')).toHaveText('Ran “New document” from recent.')
+    })
+
+    test('dependent: scopes cities to the selected country and resets on change', async ({
+      page,
+    }) => {
+      const root = await open(page, 'dependent')
+      const input = root.locator('input[type="text"]')
+      await expect(input).toBeDisabled()
+      await root.locator('select').selectOption('Spain')
+      await expect(input).toBeFocused()
+      await expect(root.locator('[data-autocomplete-option]')).toHaveText([
+        'Madrid',
+        'Barcelona',
+        'Seville',
+        'Valencia',
+      ])
+      await input.fill('bar')
+      await expect(root.locator('[data-autocomplete-option]')).toHaveText(['Barcelona'])
+      await input.press('ArrowDown')
+      await input.press('Enter')
+      await root.getByRole('button', { name: 'Submit' }).click()
+      await expect(root.locator('[data-note]')).toHaveText(
+        'Submitted country=Spain, city_id=es-bcn.'
+      )
+      await root.locator('select').selectOption('Mexico')
+      await expect(input).toHaveValue('')
+      await input.fill('bar')
+      await expect(root.locator('[data-autocomplete-status]')).toHaveText(
+        'No city in Mexico matches “bar”.'
+      )
+      await input.press('Escape')
+      await root.getByRole('button', { name: 'Submit' }).click()
+      await expect(root.locator('[data-note]')).toHaveText('Pick a city first.')
+    })
   })
 }
 
 test('advanced previews release controllers and remount after removal', async ({ page }) => {
   await page.goto('examples/')
-  const preview = page.locator('[data-advanced-preview="pills-inline"]')
+  const preview = page.locator('[data-advanced-preview="pills"]')
   await expect(preview).toHaveAttribute('data-mounted', 'true')
   await choose(preview, 'des')
   await preview.evaluate(element => {
@@ -211,7 +280,7 @@ for (const width of [390, 1280]) {
   test(`pills layout and accessibility at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('examples/')
-    for (const id of ['pills-external', 'pills-inline']) {
+    for (const id of ['pills']) {
       const root = page.locator(`[data-example="${id}"]`)
       await choose(root, 'des')
       await choose(root, 'eng')

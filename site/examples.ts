@@ -112,21 +112,25 @@ Autocomplete.newAutocomplete({
   {
     id: 'events',
     tab: 'Events',
-    title: 'React to selection and clearing',
+    title: 'Follow the lifecycle with events',
     description:
-      'Listen for autocomplete:select and autocomplete:clear on the input to keep a hidden id field in sync. Editing the text after a selection also clears it.',
+      'controller.on() subscribes to loadstart, load, open, close, select, clear and error. Type “lis”, retype it to see a cache hit, pick a city, then edit the text or press Clear. The same events bubble from the input as autocomplete:* DOM events.',
     files: {
       html: `<div class="field">
   <label for="origin">Origin</label>
   <input id="origin" type="text" />
 </div>
-<input type="hidden" id="origin-key" name="origin" />
-<p id="log" aria-live="polite">No events yet.</p>
-<button type="button" id="reset">Clear</button>`,
-      css: baseCss,
-      js: `const input = document.querySelector('#origin')
-const key = document.querySelector('#origin-key')
-const log = document.querySelector('#log')
+<button type="button" id="reset">Clear</button>
+<ol id="log" aria-label="Event log"></ol>`,
+      css: `${baseCss}
+#log { font: 0.875rem/1.6 ui-monospace, monospace; }`,
+      js: `const log = document.querySelector('#log')
+const write = text => {
+  const entry = document.createElement('li')
+  entry.textContent = text
+  log.prepend(entry)
+  log.querySelectorAll('li:nth-child(n + 7)').forEach(item => item.remove())
+}
 
 const controller = window.Autocomplete.newAutocomplete({
   id: 'origin',
@@ -138,21 +142,27 @@ const controller = window.Autocomplete.newAutocomplete({
   },
 })
 
-input.addEventListener('autocomplete:select', event => {
-  key.value = event.detail.suggestion.key
-  log.textContent = \`select: \${event.detail.label} (key \${key.value})\`
-})
-input.addEventListener('autocomplete:clear', () => {
-  key.value = ''
-  log.textContent = 'clear: selection removed'
-})
+// on() unwraps event.detail and returns an unsubscribe function.
+controller.on('loadstart', ({ query }) => write(\`loadstart “\${query}”\`))
+controller.on('load', ({ suggestions, cached }) =>
+  write(\`load \${suggestions.length} results\${cached ? ' (cache)' : ''}\`)
+)
+controller.on('open', () => write('open'))
+controller.on('close', () => write('close'))
+controller.on('select', ({ label, value }) => write(\`select \${label} → \${value}\`))
+controller.on('clear', () => write('clear'))
+controller.on('error', ({ error }) => write(\`error \${error}\`))
 document.querySelector('#reset').addEventListener('click', () => controller.clear())`,
       esm: `import Autocomplete from '@samline/autocomplete/browser'
 import '@samline/autocomplete/styles.css'
 
-const input = document.querySelector('#origin')
-const key = document.querySelector('#origin-key')
 const log = document.querySelector('#log')
+const write = text => {
+  const entry = document.createElement('li')
+  entry.textContent = text
+  log.prepend(entry)
+  log.querySelectorAll('li:nth-child(n + 7)').forEach(item => item.remove())
+}
 
 const controller = Autocomplete.newAutocomplete({
   id: 'origin',
@@ -164,14 +174,16 @@ const controller = Autocomplete.newAutocomplete({
   },
 })
 
-input.addEventListener('autocomplete:select', event => {
-  key.value = event.detail.suggestion.key
-  log.textContent = \`select: \${event.detail.label} (key \${key.value})\`
-})
-input.addEventListener('autocomplete:clear', () => {
-  key.value = ''
-  log.textContent = 'clear: selection removed'
-})
+// on() unwraps event.detail and returns an unsubscribe function.
+controller.on('loadstart', ({ query }) => write(\`loadstart “\${query}”\`))
+controller.on('load', ({ suggestions, cached }) =>
+  write(\`load \${suggestions.length} results\${cached ? ' (cache)' : ''}\`)
+)
+controller.on('open', () => write('open'))
+controller.on('close', () => write('close'))
+controller.on('select', ({ label, value }) => write(\`select \${label} → \${value}\`))
+controller.on('clear', () => write('clear'))
+controller.on('error', ({ error }) => write(\`error \${error}\`))
 document.querySelector('#reset').addEventListener('click', () => controller.clear())`,
     },
   },

@@ -35,7 +35,7 @@
         "reviewed": true
       },
       {
-        "name": "Selection and clear events",
+        "name": "Lifecycle events and cache hits",
         "evidence": "src/vanilla/render.ts dispatch; test/vanilla/render.test.ts",
         "destination": "site/examples/events.astro",
         "reviewed": true
@@ -65,6 +65,12 @@
         "reviewed": true
       },
       {
+        "name": "Multiple selection with pills, command palette and dependent fields",
+        "evidence": "src/vanilla/render.ts transformSuggestions, select detail, clear and clearCache; src/core/search.ts section filters",
+        "destination": "site/advanced-examples.ts",
+        "reviewed": true
+      },
+      {
         "name": "State bindings, hooks, plugins and headless search",
         "evidence": "src/core/search.ts; src/vanilla/render.ts; test/vanilla/phase-three.test.ts",
         "destination": "docs/src/content/docs/guides/recipes.md",
@@ -86,7 +92,7 @@
   "sources": [
     {
       "source": "README.md",
-      "sha256": "b2a879d186b71f4a257a7f92f9a58b052e68b858999872ada1a92a02f3124e83",
+      "sha256": "07dfd931b1ca5cea06248c0501d76bdc4e451876de62b097d8787bfd5af6c3f4",
       "destination": "README.md",
       "reviewed": true
     },
@@ -224,7 +230,7 @@
     },
     {
       "source": "site/examples.ts",
-      "sha256": "b51a6b9318803a9a62877a35d09c0be3820f6c08f89adf83d6779765b17c5dcc",
+      "sha256": "4b8e7a0514bf94b0732a54f271239dde7df3c50e1a31da7cdab70d7d61a80088",
       "destination": "docs/src/content/docs/guides/examples.mdx",
       "reviewed": true
     },

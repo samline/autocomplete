@@ -43,6 +43,7 @@ export const openCopiedFiles = async (
       stdin: { contents: javascript, resolveDir: root, sourcefile: 'main.js' },
       alias: {
         '@samline/autocomplete/browser': `${root}dist/browser/index.js`,
+        '@samline/autocomplete/core': `${root}dist/core/index.js`,
         '@samline/autocomplete/styles.css': `${root}dist/styles.css`,
         '@samline/autocomplete': `${root}dist/index.js`,
       },

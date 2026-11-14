@@ -47,15 +47,22 @@ for (const mode of ['cdn', 'esm'] as const) {
         await expect(page.locator('[data-autocomplete-option] small').first()).toHaveText('Mexico')
       })
 
-      test('events: keeps the hidden key in sync and clears it', async ({ page }) => {
+      test('events: logs the lifecycle, cache hits, selection and clearing', async ({ page }) => {
         await open(page, 'events')
-        await page.locator('#origin').pressSequentially('lis', { delay: 20 })
+        const input = page.locator('#origin')
+        const log = page.locator('#log li')
+        await input.pressSequentially('lis', { delay: 20 })
+        await expect(page.locator('[data-autocomplete-option]')).toHaveCount(1)
+        await expect(page.locator('#log')).toContainText('open')
+        await expect(page.locator('#log')).toContainText('loadstart “lis”')
+        await expect(page.locator('#log')).toContainText('load 1 results')
+        await input.fill('')
+        await input.pressSequentially('lis', { delay: 20 })
+        await expect(page.locator('#log')).toContainText('load 1 results (cache)')
         await page.locator('[data-autocomplete-option]').first().dispatchEvent('pointerdown')
-        await expect(page.locator('#origin-key')).toHaveValue('pt-lis')
-        await expect(page.locator('#log')).toHaveText('select: Lisbon (key pt-lis)')
+        await expect(page.locator('#log')).toContainText('select Lisbon → Lisbon')
         await page.locator('#reset').click()
-        await expect(page.locator('#origin-key')).toHaveValue('')
-        await expect(page.locator('#log')).toHaveText('clear: selection removed')
+        await expect(log.first()).toHaveText('clear')
       })
 
       test('local: filters an array ignoring accents and highlights the match', async ({

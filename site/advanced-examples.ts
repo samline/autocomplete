@@ -4,6 +4,17 @@ import { setupPlugins } from './examples/behaviors/plugins.js'
 import { setupState } from './examples/behaviors/state.js'
 import { setupRendering } from './examples/behaviors/rendering.js'
 import { setupHeadless } from './examples/behaviors/headless.js'
+import { setupPalette } from './examples/behaviors/palette.js'
+import { setupDependent } from './examples/behaviors/dependent.js'
+import { project } from '../shared/lib/project.mjs'
+
+// The browser bundle exposes the DOM controller only, so the CDN headless
+// example imports the ESM core build published next to it, at the same version.
+const coreModule = project.delivery.cdnScript.replace(
+  /browser\/global\.global\.js$/,
+  'core/index.js'
+)
+const endpoint = 'https://samline.github.io/autocomplete/cities.json'
 
 // These setup functions have no module dependencies. Both the mounted preview
 // and the copyable document run the same behavior, using only public APIs.
@@ -28,27 +39,26 @@ const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
 [data-example] .pill-field input[type="text"]:focus-visible { outline: none; }
 [data-example] .directory { display: grid; gap: .5rem; padding: 0; margin: 0; list-style: none; }
 [data-example] .directory button { width: 100%; text-align: left; }
-[data-example] [aria-disabled="true"] { opacity: .65; }`
+[data-example] [aria-disabled="true"] { opacity: .65; }
+[data-example] select { padding: .75rem 1rem; border: 1px solid var(--color-border, #888); border-radius: .5rem; background: var(--color-bg-soft, #fff); color: inherit; font: inherit; }
+[data-example] input[type="text"]:disabled { opacity: .65; cursor: not-allowed; }
+[data-example] [data-autocomplete-option] small { display: block; opacity: .75; }
+[data-example] kbd { float: right; padding: 0 .375rem; border: 1px solid currentColor; border-radius: .25rem; font: .75rem/1.5 ui-monospace, monospace; opacity: .75; }`
 
-const pills = (inline: boolean) => {
-  const id = inline ? 'pills-inline' : 'pills-external'
-  const list = '<ul data-pills aria-label="Selected teams"></ul>'
-  const input = `<input id="${id}-input" type="text" aria-describedby="${id}-help" />`
-  return {
-    id,
-    tab: inline ? 'Inline pills' : 'External pills',
-    title: inline ? 'Build a field with removable pills' : 'Collect selections as pills elsewhere',
-    description: inline
-      ? 'Pills and a real input share a visual field. With an empty input, Backspace or ← focuses the last pill; Backspace/Delete removes it, arrows move between pills and Escape returns to typing. The application owns the selection collection.'
-      : 'Select several teams, remove any pill and submit repeated teams[] fields. onSelect collects selections, clear prepares the next search and transformSuggestions hides selected teams. This recipe uses the single-selection API; it is not a built-in multiple mode.',
+export default [
+  {
+    id: 'pills',
+    tab: 'Pills',
+    title: 'Select several items as removable pills',
+    description:
+      'Pills and a real input share one visual field, and each selection is submitted as a repeated teams[] field. transformSuggestions hides teams already chosen and the application owns the collection: this composes the single-selection API, it is not a built-in multiple mode. With an empty input, Backspace or ← focuses the last pill; Backspace/Delete removes it, arrows move between pills and Escape returns to typing.',
     files: {
-      html: `<form data-example="${id}" data-inline="${inline}">
+      html: `<form data-example="pills">
   <div class="field">
-    <label for="${id}-input">Teams</label>
-    ${inline ? `<div class="pill-field">${list}${input}</div>` : input}
+    <label for="pills-input">Teams</label>
+    <div class="pill-field"><ul data-pills aria-label="Selected teams"></ul><input id="pills-input" type="text" aria-describedby="pills-help" /></div>
   </div>
-  <p id="${id}-help">${inline ? 'Type to add teams. With no text, press Backspace to focus the last pill, then Delete to remove it.' : 'Choose teams from the list. Selected teams appear below.'}</p>
-  ${inline ? '' : list}
+  <p id="pills-help">Type to add teams. With no text, press Backspace to focus the last pill, then Delete to remove it.</p>
   <div data-values></div>
   <p data-announcement role="status">No teams selected.</p>
   <div class="actions"><button type="submit">Submit teams</button><button type="reset">Reset teams</button></div>
@@ -58,12 +68,7 @@ const pills = (inline: boolean) => {
       js: script(setupPills),
       esm: script(setupPills, 'esm'),
     },
-  }
-}
-
-export default [
-  pills(false),
-  pills(true),
+  },
   {
     id: 'hooks',
     tab: 'Hooks',
@@ -121,12 +126,38 @@ export default [
     tab: 'Headless',
     title: 'Render a directory with the search pipeline alone',
     description:
-      'createSearch handles filtering while the application renders a persistent list of native buttons. Tab and Enter operate the results. This is a filterable directory, not a combobox: a custom combobox would also need application-owned ARIA and arrow-key behavior. The copyable code imports the public ESM core entrypoint.',
+      'createSearch handles filtering while the application renders a persistent list of native buttons. Tab and Enter operate the results. This is a filterable directory, not a combobox: a custom combobox would also need application-owned ARIA and arrow-key behavior. The ESM version imports @samline/autocomplete/core; the CDN version loads that same module, since the browser bundle only exposes the controller.',
     files: {
       html: `<div data-example="headless"><label for="headless-input">Filter teams</label><input id="headless-input" type="text" /><p data-note role="status"></p><ul class="directory" data-results aria-label="Matching teams"></ul></div>`,
       css,
-      js: `const setup = ${setupHeadless.toString()}\nimport('https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/core/index.js')\n  .then(({ createSearch }) => setup(document, createSearch))\n  .catch(() => { document.querySelector('[data-note]').textContent = 'Could not load the search module.' })`,
-      esm: `const setup = ${setupHeadless.toString()}\nimport('https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/core/index.js')\n  .then(({ createSearch }) => setup(document, createSearch))\n  .catch(() => { document.querySelector('[data-note]').textContent = 'Could not load the search module.' })`,
+      js: `const setup = ${setupHeadless.toString()}\nimport('${coreModule}')\n  .then(({ createSearch }) => setup(document, createSearch))\n  .catch(() => { document.querySelector('[data-note]').textContent = 'Could not load the search module.' })`,
+      esm: `import { createSearch } from '@samline/autocomplete/core'\nconst setup = ${setupHeadless.toString()}\nsetup(document, createSearch)`,
+    },
+  },
+  {
+    id: 'palette',
+    tab: 'Command palette',
+    title: 'Build a command palette with actions and pages',
+    description:
+      'Two local sections share a filter that also matches hidden keywords: “invoice” finds Billing and renderOption explains why. Shortcut hints and a footer are plain DOM nodes. The select event reports the section, the palette clears itself after each command and the last three picks return as Recent on an empty field.',
+    files: {
+      html: `<div data-example="palette"><div class="field"><label for="palette-input">Command</label><input id="palette-input" type="text" placeholder="Try new, invoice or theme" /></div><p data-output role="status">Nothing run yet.</p></div>`,
+      css,
+      js: script(setupPalette),
+      esm: script(setupPalette, 'esm'),
+    },
+  },
+  {
+    id: 'dependent',
+    tab: 'Dependent fields',
+    title: 'Narrow one field by another',
+    description:
+      'The country select drives the city search through a function endpoint, so each request reads the current country. Because results are cached per query, changing the country calls clearCache and clear. minLength: 0 lists every city of the country on focus, and the form submits both values.',
+    files: {
+      html: `<div data-example="dependent" data-endpoint="${endpoint}"><form><div class="field"><label for="dependent-country">Country</label><select id="dependent-country" name="country"><option value="">Choose a country</option><option>Colombia</option><option>Mexico</option><option>Spain</option></select></div><div class="field"><label for="dependent-input">City</label><input id="dependent-input" type="text" disabled /></div><div class="actions"><button type="submit">Submit</button></div></form><p data-note role="status">Choose a country first.</p></div>`,
+      css,
+      js: script(setupDependent),
+      esm: script(setupDependent, 'esm'),
     },
   },
 ] as const

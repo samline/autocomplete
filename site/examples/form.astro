@@ -1,7 +1,9 @@
 ---
+import { sitePath } from '../../shared/lib/project.mjs'
 import '../../dist/styles.css'
 import './_shared.css'
-const endpoint = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`
+// Landing and Docs share one site root, where cities.json is served.
+const endpoint = sitePath('cities.json')
 ---
 
 <div class="preview" data-preview="form" data-endpoint={endpoint}>

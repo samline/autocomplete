@@ -153,9 +153,9 @@ Every option with a plain value has an attribute (`data-autocomplete-min-length`
 - An optional stylesheet themed with `--autocomplete-*` custom properties.
 - React, Vue, Svelte, Shopify and WordPress through the same API, with no adapter.
 
-[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, events, local data, sections, forms, declarative setup, external and inline pills, hooks, plugins and cache, observable state and prefill, custom status/header/footer, and headless rendering. Each includes copyable files.
+[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, the event lifecycle, local data, sections, forms, declarative setup, removable pills, hooks, plugins and cache, observable state and prefill, custom status/header/footer, headless rendering, a command palette and dependent fields. Each includes copyable HTML / CDN and Package / ESM files.
 
-The pills recipes compose the existing single-selection API with an application-owned collection. They support removable selections, duplicate prevention and repeated form fields; inline pills also demonstrate keyboard navigation and removal. There is no built-in `multiple` mode.
+The pills recipe composes the existing single-selection API with an application-owned collection: removable selections, duplicate prevention, repeated form fields and keyboard navigation between pills. There is no built-in `multiple` mode.
 
 ### Any source
 
@@ -296,7 +296,7 @@ createAutocomplete('#city', { endpoint: '/api/cities', cache: { max: 100, ttl: 6
 createAutocomplete('#stock', { endpoint: '/api/stock', cache: false })
 ```
 
-Call `controller.clearCache()` after the data changes. `autocomplete:load` reports `cached: true` for cache hits.
+Call `controller.clearCache()` after the data changes. The cache key is the query alone, so an endpoint function or source that reads other fields (a country filter, a tenant) must clear it when those change. `autocomplete:load` reports `cached: true` for cache hits.
 
 ### Highlighting and custom options
 

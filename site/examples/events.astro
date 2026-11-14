@@ -1,32 +1,42 @@
 ---
+import { sitePath } from '../../shared/lib/project.mjs'
 import '../../dist/styles.css'
 import './_shared.css'
-const endpoint = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`
+// Landing and Docs share one site root, where cities.json is served.
+const endpoint = sitePath('cities.json')
 ---
 
 <div class="preview" data-preview="events" data-endpoint={endpoint}>
   <div class="field">
     <label for="preview-origin">Origin</label>
-    <input id="preview-origin" type="text" />
+    <input id="preview-origin" type="text" placeholder="Try “lis”" />
   </div>
-  <input type="hidden" name="origin" />
-  <p class="note" aria-live="polite">
-    No events yet.
-  </p>
   <button type="button" class="reset">
     Clear
   </button>
+  <ol class="note log" aria-label="Event log"></ol>
 </div>
+
+<style>
+  .log {
+    margin: 0;
+    font-family: ui-monospace, monospace;
+  }
+</style>
 
 <script>
   import { createAutocomplete } from '@samline/autocomplete'
   type City = { key: string; name: string; country: string }
   const root = document.querySelector<HTMLElement>('[data-preview="events"]')!
-  const input = root.querySelector<HTMLInputElement>('#preview-origin')!
-  const key = root.querySelector<HTMLInputElement>('input[type="hidden"]')!
-  const log = root.querySelector('.note')!
+  const log = root.querySelector('.log')!
+  const write = (text: string) => {
+    const entry = document.createElement('li')
+    entry.textContent = text
+    log.prepend(entry)
+    log.querySelectorAll('li:nth-child(n + 7)').forEach(item => item.remove())
+  }
 
-  const controller = createAutocomplete<City>(input, {
+  const controller = createAutocomplete<City>('#preview-origin', {
     endpoint: root.dataset.endpoint!,
     mapResponse: (payload, _response, query) =>
       (payload as { results: City[] }).results.filter(city =>
@@ -36,14 +46,14 @@ const endpoint = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`
     getLabel: city => city.name,
   })
 
-  input.addEventListener('autocomplete:select', event => {
-    const { suggestion, label } = (event as CustomEvent<{ suggestion: City; label: string }>).detail
-    key.value = suggestion.key
-    log.textContent = `select: ${label} (key ${key.value})`
-  })
-  input.addEventListener('autocomplete:clear', () => {
-    key.value = ''
-    log.textContent = 'clear: selection removed'
-  })
+  controller.on('loadstart', ({ query }) => write(`loadstart “${query}”`))
+  controller.on('load', ({ suggestions, cached }) =>
+    write(`load ${suggestions.length} results${cached ? ' (cache)' : ''}`)
+  )
+  controller.on('open', () => write('open'))
+  controller.on('close', () => write('close'))
+  controller.on('select', ({ label, value }) => write(`select ${label} → ${value}`))
+  controller.on('clear', () => write('clear'))
+  controller.on('error', ({ error }) => write(`error ${error}`))
   root.querySelector('.reset')!.addEventListener('click', () => controller.clear())
 </script>

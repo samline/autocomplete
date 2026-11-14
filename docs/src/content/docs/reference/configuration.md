@@ -29,6 +29,8 @@ Pass exactly one of `source`, `endpoint` or `sections`.
 
 Each section has a unique `id` (letters, digits, `-`, `_`), an optional `label` rendered as a group heading, and its own `source` (array or function). `maxResults`, `filter` and `cache` default to the instance options. Sections are searched in parallel and rendered in order; one failing section is dropped and reported through `autocomplete:error`, and the error state is shown only when every pending section fails and nothing else matched. When every section is an array, `minLength` defaults to `1` and `debounce` to `0`.
 
+The cache is keyed by the query alone. When an endpoint function or source also reads other state, such as a country select, call `controller.clearCache()` whenever that state changes.
+
 ## Recent selections and forms
 
 | Option        | Default | Description                                                                                                                       |

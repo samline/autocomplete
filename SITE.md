@@ -1,6 +1,6 @@
 # Autocomplete website
 
-Landing, Examples and Docs for `@samline/autocomplete` 1.0.0, built with [package-landing-docs](https://github.com/samline/package-landing-docs) embedded in this package. The package's runtime, exports, Node 20+ requirement, README, license and release history remain the package contract. Website tooling requires Node **22.12+**.
+Landing, Examples and Docs for `@samline/autocomplete`, built with [package-landing-docs](https://github.com/samline/package-landing-docs) embedded in this package. The package's runtime, exports, Node 20+ requirement, README, license and release history remain the package contract. Website tooling requires Node **22.12+**.
 
 ## Run locally
 

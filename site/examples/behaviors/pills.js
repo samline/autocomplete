@@ -8,7 +8,6 @@ export const setupPills = (root, createAutocomplete) => {
   const submitted = root.querySelector('[data-submitted]')
   const selected = new Map()
   const events = new AbortController()
-  const inline = form.dataset.inline === 'true'
   const source = [
     { id: 'design', label: 'Design' },
     { id: 'engineering', label: 'Engineering' },
@@ -61,41 +60,39 @@ export const setupPills = (root, createAutocomplete) => {
     },
   })
   render()
-  if (inline) {
-    input.addEventListener(
-      'keydown',
-      event => {
-        if (event.isComposing || input.value || !selected.size) return
-        if (event.key === 'Backspace' || event.key === 'ArrowLeft') {
-          event.preventDefault()
-          controller.close()
-          pills.querySelector('li:last-child button')?.focus()
-        }
-      },
-      { signal: events.signal }
-    )
-    // Focus the last removal button first; a second Backspace/Delete removes it.
-    pills.addEventListener(
-      'keydown',
-      event => {
-        const buttons = [...pills.querySelectorAll('button')]
-        const index = buttons.indexOf(document.activeElement)
-        if (index < 0 || event.isComposing) return
-        if (event.key === 'Backspace' || event.key === 'Delete') {
-          event.preventDefault()
-          buttons[index].click()
-        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-          event.preventDefault()
-          const next = index + (event.key === 'ArrowLeft' ? -1 : 1)
-          ;(buttons[next] ?? input).focus()
-        } else if (event.key === 'Escape') {
-          event.preventDefault()
-          input.focus()
-        }
-      },
-      { signal: events.signal }
-    )
-  }
+  input.addEventListener(
+    'keydown',
+    event => {
+      if (event.isComposing || input.value || !selected.size) return
+      if (event.key === 'Backspace' || event.key === 'ArrowLeft') {
+        event.preventDefault()
+        controller.close()
+        pills.querySelector('li:last-child button')?.focus()
+      }
+    },
+    { signal: events.signal }
+  )
+  // Focus the last removal button first; a second Backspace/Delete removes it.
+  pills.addEventListener(
+    'keydown',
+    event => {
+      const buttons = [...pills.querySelectorAll('button')]
+      const index = buttons.indexOf(document.activeElement)
+      if (index < 0 || event.isComposing) return
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault()
+        buttons[index].click()
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault()
+        const next = index + (event.key === 'ArrowLeft' ? -1 : 1)
+        ;(buttons[next] ?? input).focus()
+      } else if (event.key === 'Escape') {
+        event.preventDefault()
+        input.focus()
+      }
+    },
+    { signal: events.signal }
+  )
   form.addEventListener(
     'submit',
     event => {
