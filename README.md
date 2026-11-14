@@ -109,6 +109,7 @@ The standalone script (an IIFE) defines `window.Autocomplete`:
 - Debounced searches, aborted superseded requests and ignored late responses.
 - Bubbling DOM events that keep hidden fields and other UI in sync.
 - An optional stylesheet themed with `--autocomplete-*` custom properties.
+- React, Vue, Svelte, Shopify and WordPress through the same API, with no adapter.
 
 [Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options and events, each with copyable files.
 
@@ -192,14 +193,14 @@ The package includes declarations. Pass your suggestion type to `createAutocompl
 
 Read the [documentation](https://samline.github.io/autocomplete/docs/) for the full guides and API contracts, and explore [working examples](https://samline.github.io/autocomplete/examples/) with complete and separate source files.
 
-| Guide                                                                              | What it covers                                          |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| [Installation](https://samline.github.io/autocomplete/docs/getting-started/)       | Package / ESM, HTML / CDN and working starter files.    |
-| [Examples](https://samline.github.io/autocomplete/docs/guides/examples/)           | Live previews with their complete, copyable source.     |
-| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/)    | Every option and its default.                           |
-| [API reference](https://samline.github.io/autocomplete/docs/reference/api/)        | The controller, helpers, browser global, events, types. |
-| [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides. |
-| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/)             | The DOM contract and the custom properties.             |
+| Guide                                                                              | What it covers                                           |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [Installation](https://samline.github.io/autocomplete/docs/getting-started/)       | Package / ESM, HTML / CDN, frameworks and starter files. |
+| [Examples](https://samline.github.io/autocomplete/docs/guides/examples/)           | Live previews with their complete, copyable source.      |
+| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/)    | Every option and its default.                            |
+| [API reference](https://samline.github.io/autocomplete/docs/reference/api/)        | The controller, helpers, browser global, events, types.  |
+| [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides.  |
+| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/)             | The DOM contract and the custom properties.              |
 
 ## Changelog
 

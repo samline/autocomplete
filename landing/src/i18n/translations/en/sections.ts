@@ -35,11 +35,10 @@ export default {
     titleAccent: 'Search that feels right.',
     description:
       'Turn any text input into an accessible combobox that searches your endpoint, with debounce, cancellation and keyboard support built in.',
-    descriptionContinuation:
-      'Install it, search the live preview, then read the complete reference.',
-    footnotes: ['Zero dependencies', 'ARIA combobox', `${project.license} licensed`],
-    compatibilityLabel: 'Works with',
-    platforms: ['Vanilla JS', 'TypeScript', 'Plain HTML', 'Any framework', 'Any backend'],
+    descriptionContinuation: 'Cities, products or people. Your data, one keystroke away.',
+    footnotes: ['Zero dependencies', 'TypeScript ready', `${project.license} licensed`],
+    compatibilityLabel: 'ONE SMALL SCRIPT. RIGHT AT HOME IN YOUR STACK.',
+    platforms: ['JavaScript', 'TypeScript', 'React', 'Vue', 'Svelte', 'Shopify', 'WordPress'],
   },
   features: {
     eyebrow: '01 / More than a dropdown',
@@ -132,12 +131,27 @@ export default {
     steps: { install: 'Install', markup: 'Add markup', initialize: 'Create the autocomplete' },
     installLabel: 'Installation method',
     installTabs: [],
+    initLabel: 'Example format',
+    initTabs: [
+      { id: 'script', label: 'Package / ESM' },
+      { id: 'complete', label: 'HTML / CDN' },
+    ],
+    cdnHint:
+      'Load the CDN stylesheet and script from step 1, then load this file with defer after the runtime script.',
     fullExampleLabel: 'Copy complete working files',
     markupDescription:
       'Keep your label and input. The wrapper needs position: relative so the list can sit under the field.',
     examples: {
       markup: code('index.html', markup, 'html'),
       script: code('main.js', script, 'javascript'),
+      complete: code(
+        'main.js',
+        script
+          .replace(/import[^\n]*\n/g, '')
+          .replace('createAutocomplete(', 'window.Autocomplete.create(')
+          .trim(),
+        'javascript'
+      ),
     },
     docs: {
       description: 'Continue with every option, the controller and the events.',
@@ -193,34 +207,67 @@ export default {
     eyebrow: '05 / Before you build',
     heading: heading('A few details.', 'Clearly answered.'),
     items: {
-      docs: {
+      backend: {
         question: text('Does it work with my backend?'),
-        answer: text(
-          'Yes. It calls any URL or function you provide and lets mapResponse read whatever JSON comes back. Filtering and ranking stay on your server.'
-        ),
+        answer: [
+          { kind: 'text', value: 'Yes. It requests any URL or function you provide, adding ' },
+          { kind: 'code', value: '?q=<query>' },
+          { kind: 'text', value: ' by default, and ' },
+          { kind: 'code', value: 'mapResponse' },
+          {
+            kind: 'text',
+            value:
+              ' reads whatever JSON comes back. Filtering and ranking stay on your server, where your data lives.',
+          },
+        ],
       },
-      copy: {
-        question: text('Can I use it without a bundler?'),
-        answer: text(
-          'Yes. Load dist/browser/global.global.js and dist/styles.css from a CDN and call window.Autocomplete.create. Pin the version in production.'
-        ),
+      noBundler: {
+        question: text('Does it work without a bundler?'),
+        answer: [
+          {
+            kind: 'text',
+            value:
+              'Yes. HTML / CDN loads a script that exposes window.Autocomplete in plain HTML, WordPress or Shopify. Call ',
+          },
+          { kind: 'code', value: "window.Autocomplete.create('#city', options)" },
+          {
+            kind: 'text',
+            value: ' on an input with an id, and pin the version in production.',
+          },
+        ],
       },
-      changes: {
-        question: text('How are releases documented?'),
-        answer: text(
-          'CHANGELOG.md is the single release history and is published in the docs. Breaking and behavior changes are called out explicitly.'
-        ),
+      frameworks: {
+        question: text('Can I use it with React, Vue or Svelte?'),
+        answer: [
+          { kind: 'text', value: 'Yes. Pass the mounted input from a ref to ' },
+          { kind: 'code', value: 'createAutocomplete()' },
+          { kind: 'text', value: ' and call ' },
+          { kind: 'code', value: 'destroy()' },
+          {
+            kind: 'text',
+            value:
+              ' from your unmount handler. There is no framework adapter to install and no peer dependency to ship.',
+          },
+        ],
       },
-      keyboard: {
-        question: text('Which keys are supported?'),
-        answer: text(
-          'ArrowUp and ArrowDown move through options, Home and End jump to the first and last, Enter selects, and Escape or Tab close the list.'
-        ),
+      accessibility: {
+        question: text('How does it handle accessibility?'),
+        answer: [
+          { kind: 'text', value: 'The input becomes an ARIA ' },
+          { kind: 'code', value: 'combobox' },
+          { kind: 'text', value: ' that controls a ' },
+          { kind: 'code', value: 'listbox' },
+          {
+            kind: 'text',
+            value:
+              '. ArrowUp and ArrowDown move through options, Home and End jump to the ends, Enter selects, and Escape or Tab close the list. Loading, empty and error states are announced. Your page supplies the visible label.',
+          },
+        ],
       },
       stale: {
         question: text('What happens to slow responses?'),
         answer: text(
-          'Each new search aborts the previous request and older responses are ignored. Closing the list also cancels the pending search.'
+          'Each new search aborts the previous request and older responses are ignored. Closing the list also cancels the pending search, so a late response never reopens it.'
         ),
       },
       ime: {
@@ -231,15 +278,53 @@ export default {
       },
       styling: {
         question: text('How do I change how it looks?'),
-        answer: text(
-          'Override the --autocomplete-* custom properties or target [data-autocomplete-list] and [data-autocomplete-option]. renderOption adds your own content to each option.'
-        ),
+        answer: [
+          { kind: 'text', value: 'Override the ' },
+          { kind: 'code', value: '--autocomplete-*' },
+          { kind: 'text', value: ' custom properties or target ' },
+          { kind: 'code', value: '[data-autocomplete-list]' },
+          { kind: 'text', value: ' and ' },
+          { kind: 'code', value: '[data-autocomplete-option]' },
+          { kind: 'text', value: '. ' },
+          { kind: 'code', value: 'renderOption' },
+          {
+            kind: 'text',
+            value: ' appends your own DOM nodes to each option, never HTML strings.',
+          },
+        ],
       },
       cleanup: {
-        question: text('How do I remove it?'),
-        answer: text(
-          'Call controller.destroy(). It aborts any request, removes the list and listeners, and restores the input attributes it changed.'
-        ),
+        question: text('Should I close it or destroy it?'),
+        answer: [
+          { kind: 'code', value: 'close()' },
+          {
+            kind: 'text',
+            value:
+              ' hides the list and cancels the pending search; the controller stays usable. Call ',
+          },
+          { kind: 'code', value: 'destroy()' },
+          {
+            kind: 'text',
+            value:
+              ' when the input leaves the page: it aborts any request, removes the list and listeners, and restores the input attributes it changed.',
+          },
+        ],
+      },
+      bundleSize: {
+        question: text('How big is the bundle?'),
+        answer: [
+          {
+            kind: 'text',
+            value: 'The browser IIFE build is approximately ',
+          },
+          { kind: 'strong', value: '4.1 KiB gzipped' },
+          { kind: 'text', value: ', plus ' },
+          { kind: 'strong', value: '0.5 KiB gzipped' },
+          {
+            kind: 'text',
+            value: ' for the optional stylesheet. There are zero runtime dependencies.',
+          },
+        ],
       },
     },
   },
@@ -248,7 +333,7 @@ export default {
     heading: heading('Make every search', 'feel instant.'),
     description: 'Follow the first steps, or read the source on GitHub.',
     docs: {
-      description: 'Guides, the complete API and release notes, in one place.',
+      description: `Installation, practical guides and the complete API for ${project.name} ${project.version}.`,
       label: 'Read the documentation',
     },
   },

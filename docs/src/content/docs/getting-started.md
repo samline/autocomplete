@@ -52,6 +52,33 @@ For Shopify, WordPress or plain HTML pages without a build step, load the styles
 
 `Autocomplete.create` requires an input with an `id` and stores the controller in `Autocomplete.available[id]`; `Autocomplete.destroy(id)` removes it. `Autocomplete.autocomplete(input, options)` creates one without the registry.
 
+## Frameworks and CMS
+
+There is no adapter: create the controller once the input exists in the DOM and destroy it when the input leaves. In React:
+
+```jsx
+import { useEffect, useRef } from 'react'
+import { createAutocomplete } from '@samline/autocomplete'
+
+export function CitySearch() {
+  const input = useRef(null)
+
+  useEffect(() => {
+    const controller = createAutocomplete(input.current, { endpoint: '/api/cities' })
+    return () => controller.destroy()
+  }, [])
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <label htmlFor="city">City</label>
+      <input id="city" ref={input} type="text" />
+    </div>
+  )
+}
+```
+
+Vue (`onMounted` / `onBeforeUnmount`) and Svelte (`onMount` returning the cleanup) follow the same pattern. In Shopify themes or WordPress, use the HTML / CDN files and call `window.Autocomplete.create` after the input is in the page.
+
 ## Requirements
 
 - Modern browsers with `fetch` and `AbortController`. Node 20 or newer for server-side imports.
