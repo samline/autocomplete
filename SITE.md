@@ -24,7 +24,7 @@ The combined Pages artifact is `landing/dist/`. No backend is required: the prev
 
 - `project.config.json` owns site identity, URL, namespace, accent pair, CDN script and stylesheet, and package version. Keep the CDN pins aligned with `package.json`.
 - Home copy lives in `landing/src/i18n/translations/en/sections.ts`; articles in `docs/src/content/docs/`.
-- Previews: `site/Demo.astro` (Home) and `site/examples.ts` with `site/examples/*.astro` (Examples and the docs examples guide) import the package itself through a Vite alias, so build the package first. The copyable files in `site/examples.ts` load the published CDN bundle; `site-e2e/copied-examples.spec.ts` runs them against the local build.
+- Previews: `site/Demo.astro` (Home) and `site/examples.ts` with `site/examples/*.astro` (Examples and the docs examples guide) import the package itself through a Vite alias, so build the package first. Every code disclosure offers HTML / CDN and Package / ESM, with split files and a complete document. `files.js` uses the published browser bundle; `files.esm` uses public package imports and explicitly mounts declarative inputs. `shared/components/PackageCode.astro` shares the mode tabs across Examples and Docs. `site-e2e/copied-examples.spec.ts` and `advanced-examples.spec.ts` execute the exact rendered sources in all four combinations against the local build.
 - `content-audit.json` maps the reviewed sources and public exports to their destinations.
 - `CHANGELOG.md` is the single release history, loaded into the docs.
 - `skills/autocomplete/SKILL.md` is the package integration skill, served at `/skills/autocomplete/SKILL.md`.

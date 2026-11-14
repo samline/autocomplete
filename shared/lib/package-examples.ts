@@ -15,7 +15,12 @@ export interface PackageExample {
   /** The visitor's task, used as the section heading. */
   readonly title: string
   readonly description: string
-  readonly files: { readonly html: string; readonly css?: string; readonly js: string }
+  readonly files: {
+    readonly html: string
+    readonly css?: string
+    readonly js: string
+    readonly esm: string
+  }
 }
 
 const records = {
@@ -68,15 +73,18 @@ export const previewFor = (slug: string | null | undefined, id: string) =>
 const documentFor = (
   slug: string | null | undefined,
   example: PackageExample,
-  separate: boolean
+  separate: boolean,
+  mode: ExampleMode
 ) => {
   const { cdnScript, cdnStylesheet } = slug ? findPackage(slug).delivery : project.delivery
   const css = example.files.css?.trim()
+  const javascript = mode === 'esm' ? example.files.esm : example.files.js
+  const type = mode === 'esm' ? ' type="module"' : ''
   const head = [
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
     `<title>${example.title}</title>`,
-    cdnStylesheet ? `<link rel="stylesheet" href="${cdnStylesheet}">` : '',
+    mode === 'cdn' && cdnStylesheet ? `<link rel="stylesheet" href="${cdnStylesheet}">` : '',
     css
       ? separate
         ? '<link rel="stylesheet" href="./style.css">'
@@ -84,23 +92,32 @@ const documentFor = (
       : '',
   ]
   const scripts = [
-    cdnScript ? `<script src="${cdnScript}"></script>` : '',
+    mode === 'cdn' && cdnScript ? `<script src="${cdnScript}"></script>` : '',
     separate
-      ? '<script src="./main.js" defer></script>'
-      : `<script>\n${example.files.js}\n</script>`,
+      ? `<script${type} src="./main.js"${mode === 'cdn' ? ' defer' : ''}></script>`
+      : `<script${type}>\n${javascript}\n</script>`,
   ]
   return `<!doctype html>\n<html lang="en">\n<head>\n${head.filter(Boolean).join('\n')}\n</head>\n<body>\n<main>\n${example.files.html}\n</main>\n${scripts.filter(Boolean).join('\n')}\n</body>\n</html>`
 }
 
 /** Formatted, copyable files for one example: separate files plus one complete document. */
-export const filesFor = async (slug: string | null | undefined, example: PackageExample) => {
+export type ExampleMode = 'cdn' | 'esm'
+
+export const modesFor = (slug?: string | null): readonly ExampleMode[] =>
+  (slug ? findPackage(slug).delivery : project.delivery).cdnScript ? ['cdn', 'esm'] : ['esm']
+
+export const filesFor = async (
+  slug: string | null | undefined,
+  example: PackageExample,
+  mode: ExampleMode = modesFor(slug)[0]!
+) => {
   const files = [
     {
       id: 'html',
       label: controls.codeFiles.html,
       filename: 'index.html',
       language: 'html' as const,
-      code: await format(documentFor(slug, example, true), { ...options, parser: 'html' }),
+      code: await format(documentFor(slug, example, true, mode), { ...options, parser: 'html' }),
     },
     ...(example.files.css?.trim()
       ? [
@@ -118,9 +135,15 @@ export const filesFor = async (slug: string | null | undefined, example: Package
       label: controls.codeFiles.javascript,
       filename: 'main.js',
       language: 'javascript' as const,
-      code: await format(example.files.js, { ...options, parser: 'babel' }),
+      code: await format(mode === 'esm' ? example.files.esm : example.files.js, {
+        ...options,
+        parser: 'babel',
+      }),
     },
   ]
-  const complete = await format(documentFor(slug, example, false), { ...options, parser: 'html' })
+  const complete = await format(documentFor(slug, example, false, mode), {
+    ...options,
+    parser: 'html',
+  })
   return { files, complete }
 }

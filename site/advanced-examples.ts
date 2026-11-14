@@ -7,8 +7,10 @@ import { setupHeadless } from './examples/behaviors/headless.js'
 
 // These setup functions have no module dependencies. Both the mounted preview
 // and the copyable document run the same behavior, using only public APIs.
-const script = (setup: Function) =>
-  `const setup = ${setup.toString()}\nsetup(document, window.Autocomplete.autocomplete)`
+const script = (setup: Function, mode: 'cdn' | 'esm' = 'cdn') =>
+  mode === 'esm'
+    ? `import { autocomplete } from '@samline/autocomplete'\nimport '@samline/autocomplete/styles.css'\nconst setup = ${setup.toString()}\nsetup(document, autocomplete)`
+    : `const setup = ${setup.toString()}\nsetup(document, window.Autocomplete.autocomplete)`
 const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
 [data-example] .field { position: relative; }
 [data-example] label { display: block; margin-bottom: .5rem; }
@@ -54,6 +56,7 @@ const pills = (inline: boolean) => {
 </form>`,
       css,
       js: script(setupPills),
+      esm: script(setupPills, 'esm'),
     },
   }
 }
@@ -71,6 +74,7 @@ export default [
       html: `<div data-example="hooks"><div class="field"><label for="hooks-input">Team</label><input id="hooks-input" type="text" placeholder="Try #de or en" /></div><p data-note role="status">Search with an optional # prefix.</p></div>`,
       css,
       js: script(setupHooks),
+      esm: script(setupHooks, 'esm'),
     },
   },
   {
@@ -83,6 +87,7 @@ export default [
       html: `<div data-example="plugins"><div class="field"><label for="plugins-input">Team directory</label><input id="plugins-input" type="text" placeholder="Try en" /></div><p data-requests>Source calls: 0</p><p data-note role="status">No searches yet.</p><div class="actions"><button type="button" data-repeat>Repeat search</button><button type="button" data-clear-cache>Clear cache</button></div></div>`,
       css,
       js: script(setupPlugins),
+      esm: script(setupPlugins, 'esm'),
     },
   },
   {
@@ -95,6 +100,7 @@ export default [
       html: `<div data-example="state"><form><div class="field"><label for="state-input">Assigned team</label><input id="state-input" type="text" /></div><div class="actions"><button type="button" data-prefill>Restore saved team</button><button type="button" data-clear>Clear team</button><button type="submit">Save assignment</button></div></form><p data-state role="status"></p><p data-submitted aria-live="polite">Nothing submitted yet.</p></div>`,
       css,
       js: script(setupState),
+      esm: script(setupState, 'esm'),
     },
   },
   {
@@ -107,6 +113,7 @@ export default [
       html: `<div data-example="rendering"><div class="field"><label for="rendering-input">Team directory</label><input id="rendering-input" type="text" placeholder="Try en or zzz" /></div><label><input type="checkbox" /> Simulate failure</label></div>`,
       css,
       js: script(setupRendering),
+      esm: script(setupRendering, 'esm'),
     },
   },
   {
@@ -119,6 +126,7 @@ export default [
       html: `<div data-example="headless"><label for="headless-input">Filter teams</label><input id="headless-input" type="text" /><p data-note role="status"></p><ul class="directory" data-results aria-label="Matching teams"></ul></div>`,
       css,
       js: `const setup = ${setupHeadless.toString()}\nimport('https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/core/index.js')\n  .then(({ createSearch }) => setup(document, createSearch))\n  .catch(() => { document.querySelector('[data-note]').textContent = 'Could not load the search module.' })`,
+      esm: `const setup = ${setupHeadless.toString()}\nimport('https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/core/index.js')\n  .then(({ createSearch }) => setup(document, createSearch))\n  .catch(() => { document.querySelector('[data-note]').textContent = 'Could not load the search module.' })`,
     },
   },
 ] as const

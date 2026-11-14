@@ -40,6 +40,23 @@ export default [
     },
   },
 })`,
+      esm: `import Autocomplete from '@samline/autocomplete/browser'
+import '@samline/autocomplete/styles.css'
+
+Autocomplete.newAutocomplete({
+  id: 'city',
+  options: {
+    endpoint: '${endpoint}',
+    minLength: 2,
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => \`\${city.name}, \${city.country}\`,
+    getValue: city => city.name,
+    onSelect: city => {
+      document.querySelector('#selected').textContent = \`Selected \${city.name}.\`
+    },
+  },
+})`,
     },
   },
   {
@@ -56,6 +73,25 @@ export default [
       css: `${baseCss}
 [data-autocomplete-option] small { display: block; color: #666; }`,
       js: `window.Autocomplete.newAutocomplete({
+  id: 'destination',
+  options: {
+    endpoint: '${endpoint}',
+    minLength: 1,
+    maxResults: 5,
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => city.name,
+    renderOption: (option, city) => {
+      const country = document.createElement('small')
+      country.textContent = city.country
+      option.append(country)
+    },
+  },
+})`,
+      esm: `import Autocomplete from '@samline/autocomplete/browser'
+import '@samline/autocomplete/styles.css'
+
+Autocomplete.newAutocomplete({
   id: 'destination',
   options: {
     endpoint: '${endpoint}',
@@ -111,6 +147,32 @@ input.addEventListener('autocomplete:clear', () => {
   log.textContent = 'clear: selection removed'
 })
 document.querySelector('#reset').addEventListener('click', () => controller.clear())`,
+      esm: `import Autocomplete from '@samline/autocomplete/browser'
+import '@samline/autocomplete/styles.css'
+
+const input = document.querySelector('#origin')
+const key = document.querySelector('#origin-key')
+const log = document.querySelector('#log')
+
+const controller = Autocomplete.newAutocomplete({
+  id: 'origin',
+  options: {
+    endpoint: '${endpoint}',
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => city.name,
+  },
+})
+
+input.addEventListener('autocomplete:select', event => {
+  key.value = event.detail.suggestion.key
+  log.textContent = \`select: \${event.detail.label} (key \${key.value})\`
+})
+input.addEventListener('autocomplete:clear', () => {
+  key.value = ''
+  log.textContent = 'clear: selection removed'
+})
+document.querySelector('#reset').addEventListener('click', () => controller.clear())`,
     },
   },
   {
@@ -135,6 +197,19 @@ document.querySelector('#reset').addEventListener('click', () => controller.clea
     messages: { empty: ({ query }) => \`No state matches “\${query}”\` },
   },
 })`,
+      esm: `import Autocomplete from '@samline/autocomplete/browser'
+import '@samline/autocomplete/styles.css'
+
+Autocomplete.newAutocomplete({
+  id: 'state',
+  options: {
+    source: [
+      'Aguascalientes', 'Baja California', 'Campeche', 'Ciudad de México', 'Michoacán',
+      'Morelos', 'Nuevo León', 'Querétaro', 'San Luis Potosí', 'Yucatán',
+    ],
+    messages: { empty: ({ query }) => \`No state matches “\${query}”\` },
+  },
+})`,
     },
   },
   {
@@ -150,6 +225,35 @@ document.querySelector('#reset').addEventListener('click', () => controller.clea
 </div>`,
       css: baseCss,
       js: `window.Autocomplete.newAutocomplete({
+  id: 'place',
+  options: {
+    sections: [
+      {
+        id: 'countries',
+        label: 'Countries',
+        source: ['Argentina', 'Canada', 'Japan', 'Mexico', 'Portugal', 'Spain'],
+      },
+      {
+        id: 'cities',
+        label: 'Cities',
+        maxResults: 4,
+        source: async (query, { signal }) => {
+          const response = await fetch('${endpoint}', { signal })
+          const payload = await response.json()
+          return payload.results
+            .filter(city => city.name.toLowerCase().includes(query.toLowerCase()))
+            .map(city => city.name)
+        },
+      },
+    ],
+    minLength: 2,
+    recent: { label: 'Recent' },
+  },
+})`,
+      esm: `import Autocomplete from '@samline/autocomplete/browser'
+import '@samline/autocomplete/styles.css'
+
+Autocomplete.newAutocomplete({
   id: 'place',
   options: {
     sections: [
@@ -214,6 +318,28 @@ document.querySelector('#trip').addEventListener('submit', event => {
     ? \`Submitted city_id=\${cityId}.\`
     : 'Pick a city first.'
 })`,
+      esm: `import Autocomplete from '@samline/autocomplete/browser'
+import '@samline/autocomplete/styles.css'
+
+Autocomplete.newAutocomplete({
+  id: 'destination-city',
+  options: {
+    endpoint: '${endpoint}',
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => city.name,
+    hiddenInput: 'city_id',
+    popover: true,
+  },
+})
+
+document.querySelector('#trip').addEventListener('submit', event => {
+  event.preventDefault()
+  const cityId = new FormData(event.currentTarget).get('city_id')
+  document.querySelector('#submitted').textContent = cityId
+    ? \`Submitted city_id=\${cityId}.\`
+    : 'Pick a city first.'
+})`,
     },
   },
   {
@@ -240,6 +366,10 @@ document.querySelector('#trip').addEventListener('submit', event => {
       css: baseCss,
       js: `// Nothing to write: the browser bundle mounts input[data-autocomplete] on load.
 // Read a mounted controller with window.Autocomplete.getAutocomplete('fruit').`,
+      esm: `import Autocomplete from '@samline/autocomplete/browser'
+import '@samline/autocomplete/styles.css'
+
+Autocomplete.mount()`,
     },
   },
   ...advancedExamples,

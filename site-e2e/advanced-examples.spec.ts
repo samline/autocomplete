@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { expect, test, type Page, type Locator } from '@playwright/test'
+import { openCopiedFiles } from './copied-files'
 
 const local = (path: string) => fileURLToPath(new URL(`../${path}`, import.meta.url))
 
@@ -19,26 +20,29 @@ const choose = async (root: Locator, query: string) => {
   await input.press('Enter')
 }
 
-for (const mode of ['copied', 'gallery', 'docs'] as const) {
+for (const mode of [
+  'cdn-complete',
+  'cdn-split',
+  'esm-complete',
+  'esm-split',
+  'gallery',
+  'docs',
+] as const) {
   test.describe(mode, () => {
     const open = async (page: Page, id: string) => {
-      if (mode === 'copied') {
-        await page.goto('examples/')
-        const code = await page
-          .locator(`[data-package-example="site/${id}"] [data-code-files] code`)
-          .last()
-          .textContent()
-        expect(code).toContain('<!doctype html>')
-        // Run exactly the complete document shown to visitors, including the
-        // generated setup source and ESM loading mode, in a fresh document.
-        await page.goto('about:blank')
-        await page.setContent(code!)
+      if (mode.startsWith('cdn-') || mode.startsWith('esm-')) {
+        await openCopiedFiles(
+          page,
+          id,
+          mode.startsWith('esm') ? 'esm' : 'cdn',
+          mode.endsWith('split') ? 'split' : 'complete'
+        )
       } else {
         await page.goto(mode === 'gallery' ? 'examples/' : 'docs/guides/examples/')
       }
       const root = page.locator(`[data-example="${id}"]`)
       await expect(root).toBeVisible()
-      if (mode !== 'copied')
+      if (mode === 'gallery' || mode === 'docs')
         await expect(root.locator('..')).toHaveAttribute('data-mounted', 'true')
       return root
     }
