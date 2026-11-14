@@ -29,3 +29,23 @@ Mirror the sibling `@samline` packages (`../ticker` is the closest reference).
 - Any public API change must update tests, README, and `docs/` in the same change.
 - One license file: `LICENSE.md` (MIT, `Copyright (c) 2026 Samuel Olvera (samline)`), covering the package and the website. Add `SITE-LICENSE.md` only if the site theme ever uses a different license.
 - Run `bun run build`, `bun run typecheck`, `bun run test`, `bun run format:check`, and `npm pack --dry-run` before release. Use `bun run test`, not Bun's native `bun test`, because the suite depends on Vitest's jsdom configuration.
+
+<!-- samline:family:start -->
+
+## Family conventions (@samline)
+
+This block is synced from the template that owns the family conventions ([package-landing-docs](https://github.com/samline/package-landing-docs) `family/AGENTS.md`, `node family/scripts/sync.mjs`). Do not edit it here; change the template and re-sync. The skill `.agents/skills/samline-package/SKILL.md` carries the full rules for a repository cloned on its own.
+
+- One package per repository. Framework-agnostic core in JS/CSS/HTML; adapters only when idiomatic, as optional peers.
+- No DOM access at import time; without a DOM, calls are no-ops. Respect `prefers-reduced-motion`; content stays visible without JavaScript.
+- Arrow functions and closures, no classes or `this`. `destroy()` is idempotent and restores markup.
+- Zero runtime dependencies: shared primitives (`@samline/internal`, `@samline/is-visible`, `@samline/debounce`) are devDependencies bundled with `noExternal`.
+- Install with pnpm, run with Bun: `pnpm install` / `pnpm add -D` (only `pnpm-lock.yaml` is committed), `bun run <script>` for everything else. Never `bun install`, `bun add`, `npm install` or `yarn`.
+- Packages talk through npm only: install the published version of any sibling package. Never link or import a local checkout (`bun link`, `link:`, `file:`, path aliases, `../other-package/src`).
+- Layout: `src/core`, `src/vanilla`, `src/browser/global.ts` (`window.<PascalName>`, `dist/browser/<name>.global.js`), side-effect-free `src/index.ts`. Every public entry has a gzip budget in `package.json` → `size`.
+- `bun run check` must pass: format, typecheck, unit tests with coverage thresholds, build, size budgets, e2e in Chromium, Firefox and WebKit.
+- README is the package guide and the site's source of truth; public text in English. Any public API change updates tests, README, docs, examples and `skills/<name>/SKILL.md` together.
+- Releases: Keep a Changelog entry for every user-facing change, semver, pinned CDN URLs bumped before release. Publishing is manual (`bun run release` by the maintainer); CI never publishes; no `--provenance`.
+- Never add AI attribution to commits, tags or pull requests.
+
+<!-- samline:family:end -->
