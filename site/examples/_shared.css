@@ -7,8 +7,15 @@
   --autocomplete-active-background: var(--color-bg);
   --autocomplete-muted-color: var(--color-text-subtle);
 }
-.preview .field { position: relative; }
-.preview label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--palette-specimen-text); }
+.preview .field {
+  position: relative;
+}
+.preview label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--palette-specimen-text);
+}
 .preview input[type='text'] {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -18,8 +25,15 @@
   color: var(--color-text);
   font: inherit;
 }
-.preview .note { margin: 0; font-size: 0.875rem; color: var(--color-text-muted); }
-.preview [data-autocomplete-option] small { display: block; color: var(--color-text-subtle); }
+.preview .note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+.preview [data-autocomplete-option] small {
+  display: block;
+  color: var(--color-text-subtle);
+}
 .preview button.reset {
   justify-self: start;
   padding: 0.5rem 1rem;
@@ -31,4 +45,6 @@
   cursor: pointer;
 }
 /* The preview frame clips overflow: let the list take space inside it. */
-.preview [data-autocomplete-list] { position: static; }
+.preview [data-autocomplete-popup] {
+  position: static;
+}

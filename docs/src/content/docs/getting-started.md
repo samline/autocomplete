@@ -5,7 +5,7 @@ sidebar:
   order: 2
 title: 'Install and search'
 titleAccent: 'search'
-description: 'Install @samline/autocomplete with a package manager or a script tag, add the input and create your first remote search.'
+description: 'Install @samline/autocomplete with a package manager or a script tag, add the input and create your first search from an endpoint, a function or a local array.'
 ---
 
 ## Package / ESM
@@ -33,7 +33,18 @@ const controller = createAutocomplete('#city', {
 })
 ```
 
-The request is `GET /api/cities?q=<query>`. Return an array, or an object with `suggestions`, `items` or `data`; otherwise use `mapResponse`. The wrapper around the input needs `position: relative`, because the default list is absolutely positioned under it.
+The request is `GET /api/cities?q=<query>`. Return an array, or an object with `suggestions`, `items` or `data`; otherwise use `mapResponse`. Results are cached per query for five minutes. The wrapper around the input needs `position: relative`, because the default popup is absolutely positioned under it.
+
+No endpoint? Pass a `source` instead: an array filtered in the browser, or any function that returns suggestions.
+
+```js
+createAutocomplete('#state', { source: ['Jalisco', 'Michoacán', 'Querétaro'] })
+
+createAutocomplete('#user', {
+  source: (query, { signal }) => api.users.search(query, { signal }),
+  getLabel: user => user.name,
+})
+```
 
 ## HTML / CDN
 
@@ -42,15 +53,15 @@ For Shopify, WordPress or plain HTML pages without a build step, load the styles
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/styles.css"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/styles.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/browser/global.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/browser/global.global.js"></script>
 <script>
-  window.Autocomplete.create('#city', { endpoint: '/api/cities' })
+  window.Autocomplete.newAutocomplete({ id: 'city', options: { endpoint: '/api/cities' } })
 </script>
 ```
 
-`Autocomplete.create` requires an input with an `id` and stores the controller in `Autocomplete.available[id]`; `Autocomplete.destroy(id)` removes it. `Autocomplete.autocomplete(input, options)` creates one without the registry.
+`Autocomplete.newAutocomplete({ id, options })` enhances the input with that `id` and registers the controller; `Autocomplete.getAutocomplete(id)` reads it back and `Autocomplete.destroyAutocomplete(id)` removes it. `Autocomplete.autocomplete(input, options)` creates one without the registry. The registry has the same shape as the other `@samline` packages.
 
 ## Frameworks and CMS
 
@@ -77,11 +88,11 @@ export function CitySearch() {
 }
 ```
 
-Vue (`onMounted` / `onBeforeUnmount`) and Svelte (`onMount` returning the cleanup) follow the same pattern. In Shopify themes or WordPress, use the HTML / CDN files and call `window.Autocomplete.create` after the input is in the page.
+Vue (`onMounted` / `onBeforeUnmount`) and Svelte (`onMount` returning the cleanup) follow the same pattern. In Shopify themes or WordPress, use the HTML / CDN files and call `window.Autocomplete.newAutocomplete` after the input is in the page.
 
 ## Requirements
 
-- Modern browsers with `fetch` and `AbortController`. Node 20 or newer for server-side imports.
+- Modern browsers with `fetch`, `AbortController` and Unicode property escapes in regular expressions. Node 20 or newer for server-side imports.
 - No runtime dependencies. The stylesheet is optional.
 
 ## Working starter files
@@ -97,7 +108,7 @@ A complete page that runs as-is. It searches the public list of cities used by t
     <title>Autocomplete starter</title>
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/styles.css"
+      href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/styles.css"
     />
   </head>
   <body>
@@ -105,14 +116,17 @@ A complete page that runs as-is. It searches the public list of cities used by t
       <label for="city">City</label>
       <input id="city" type="text" />
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/browser/global.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.0.0/dist/browser/global.global.js"></script>
     <script>
-      window.Autocomplete.create('#city', {
-        endpoint: 'https://samline.github.io/autocomplete/cities.json',
-        mapResponse: (payload, response, query) =>
-          payload.results.filter(city => city.name.toLowerCase().includes(query.toLowerCase())),
-        getId: city => city.key,
-        getLabel: city => city.name,
+      window.Autocomplete.newAutocomplete({
+        id: 'city',
+        options: {
+          endpoint: 'https://samline.github.io/autocomplete/cities.json',
+          mapResponse: (payload, response, query) =>
+            payload.results.filter(city => city.name.toLowerCase().includes(query.toLowerCase())),
+          getId: city => city.key,
+          getLabel: city => city.name,
+        },
       })
     </script>
   </body>

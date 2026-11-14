@@ -1,15 +1,6 @@
-export { createAutocompleteController } from './controller'
-export { mapCommonResponse, parseJsonResponse } from './defaults'
-export type {
-  AutocompleteController,
-  AutocompleteEndpoint,
-  AutocompleteErrorDetail,
-  AutocompleteLoadDetail,
-  AutocompleteMessages,
-  AutocompleteOptions,
-  AutocompleteParser,
-  AutocompleteRequestInit,
-  AutocompleteResponseMapper,
-  AutocompleteSelectDetail,
-  AutocompleteTarget,
-} from './types'
+export * from './types'
+export { createCache } from './cache'
+export { fromEndpoint, mapCommonResponse, parseJsonResponse } from './source'
+export { DEFAULT_MESSAGES } from './state'
+export { filterSuggestions, highlight, normalizeText } from './text'
+export type { AutocompleteNormalizer, FilterSuggestionsOptions } from './text'

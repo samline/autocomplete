@@ -9,7 +9,12 @@ const copyStyles = async (): Promise<void> => {
 
 export default defineConfig([
   {
-    entry: { index: 'src/index.ts' },
+    entry: {
+      index: 'src/index.ts',
+      'core/index': 'src/core/index.ts',
+      'vanilla/index': 'src/vanilla/index.ts',
+      'browser/index': 'src/browser/index.ts',
+    },
     format: ['esm', 'cjs'],
     dts: true,
     sourcemap: true,
@@ -26,6 +31,6 @@ export default defineConfig([
     clean: false,
     target: 'es2020',
     outDir: 'dist',
-    globalName: 'Autocomplete',
+    globalName: 'AutocompleteBundle',
   },
 ])

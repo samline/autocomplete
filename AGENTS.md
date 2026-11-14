@@ -6,9 +6,12 @@
 
 ## Architecture
 
-- `src/core/`: DOM/runtime implementation and public contracts.
-- `src/api/`: public named factories.
-- `src/browser/`: registry and `window.Autocomplete` IIFE entrypoint.
+Mirror the sibling `@samline` packages (`../ticker` is the closest reference).
+
+- `src/constants.ts`: defaults and data-attribute names.
+- `src/core/`: DOM-free contracts and helpers (types, validation, sources, cache, text matching and highlighting).
+- `src/vanilla/`: the DOM controller (`autocomplete` / `createAutocomplete`) and DOM helpers.
+- `src/browser/`: the shared registry (`newAutocomplete`, `getAutocomplete`, `getAutocompletes`, `destroyAutocomplete`, `destroyAutocompletes`, `available`), its module entrypoint and the `window.Autocomplete` IIFE entrypoint (`global.ts`).
 - `src/index.ts`: side-effect-free package entrypoint.
 - `src/styles.css`: optional data-attribute-driven styles.
 - `test/`: Vitest + jsdom contracts.
@@ -19,6 +22,7 @@
 
 - Query codebase-memory before code discovery; index this project after structural changes.
 - Keep the root entrypoint side-effect free.
+- No classes: arrow functions and closures by default, no `this`.
 - Keep response shape configurable through adapters.
 - Never render endpoint content with `innerHTML`; use `textContent` or consumer-owned DOM callbacks.
 - Preserve WAI-ARIA combobox/listbox behavior and keyboard operation.

@@ -12,27 +12,24 @@ const places: Place[] = [
   { key: 'mor', description: 'Cuernavaca, Morelos' },
 ]
 
-function inputMarkup(): void {
+const inputMarkup = (): void => {
   document.body.innerHTML = '<label for="place">Place</label><input id="place" class="original">'
 }
 
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
+const jsonResponse = (body: unknown, status = 200): Response =>
+  new Response(JSON.stringify(body), {
     status,
     headers: { 'content-type': 'application/json' },
   })
-}
 
-function options() {
-  return {
-    endpoint: '/api/places',
-    debounce: 0,
-    mapResponse: (payload: unknown) => (payload as { results: Place[] }).results,
-    getId: (place: Place) => place.key,
-    getLabel: (place: Place) => place.description,
-    getValue: (place: Place) => place.description,
-  }
-}
+const options = () => ({
+  endpoint: '/api/places',
+  debounce: 0,
+  mapResponse: (payload: unknown) => (payload as { results: Place[] }).results,
+  getId: (place: Place) => place.key,
+  getLabel: (place: Place) => place.description,
+  getValue: (place: Place) => place.description,
+})
 
 describe('createAutocomplete', () => {
   beforeEach(() => {
@@ -52,7 +49,10 @@ describe('createAutocomplete', () => {
   it('requires a valid input and endpoint', () => {
     expect(() => createAutocomplete('#missing', { endpoint: '/api' })).toThrow(TypeError)
     expect(() => createAutocomplete('#place', { endpoint: '' })).toThrow(
-      'Autocomplete requires an endpoint.'
+      'Autocomplete requires a source or an endpoint.'
+    )
+    expect(() => createAutocomplete('#place', { endpoint: '/api', source: [] })).toThrow(
+      'Autocomplete accepts either a source or an endpoint, not both.'
     )
   })
 
@@ -64,6 +64,11 @@ describe('createAutocomplete', () => {
     expect(controller.element.getAttribute('aria-controls')).toBe(controller.listElement.id)
     expect(controller.listElement.getAttribute('role')).toBe('listbox')
     expect(controller.listElement.hidden).toBe(true)
+    expect(controller.listElement.getAttribute('aria-labelledby')).toBe(
+      document.querySelector('label')!.id
+    )
+    expect(controller.popupElement.contains(controller.listElement)).toBe(true)
+    expect(controller.liveElement.getAttribute('aria-live')).toBe('polite')
   })
 
   it('queries the configured endpoint and maps arbitrary payloads', async () => {
@@ -153,7 +158,7 @@ describe('createAutocomplete', () => {
     const controller = createAutocomplete('#place', options())
     await controller.search('morelos')
 
-    const second = controller.listElement.querySelectorAll<HTMLButtonElement>('[role="option"]')[1]!
+    const second = controller.listElement.querySelectorAll<HTMLElement>('[role="option"]')[1]!
     second.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true }))
 
     expect(controller.getSelected()).toEqual(places[1])
@@ -172,14 +177,20 @@ describe('createAutocomplete', () => {
     })
 
     const pending = controller.search('empty')
-    expect(controller.listElement.textContent).toBe('Loading')
+    expect(controller.statusElement.textContent).toBe('Loading')
+    expect(controller.statusElement.dataset.autocompleteStatus).toBe('loading')
+    expect(controller.liveElement.textContent).toBe('')
     await pending
-    expect(controller.listElement.textContent).toBe('Nothing')
+    expect(controller.statusElement.textContent).toBe('Nothing')
+    expect(controller.liveElement.textContent).toBe('Nothing')
+    expect(controller.listElement.hidden).toBe(true)
+    expect(controller.listElement.children).toHaveLength(0)
 
     response = jsonResponse({}, 500)
     await controller.search('error')
-    expect(controller.listElement.textContent).toBe('Failed')
-    expect(controller.listElement.querySelector('[role="alert"]')).toBeTruthy()
+    expect(controller.statusElement.textContent).toBe('Failed')
+    expect(controller.statusElement.dataset.autocompleteStatus).toBe('error')
+    expect(controller.liveElement.textContent).toBe('Failed')
   })
 
   it('ignores stale responses and aborts the previous request', async () => {
@@ -318,5 +329,192 @@ describe('createAutocomplete', () => {
     expect(input.getAttribute('autocomplete')).toBe('street-address')
     expect(input.hasAttribute('role')).toBe(false)
     expect(document.querySelector('[data-autocomplete-list]')).toBeNull()
+    expect(document.querySelector('[data-autocomplete-live]')).toBeNull()
+    expect(document.querySelector('label')!.hasAttribute('id')).toBe(false)
+  })
+  it('renders options as non-focusable elements with highlighted matches', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ results: places })))
+    const controller = createAutocomplete('#place', options())
+    await controller.search('mexico')
+
+    const option = controller.listElement.querySelector<HTMLElement>('[role="option"]')!
+    expect(option.tagName).toBe('DIV')
+    expect(option.tabIndex).toBe(-1)
+    expect(option.textContent).toBe('Mexico City')
+    expect(option.querySelector('mark[data-autocomplete-highlight]')!.textContent).toBe('Mexico')
+    expect(controller.liveElement.textContent).toBe('2 results available')
+  })
+
+  it('can disable highlighting', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ results: places })))
+    const controller = createAutocomplete('#place', { ...options(), highlight: false })
+    await controller.search('mexico')
+
+    expect(controller.listElement.querySelector('mark')).toBeNull()
+  })
+
+  it('passes the query, index and highlight parts to renderOption', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ results: places })))
+    const renderOption = vi.fn((element: HTMLElement, place: Place) => {
+      const key = document.createElement('small')
+      key.textContent = place.key
+      element.append(key)
+    })
+    const controller = createAutocomplete('#place', { ...options(), renderOption })
+    await controller.search('city')
+
+    expect(renderOption).toHaveBeenCalledWith(expect.any(HTMLElement), places[0], {
+      query: 'city',
+      index: 0,
+      label: 'Mexico City',
+      highlight: [
+        { text: 'Mexico ', match: false },
+        { text: 'City', match: true },
+      ],
+    })
+    expect(controller.listElement.querySelector('small')!.textContent).toBe('mx')
+  })
+
+  it('filters an array source locally without accents or case', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const cities = ['Cancún', 'Mérida', 'Monterrey', 'Morelia']
+    const loaded = vi.fn()
+    const controller = createAutocomplete('#place', { source: cities })
+    controller.element.addEventListener('autocomplete:load', loaded)
+
+    controller.element.value = 'MER'
+    controller.element.dispatchEvent(new Event('input'))
+
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(controller.listElement.textContent).toBe('Mérida')
+    expect(controller.listElement.querySelector('mark')!.textContent).toBe('Mér')
+    expect(loaded.mock.calls[0]![0].detail).toEqual({
+      query: 'MER',
+      suggestions: ['Mérida'],
+      cached: false,
+    })
+
+    await controller.search('can')
+    expect(controller.listElement.textContent).toBe('Cancún')
+  })
+
+  it('accepts a custom local filter and normalizer', async () => {
+    const controller = createAutocomplete('#place', {
+      source: places,
+      getLabel: place => place.description,
+      filter: (place, query) => place.key.startsWith(query),
+    })
+
+    await controller.search('mo')
+    expect(controller.listElement.textContent).toBe('Cuernavaca, Morelos')
+  })
+
+  it('calls a function source with the query, input and an abort signal', async () => {
+    const source = vi.fn(async (query: string) =>
+      places.filter(place => place.description.toLowerCase().includes(query))
+    )
+    const controller = createAutocomplete('#place', {
+      source,
+      getLabel: place => place.description,
+    })
+
+    await controller.search('city')
+
+    expect(source).toHaveBeenCalledWith('city', {
+      signal: expect.any(AbortSignal),
+      input: controller.element,
+    })
+    expect(controller.listElement.textContent).toBe('Mexico City')
+  })
+
+  it('aborts the signal of a function source when dismissed', async () => {
+    let signal: AbortSignal | undefined
+    const controller = createAutocomplete('#place', {
+      source: (_query, context) => {
+        signal = context.signal
+        return new Promise<Place[]>(() => {})
+      },
+    })
+
+    void controller.search('city')
+    controller.close()
+
+    expect(signal!.aborted).toBe(true)
+  })
+
+  it('reports a function source that does not return an array', async () => {
+    const onError = vi.fn()
+    const controller = createAutocomplete('#place', {
+      source: (async () => ({ nope: true })) as unknown as () => Promise<Place[]>,
+      onError,
+    })
+
+    await controller.search('city')
+
+    expect(onError.mock.calls[0]![0]).toBeInstanceOf(TypeError)
+    expect(controller.statusElement.dataset.autocompleteStatus).toBe('error')
+  })
+
+  it('caches results per query and can clear the cache', async () => {
+    const fetchMock = vi.fn().mockImplementation(async () => jsonResponse({ results: places }))
+    vi.stubGlobal('fetch', fetchMock)
+    const controller = createAutocomplete('#place', options())
+    const loaded = vi.fn()
+    controller.element.addEventListener('autocomplete:load', loaded)
+
+    await controller.search('mex')
+    await controller.search('mex')
+    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(loaded.mock.calls[1]![0].detail.cached).toBe(true)
+    expect(controller.listElement.textContent).toContain('Mexico City')
+
+    controller.clearCache()
+    await controller.search('mex')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not cache failures and honours cache: false and ttl', async () => {
+    vi.useFakeTimers()
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({}, 500))
+      .mockImplementation(async () => jsonResponse({ results: places }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const uncached = createAutocomplete('#place', { ...options(), cache: false })
+    await uncached.search('mex')
+    await uncached.search('mex')
+    await uncached.search('mex')
+    expect(fetchMock).toHaveBeenCalledTimes(3)
+    uncached.destroy()
+
+    fetchMock.mockClear()
+    const short = createAutocomplete('#place', { ...options(), cache: { ttl: 1000 } })
+    await short.search('mex')
+    await short.search('mex')
+    expect(fetchMock).toHaveBeenCalledOnce()
+    vi.advanceTimersByTime(1000)
+    await short.search('mex')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('resolves message functions with the query and count', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ results: places })))
+    const controller = createAutocomplete('#place', {
+      ...options(),
+      messages: {
+        results: ({ count, query }) => `${count} resultados para ${query}`,
+      },
+    })
+
+    await controller.search('me')
+    expect(controller.liveElement.textContent).toBe('2 resultados para me')
+  })
+
+  it('validates cache options', () => {
+    expect(() => createAutocomplete('#place', { ...options(), cache: { max: 0 } })).toThrow(
+      'Autocomplete cache.max must be an integer greater than zero.'
+    )
   })
 })

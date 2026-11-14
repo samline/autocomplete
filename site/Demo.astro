@@ -4,12 +4,19 @@
 import '../dist/styles.css'
 ---
 
-<autocomplete-demo class="demo" data-endpoint={`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`}>
-  <label class="label" for="demo-city">City</label>
+<autocomplete-demo
+  class="demo"
+  data-endpoint={`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}cities.json`}
+>
+  <label class="label" for="demo-city">
+    City
+  </label>
   <div class="field">
     <input id="demo-city" class="input" type="text" placeholder="Try “san” or “mex”" />
   </div>
-  <p class="selected" aria-live="polite">Nothing selected yet.</p>
+  <p class="selected" aria-live="polite">
+    Nothing selected yet.
+  </p>
 </autocomplete-demo>
 
 <script>
@@ -54,7 +61,7 @@ import '../dist/styles.css'
     position: relative;
   }
   /* The preview frame clips overflow: let the list take space inside it. */
-  .field :global([data-autocomplete-list]) {
+  .field :global([data-autocomplete-popup]) {
     position: static;
   }
   .input {

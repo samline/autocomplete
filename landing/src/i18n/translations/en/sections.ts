@@ -48,25 +48,25 @@ export default {
       endpoint: {
         title: 'Your endpoint, any shape',
         description: text(
-          'Point it at a URL or a function of the query. mapResponse, getId, getLabel and getValue adapt whatever JSON your API returns.'
+          'Point it at a URL, an async function or a local array. mapResponse, getId, getLabel and getValue adapt whatever shape your data has.'
         ),
       },
       accessibility: {
         title: 'An accessible combobox',
         description: text(
-          'ARIA combobox and listbox roles, aria-activedescendant and announced status messages, with Arrow keys, Home, End, Enter, Escape and Tab.'
+          'ARIA combobox and listbox roles, aria-activedescendant and a live region that announces results, with Arrow keys, Home, End, Enter, Escape and Tab.'
         ),
       },
       requests: {
         title: 'No stale results',
         description: text(
-          'Searches are debounced and superseded requests aborted. Closing the list cancels the pending search, so a late response never reopens it.'
+          'Searches are debounced, superseded requests aborted and results cached per query. Closing the list cancels the pending search, so a late response never reopens it.'
         ),
       },
       delivery: {
         title: 'Package or script tag',
         description: text(
-          'Import createAutocomplete as ESM or CommonJS, or load the browser bundle and call window.Autocomplete.create.'
+          'Import createAutocomplete as ESM or CommonJS, or load the browser bundle and call window.Autocomplete.newAutocomplete.'
         ),
       },
       events: {
@@ -92,24 +92,26 @@ export default {
       package: {
         label: 'Package / ESM',
         entrypoint: project.npmName,
-        description: 'createAutocomplete, the response helpers and types, as ESM or CommonJS.',
+        description:
+          'createAutocomplete, the source, cache and highlight helpers and types, as ESM or CommonJS.',
       },
       global: {
         label: 'HTML / CDN',
         entrypoint: 'window.Autocomplete',
         description:
-          'create(), destroy() and the available registry, keyed by input id, for pages without a build step.',
+          'newAutocomplete(), getAutocomplete(), destroyAutocomplete() and the available registry, keyed by input id, for pages without a build step.',
       },
       controller: {
         label: 'Controller',
         entrypoint: 'createAutocomplete(input, options)',
         description:
-          'Renders the listbox after your input and returns search(), close(), clear(), cancel() and getSelected().',
+          'Renders the popup after your input and returns search(), close(), clear(), cancel(), clearCache() and getSelected().',
       },
       cleanup: {
         label: 'Cleanup',
         entrypoint: 'controller.destroy()',
-        description: 'Aborts pending work, removes the list and listeners, and restores the input.',
+        description:
+          'Aborts pending work, removes the popup and listeners, and restores the input.',
       },
       types: {
         label: 'Types',
@@ -148,7 +150,12 @@ export default {
         'main.js',
         script
           .replace(/import[^\n]*\n/g, '')
-          .replace('createAutocomplete(', 'window.Autocomplete.create(')
+          .replace(/\n  (\w)/g, '\n    $1')
+          .replace(
+            "createAutocomplete('#city', {",
+            "window.Autocomplete.newAutocomplete({\n  id: 'city',\n  options: {"
+          )
+          .replace(/\n}\)$/, '\n  },\n})')
           .trim(),
         'javascript'
       ),
@@ -217,7 +224,7 @@ export default {
           {
             kind: 'text',
             value:
-              ' reads whatever JSON comes back. Filtering and ranking stay on your server, where your data lives.',
+              ' reads whatever JSON comes back. No endpoint? Pass a source: any async function, or a local array filtered in the browser without regard to case or accents.',
           },
         ],
       },
@@ -229,10 +236,10 @@ export default {
             value:
               'Yes. HTML / CDN loads a script that exposes window.Autocomplete in plain HTML, WordPress or Shopify. Call ',
           },
-          { kind: 'code', value: "window.Autocomplete.create('#city', options)" },
+          { kind: 'code', value: "window.Autocomplete.newAutocomplete({ id: 'city', options })" },
           {
             kind: 'text',
-            value: ' on an input with an id, and pin the version in production.',
+            value: ' with the id of an input, and pin the version in production.',
           },
         ],
       },
@@ -260,7 +267,7 @@ export default {
           {
             kind: 'text',
             value:
-              '. ArrowUp and ArrowDown move through options, Home and End jump to the ends, Enter selects, and Escape or Tab close the list. Loading, empty and error states are announced. Your page supplies the visible label.',
+              '. ArrowUp and ArrowDown move through options, Home and End jump to the ends, Enter selects, and Escape or Tab close the list. Result counts, empty results and errors are announced through a live region. Your page supplies the visible label.',
           },
         ],
       },
@@ -282,9 +289,11 @@ export default {
           { kind: 'text', value: 'Override the ' },
           { kind: 'code', value: '--autocomplete-*' },
           { kind: 'text', value: ' custom properties or target ' },
-          { kind: 'code', value: '[data-autocomplete-list]' },
+          { kind: 'code', value: '[data-autocomplete-popup]' },
           { kind: 'text', value: ' and ' },
           { kind: 'code', value: '[data-autocomplete-option]' },
+          { kind: 'text', value: ', and matches through ' },
+          { kind: 'code', value: '[data-autocomplete-highlight]' },
           { kind: 'text', value: '. ' },
           { kind: 'code', value: 'renderOption' },
           {

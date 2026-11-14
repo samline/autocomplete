@@ -1,17 +1,11 @@
-export { autocomplete, createAutocomplete } from './api/create-autocomplete'
-export { browser } from './browser/registry'
-export type { AutocompleteApi, AutocompleteAvailable } from './browser/registry'
-export { createAutocompleteController, mapCommonResponse, parseJsonResponse } from './core'
+// Side-effect free: importing the package never touches `window`.
+// Load `@samline/autocomplete/browser/global` for `window.Autocomplete`.
+export * from './core'
+export * from './vanilla'
+export { Autocomplete, browser } from './browser/registry'
 export type {
-  AutocompleteController,
-  AutocompleteEndpoint,
-  AutocompleteErrorDetail,
-  AutocompleteLoadDetail,
-  AutocompleteMessages,
-  AutocompleteOptions,
-  AutocompleteParser,
-  AutocompleteRequestInit,
-  AutocompleteResponseMapper,
-  AutocompleteSelectDetail,
-  AutocompleteTarget,
-} from './core'
+  AutocompleteApi,
+  AutocompleteAvailable,
+  NewAutocompleteInput,
+} from './browser/registry'
+export * from './constants'

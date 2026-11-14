@@ -1,6 +1,6 @@
 {
   "name": "@samline/autocomplete",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "An accessible, framework-agnostic remote autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
   "type": "module",
   "license": "MIT",
@@ -29,11 +29,26 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.cjs"
+    },
+    "./vanilla": {
+      "types": "./dist/vanilla/index.d.ts",
+      "import": "./dist/vanilla/index.js",
+      "require": "./dist/vanilla/index.cjs"
+    },
     "./browser": {
-      "types": "./dist/browser/global.d.ts",
+      "types": "./dist/browser/index.d.ts",
+      "import": "./dist/browser/index.js",
+      "require": "./dist/browser/index.cjs"
+    },
+    "./browser/global": {
       "default": "./dist/browser/global.global.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./style.css": "./dist/styles.css"
   },
   "scripts": {
     "clean": "rm -rf dist coverage",

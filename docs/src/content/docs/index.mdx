@@ -12,7 +12,7 @@ import CardGrid from '../../../../shared/components/CardGrid.astro'
 import LinkCard from '../../../../shared/components/LinkCard.astro'
 import { href } from '../../lib/routes'
 
-`@samline/autocomplete` turns an existing text input into an accessible combobox that searches a remote endpoint. You own the endpoint and the response shape; the package owns debounce, cancellation, request ordering, the listbox, keyboard interaction, events and cleanup.
+`@samline/autocomplete` turns an existing text input into an accessible combobox that searches a remote endpoint, an async function or a local array. You own the data and its shape; the package owns debounce, cancellation, request ordering, caching, accent-insensitive matching, highlighting, the listbox, keyboard interaction, announcements, events and cleanup.
 
 ## Choose your next step
 
@@ -24,10 +24,10 @@ import { href } from '../../lib/routes'
     Live previews with the complete, copyable source of each one.
   </LinkCard>
   <LinkCard href={href('reference/configuration')} title="Options">
-    Every option with its default, from endpoint to messages.
+    Every option with its default, from source to messages.
   </LinkCard>
   <LinkCard href={href('reference/api')} title="API reference">
-    createAutocomplete, the controller, helpers and events.
+    createAutocomplete, the controller, helpers, the registry and events.
   </LinkCard>
 </CardGrid>
 

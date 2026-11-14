@@ -5,50 +5,75 @@ sidebar:
   order: 2
 title: 'API reference'
 titleAccent: 'reference'
-description: 'createAutocomplete, the controller members, the response helpers, the browser global registry and every event with its detail.'
+description: 'createAutocomplete, the controller members, the source, cache, filtering and highlighting helpers, the browser registry and every event with its detail.'
 ---
 
 ## `createAutocomplete(target, options)`
 
-`target` is an `HTMLInputElement` or a selector. Returns an `AutocompleteController<T>`. `autocomplete` is an alias. Throws a `TypeError` when the target is not an input or an option is invalid.
+`target` is an `HTMLInputElement` or a selector. Returns an `AutocompleteController<T>`. `autocomplete` is an alias. Throws a `TypeError` when the target is not an input, when neither or both of `source` and `endpoint` are given, or when an option is invalid.
 
 ## Controller
 
 | Member           | Description                                                        |
 | ---------------- | ------------------------------------------------------------------ |
 | `element`        | The managed input.                                                 |
-| `listElement`    | The generated listbox.                                             |
+| `popupElement`   | The positioned container inserted after the input.                 |
+| `listElement`    | The generated listbox inside the popup.                            |
+| `statusElement`  | The visible loading, empty or error message inside the popup.      |
+| `liveElement`    | The visually hidden polite live region after the popup.            |
 | `options`        | The options object you passed.                                     |
 | `search(query?)` | Runs a search now, without debounce.                               |
 | `close()`        | Closes the list and cancels the pending or in-flight search.       |
 | `clear()`        | Clears the input, selection, results and pending work.             |
 | `cancel()`       | Cancels the debounce timer and aborts the active request.          |
+| `clearCache()`   | Forgets every cached query.                                        |
 | `getSelected()`  | The original selected suggestion, or `null`.                       |
-| `destroy()`      | Cancels work, removes listeners and the list, restores attributes. |
+| `destroy()`      | Cancels work, removes listeners and elements, restores attributes. |
 
 ## Helpers
 
-- `createAutocompleteController(target, options)`: the core factory behind `createAutocomplete`; same arguments and controller.
+All helpers are exported from `@samline/autocomplete`; the DOM-free ones also from `@samline/autocomplete/core`.
+
+- `fromEndpoint({ endpoint, queryParam?, requestInit?, parseResponse?, mapResponse? })`: returns the `(query, { signal, input })` source function used for `endpoint`. Reuse or wrap it in your own `source`.
+- `filterSuggestions(items, query, { getText, normalize? })`: keeps the items whose text contains every word of the query. The default filter for array sources.
+- `normalizeText(text)`: lowercases and removes diacritics.
+- `highlight(text, query, normalize?)`: returns `{ text, match }[]` parts that keep the original characters.
+- `renderHighlight(element, parts)`: appends parts as text nodes and `<mark data-autocomplete-highlight>` elements (from `@samline/autocomplete/vanilla`).
+- `createCache({ max?, ttl? })`: the LRU cache with `get`, `set`, `clear` and `size`.
 - `mapCommonResponse(payload)`: reads a root array or `suggestions`, `items` or `data` arrays.
 - `parseJsonResponse(response)`: the default JSON parser.
-- `browser`: the importable equivalent of the browser global.
+- `DEFAULT_MESSAGES`: the English messages.
 
-## Browser global
+## Browser registry
 
-The CDN bundle defines `window.Autocomplete` with `create(target, options)` (requires an input id and registers the controller), `destroy(id)`, `available` (controllers by id) and `autocomplete(target, options)`.
+The CDN bundle (`@samline/autocomplete/browser/global`) defines `window.Autocomplete`. The same object is importable as `Autocomplete` (alias `browser`) from `@samline/autocomplete` or `@samline/autocomplete/browser`.
+
+| Member                             | Description                                                                  |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| `newAutocomplete({ id, options })` | Enhances the input with that id and registers it; returns `null` if missing. |
+| `getAutocomplete(id)`              | The registered controller, or `null`.                                        |
+| `getAutocompletes()`               | A copy of the registered controllers by id.                                  |
+| `destroyAutocomplete(idOrInput)`   | Destroys and unregisters one controller.                                     |
+| `destroyAutocompletes()`           | Destroys and unregisters every controller.                                   |
+| `available`                        | The live registry object.                                                    |
+| `autocomplete(target, options)`    | Creates a controller without registering it.                                 |
+
+Registering an id again destroys the previous controller. Calling `destroy()` on a registered controller also unregisters it.
 
 ## Events
 
 All events bubble from the input.
 
-| Event                    | `detail`                       |
-| ------------------------ | ------------------------------ |
-| `autocomplete:loadstart` | `{ query }`                    |
-| `autocomplete:load`      | `{ query, suggestions }`       |
-| `autocomplete:error`     | `{ query, error }`             |
-| `autocomplete:select`    | `{ suggestion, label, value }` |
-| `autocomplete:clear`     | `{ query }`                    |
+| Event                    | `detail`                         |
+| ------------------------ | -------------------------------- |
+| `autocomplete:loadstart` | `{ query }`                      |
+| `autocomplete:load`      | `{ query, suggestions, cached }` |
+| `autocomplete:error`     | `{ query, error }`               |
+| `autocomplete:select`    | `{ suggestion, label, value }`   |
+| `autocomplete:clear`     | `{ query }`                      |
+
+`autocomplete:loadstart` fires only when the source is called; array sources and cache hits go straight to `autocomplete:load`.
 
 ## Types
 
-`AutocompleteOptions<T>`, `AutocompleteController<T>`, `AutocompleteTarget`, `AutocompleteEndpoint`, `AutocompleteRequestInit`, `AutocompleteParser`, `AutocompleteResponseMapper<T>`, `AutocompleteMessages`, `AutocompleteSelectDetail<T>`, `AutocompleteLoadDetail<T>`, `AutocompleteErrorDetail`, `AutocompleteApi` and `AutocompleteAvailable`.
+`AutocompleteOptions<T>`, `AutocompleteController<T>`, `AutocompleteTarget`, `AutocompleteSource<T>`, `AutocompleteSourceFunction<T>`, `AutocompleteSourceContext`, `AutocompleteEndpoint`, `AutocompleteEndpointOptions<T>`, `AutocompleteRequestInit`, `AutocompleteParser`, `AutocompleteResponseMapper<T>`, `AutocompleteCacheOptions`, `AutocompleteCache<T>`, `AutocompleteMessages`, `AutocompleteMessage`, `AutocompleteMessageContext`, `AutocompleteHighlightPart`, `AutocompleteRenderContext`, `AutocompleteNormalizer`, `FilterSuggestionsOptions<T>`, `AutocompleteSelectDetail<T>`, `AutocompleteLoadDetail<T>`, `AutocompleteErrorDetail`, `AutocompleteApi`, `AutocompleteAvailable` and `NewAutocompleteInput<T>`.

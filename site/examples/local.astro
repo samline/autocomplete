@@ -1,0 +1,30 @@
+---
+import '../../dist/styles.css'
+import './_shared.css'
+---
+
+<div class="preview" data-preview="local">
+  <div class="field">
+    <label for="preview-state">Mexican state</label>
+    <input id="preview-state" type="text" placeholder="Try “queretaro” or “leon”" />
+  </div>
+</div>
+
+<script>
+  import { createAutocomplete } from '@samline/autocomplete'
+  createAutocomplete('#preview-state', {
+    source: [
+      'Aguascalientes',
+      'Baja California',
+      'Campeche',
+      'Ciudad de México',
+      'Michoacán',
+      'Morelos',
+      'Nuevo León',
+      'Querétaro',
+      'San Luis Potosí',
+      'Yucatán',
+    ],
+    messages: { empty: ({ query }) => `No state matches “${query}”` },
+  })
+</script>

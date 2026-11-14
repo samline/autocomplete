@@ -2,18 +2,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { AutocompleteApi } from '../../src/browser/registry'
 
-// The IIFE build assigns these named exports to window.Autocomplete
+// The IIFE build assigns the registry to window.Autocomplete
 // (scripts/test-package.mjs checks the built global itself).
-async function importGlobal(): Promise<AutocompleteApi> {
+const importGlobal = async (): Promise<AutocompleteApi> => {
   vi.resetModules()
-  const module = (await import('../../src/browser/global')) as unknown as AutocompleteApi
-  window.Autocomplete = { ...module }
+  await import('../../src/browser/global')
   return window.Autocomplete
 }
 
 describe('browser global', () => {
   beforeEach(() => {
-    document.body.innerHTML = '<input id="search">'
+    document.body.innerHTML = '<input id="search"><input id="other">'
     delete (globalThis as { Autocomplete?: unknown }).Autocomplete
   })
 
@@ -22,32 +21,65 @@ describe('browser global', () => {
     delete (globalThis as { Autocomplete?: unknown }).Autocomplete
   })
 
-  it('exposes window.Autocomplete', async () => {
+  it('exposes window.Autocomplete with the shared registry shape', async () => {
     const Autocomplete = await importGlobal()
 
-    expect(window.Autocomplete).toBe(Autocomplete)
-    expect(typeof Autocomplete.autocomplete).toBe('function')
-    expect(typeof Autocomplete.create).toBe('function')
-    expect(typeof Autocomplete.destroy).toBe('function')
+    expect(Object.keys(Autocomplete).sort()).toEqual([
+      'autocomplete',
+      'available',
+      'destroyAutocomplete',
+      'destroyAutocompletes',
+      'getAutocomplete',
+      'getAutocompletes',
+      'newAutocomplete',
+    ])
   })
 
-  it('registers and destroys instances by input id', async () => {
+  it('registers, reads and destroys instances by input id', async () => {
     const Autocomplete = await importGlobal()
-    const controller = Autocomplete.create('#search', { endpoint: '/api/search' })
+    const controller = Autocomplete.newAutocomplete({ id: 'search', options: { source: ['a'] } })
 
+    expect(Autocomplete.getAutocomplete('search')).toBe(controller)
     expect(Autocomplete.available.search).toBe(controller)
-    Autocomplete.destroy('search')
-    expect(Autocomplete.available.search).toBeUndefined()
+    expect(Object.keys(Autocomplete.getAutocompletes())).toEqual(['search'])
+
+    Autocomplete.destroyAutocomplete('search')
+    expect(Autocomplete.getAutocomplete('search')).toBeNull()
     expect(document.querySelector('[data-autocomplete-list]')).toBeNull()
   })
 
-  it('requires an id for registry-backed instances', async () => {
+  it('replaces an existing registration for the same id', async () => {
     const Autocomplete = await importGlobal()
-    const input = document.createElement('input')
-    document.body.append(input)
+    Autocomplete.newAutocomplete({ id: 'search', options: { source: ['a'] } })
+    Autocomplete.newAutocomplete({ id: 'search', options: { source: ['b'] } })
 
-    expect(() => Autocomplete.create(input, { endpoint: '/api/search' })).toThrow(
-      'Autocomplete.create requires an input with an id.'
-    )
+    expect(document.querySelectorAll('[data-autocomplete-list]')).toHaveLength(1)
+  })
+
+  it('destroys by element, all at once, and on direct destroy()', async () => {
+    const Autocomplete = await importGlobal()
+    const search = Autocomplete.newAutocomplete({ id: 'search', options: { source: ['a'] } })!
+    Autocomplete.newAutocomplete({ id: 'other', options: { source: ['a'] } })
+
+    Autocomplete.destroyAutocomplete(search.element)
+    expect(Autocomplete.getAutocomplete('search')).toBeNull()
+
+    Autocomplete.destroyAutocompletes()
+    expect(Autocomplete.getAutocompletes()).toEqual({})
+
+    const again = Autocomplete.newAutocomplete({ id: 'search', options: { source: ['a'] } })!
+    again.destroy()
+    expect(Autocomplete.getAutocomplete('search')).toBeNull()
+  })
+
+  it('returns null for a missing id or input', async () => {
+    const Autocomplete = await importGlobal()
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    expect(Autocomplete.newAutocomplete({ id: '', options: { source: [] } })).toBeNull()
+    expect(Autocomplete.newAutocomplete({ id: 'missing', options: { source: [] } })).toBeNull()
+    expect(error).toHaveBeenCalledOnce()
+    expect(warn).toHaveBeenCalledOnce()
   })
 })

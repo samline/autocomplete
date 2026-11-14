@@ -8,7 +8,7 @@ label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
 input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #aaa; border-radius: 0.5rem; font: inherit; }`
 
 const filter = `mapResponse: (payload, response, query) =>
-    payload.results.filter(city => city.name.toLowerCase().includes(query.toLowerCase())),`
+      payload.results.filter(city => city.name.toLowerCase().includes(query.toLowerCase())),`
 
 export default [
   {
@@ -24,15 +24,18 @@ export default [
 </div>
 <p id="selected" aria-live="polite">Nothing selected yet.</p>`,
       css: baseCss,
-      js: `window.Autocomplete.create('#city', {
-  endpoint: '${endpoint}',
-  minLength: 2,
-  ${filter}
-  getId: city => city.key,
-  getLabel: city => \`\${city.name}, \${city.country}\`,
-  getValue: city => city.name,
-  onSelect: city => {
-    document.querySelector('#selected').textContent = \`Selected \${city.name}.\`
+      js: `window.Autocomplete.newAutocomplete({
+  id: 'city',
+  options: {
+    endpoint: '${endpoint}',
+    minLength: 2,
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => \`\${city.name}, \${city.country}\`,
+    getValue: city => city.name,
+    onSelect: city => {
+      document.querySelector('#selected').textContent = \`Selected \${city.name}.\`
+    },
   },
 })`,
     },
@@ -42,7 +45,7 @@ export default [
     tab: 'Custom options',
     title: 'Render richer options',
     description:
-      'renderOption receives each option button and its suggestion, so you can append a secondary line with DOM nodes instead of HTML strings.',
+      'renderOption receives each option element, its suggestion and the render context, so you can append a secondary line with DOM nodes instead of HTML strings.',
     files: {
       html: `<div class="field">
   <label for="destination">Destination</label>
@@ -50,17 +53,20 @@ export default [
 </div>`,
       css: `${baseCss}
 [data-autocomplete-option] small { display: block; color: #666; }`,
-      js: `window.Autocomplete.create('#destination', {
-  endpoint: '${endpoint}',
-  minLength: 1,
-  maxResults: 5,
-  ${filter}
-  getId: city => city.key,
-  getLabel: city => city.name,
-  renderOption: (option, city) => {
-    const country = document.createElement('small')
-    country.textContent = city.country
-    option.append(country)
+      js: `window.Autocomplete.newAutocomplete({
+  id: 'destination',
+  options: {
+    endpoint: '${endpoint}',
+    minLength: 1,
+    maxResults: 5,
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => city.name,
+    renderOption: (option, city) => {
+      const country = document.createElement('small')
+      country.textContent = city.country
+      option.append(country)
+    },
   },
 })`,
     },
@@ -84,11 +90,14 @@ export default [
 const key = document.querySelector('#origin-key')
 const log = document.querySelector('#log')
 
-const controller = window.Autocomplete.create('#origin', {
-  endpoint: '${endpoint}',
-  ${filter}
-  getId: city => city.key,
-  getLabel: city => city.name,
+const controller = window.Autocomplete.newAutocomplete({
+  id: 'origin',
+  options: {
+    endpoint: '${endpoint}',
+    ${filter}
+    getId: city => city.key,
+    getLabel: city => city.name,
+  },
 })
 
 input.addEventListener('autocomplete:select', event => {
@@ -100,6 +109,30 @@ input.addEventListener('autocomplete:clear', () => {
   log.textContent = 'clear: selection removed'
 })
 document.querySelector('#reset').addEventListener('click', () => controller.clear())`,
+    },
+  },
+  {
+    id: 'local',
+    tab: 'Local data',
+    title: 'Filter a local list without a server',
+    description:
+      'Pass an array as source and the list is filtered in the browser, ignoring case and accents: typing “merida” finds “Mérida”. The matching part of each label is highlighted.',
+    files: {
+      html: `<div class="field">
+  <label for="state">Mexican state</label>
+  <input id="state" type="text" />
+</div>`,
+      css: baseCss,
+      js: `window.Autocomplete.newAutocomplete({
+  id: 'state',
+  options: {
+    source: [
+      'Aguascalientes', 'Baja California', 'Campeche', 'Ciudad de México', 'Michoacán',
+      'Morelos', 'Nuevo León', 'Querétaro', 'San Luis Potosí', 'Yucatán',
+    ],
+    messages: { empty: ({ query }) => \`No state matches “\${query}”\` },
+  },
+})`,
     },
   },
 ] as const
