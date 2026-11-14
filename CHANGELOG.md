@@ -2,7 +2,7 @@
 
 All notable changes to `@samline/autocomplete` are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0] - Unreleased
+## [2.1.0] - 2026-11-14
 
 Sections, recent selections, form fields, smarter placement and custom popup content. No breaking changes.
 
@@ -69,6 +69,6 @@ First public release.
 - Escape, Tab, clicking outside, selecting a suggestion and `close()` cancel the pending debounced search and abort the request in flight. Before, a late response reopened the list after it was dismissed.
 - The standalone script defines `window.Autocomplete` with its documented members. Before, the global was wrapped as `{ default }`.
 
-[2.1.0]: https://github.com/samline/autocomplete/compare/v2.0.0...HEAD
+[2.1.0]: https://github.com/samline/autocomplete/releases/tag/v2.1.0
 [2.0.0]: https://github.com/samline/autocomplete/releases/tag/v2.0.0
 [1.0.0]: https://github.com/samline/autocomplete/releases/tag/v1.0.0
