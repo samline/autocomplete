@@ -155,7 +155,7 @@ Every option with a plain value has an attribute (`data-autocomplete-min-length`
 
 [Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, the event lifecycle, local data, sections, forms, declarative setup, removable pills, hooks, plugins and cache, observable state and prefill, custom status/header/footer, headless rendering, a command palette and dependent fields. Each includes copyable HTML / CDN and Package / ESM files.
 
-The pills recipe composes the existing single-selection API with an application-owned collection: removable selections, duplicate prevention, repeated form fields and keyboard navigation between pills. There is no built-in `multiple` mode.
+The pills recipe composes the existing single-selection API with an application-owned collection: removable selections, duplicate prevention, repeated form fields and keyboard navigation between pills, shown inside the field or below it. Moving `controller.popupElement` after the composite field keeps the suggestions below it at full width. There is no built-in `multiple` mode.
 
 ### Any source
 

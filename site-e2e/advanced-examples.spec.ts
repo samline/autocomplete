@@ -81,6 +81,35 @@ for (const mode of [
       })
     }
 
+    test('pills: moves pills between layouts without shifting the form', async ({ page }) => {
+      const root = await open(page, 'pills')
+      await choose(root, 'des')
+      await choose(root, 'eng')
+      const field = root.locator('.pill-field')
+      const help = root.locator('#pills-help')
+      await expect(field.locator('[data-pills] li')).toHaveCount(2)
+      const before = await help.boundingBox()
+      await root.getByText('Below the field').click()
+      await expect(field.locator('[data-pills]')).toHaveCount(0)
+      await expect(root.locator('[data-pills-below] [data-pills] li')).toHaveCount(2)
+      expect((await help.boundingBox())!.y).toBeCloseTo(before!.y, 0)
+      // The popup follows the whole field, not the input inside it.
+      const input = root.locator('input[type="text"]')
+      await input.fill('ma')
+      const popup = root.locator('[data-autocomplete-popup]')
+      await expect(popup).toBeVisible()
+      const [fieldBox, popupBox] = [await field.boundingBox(), await popup.boundingBox()]
+      expect(popupBox!.y).toBeGreaterThanOrEqual(fieldBox!.y + fieldBox!.height - 1)
+      expect(popupBox!.width).toBeCloseTo(fieldBox!.width, 0)
+      await input.press('Escape')
+      await root.getByText('Inside the field').click()
+      await expect(field.locator('[data-pills] li')).toHaveCount(2)
+      await root.getByRole('button', { name: 'Submit teams' }).click()
+      await expect(root.locator('[data-submitted]')).toHaveText(
+        'Submitted teams: design, engineering.'
+      )
+    })
+
     test('pills: keyboard navigation and intentional deletion', async ({ page }) => {
       const root = await open(page, 'pills')
       await choose(root, 'des')

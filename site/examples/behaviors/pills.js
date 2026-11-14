@@ -3,6 +3,8 @@ export const setupPills = (root, createAutocomplete) => {
   const form = root.querySelector('form')
   const input = root.querySelector('input[type="text"]')
   const pills = root.querySelector('[data-pills]')
+  const field = root.querySelector('.pill-field')
+  const below = root.querySelector('[data-pills-below]')
   const values = root.querySelector('[data-values]')
   const announcement = root.querySelector('[data-announcement]')
   const submitted = root.querySelector('[data-submitted]')
@@ -47,6 +49,9 @@ export const setupPills = (root, createAutocomplete) => {
     source,
     minLength: 0,
     debounce: 0,
+    // Auto placement measures from the input; this popup is anchored below
+    // the whole field instead, so keep it there.
+    placement: 'bottom',
     getId: item => item.id,
     getLabel: item => item.label,
     transformSuggestions: items => items.filter(item => !selected.has(item.id)),
@@ -59,6 +64,27 @@ export const setupPills = (root, createAutocomplete) => {
       announcement.textContent = `${item.label} added. ${selected.size} selected.`
     },
   })
+  // The popup is created right after the input; move it after the whole
+  // field so it opens below the pills too, at the field's full width.
+  field.after(controller.popupElement)
+  // The same pills list moves between the field and the area below it;
+  // selections, hidden inputs and focus handling stay as they are.
+  const place = layout => {
+    if (layout === 'inside') field.prepend(pills)
+    else below.append(pills)
+  }
+  root
+    .querySelector('.layout')
+    .addEventListener('change', event => place(event.target.value), { signal: events.signal })
+  place(root.querySelector('.layout input:checked').value)
+  // Clicking the field's padding or gaps types into the input.
+  field.addEventListener(
+    'click',
+    event => {
+      if (event.target === field) input.focus()
+    },
+    { signal: events.signal }
+  )
   render()
   input.addEventListener(
     'keydown',
@@ -118,6 +144,7 @@ export const setupPills = (root, createAutocomplete) => {
   return () => {
     events.abort()
     controller.destroy()
+    field.prepend(pills)
     pills.replaceChildren()
     values.replaceChildren()
   }

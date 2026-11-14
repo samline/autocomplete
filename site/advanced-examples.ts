@@ -30,13 +30,27 @@ const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
 [data-example] button:focus-visible, [data-example] input:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 [data-example] p { margin: 0; overflow-wrap: anywhere; }
 [data-example] .actions { display: flex; flex-wrap: wrap; gap: .5rem; }
-[data-example] [data-pills] { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0; padding: 0; list-style: none; }
-[data-example] .pill { display: inline-flex; align-items: center; gap: .25rem; padding-left: .75rem; border: 1px solid var(--color-border, #888); border-radius: 2rem; overflow-wrap: anywhere; max-width: 100%; }
-[data-example] .pill button { border: 0; border-radius: 2rem; min-width: 2.75rem; min-height: 2.75rem; }
-[data-example] .pill-field { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .5rem; border: 1px solid var(--color-border, #888); border-radius: .5rem; }
-[data-example] .pill-field:focus-within { outline: 2px solid currentColor; outline-offset: 3px; }
-[data-example] .pill-field input[type="text"] { width: auto; flex: 1 1 8rem; min-width: 0; border: 0; }
+[data-example] [data-pills] { display: flex; flex-wrap: wrap; gap: .375rem; margin: 0; padding: 0; list-style: none; }
+[data-example] [data-pills]:empty { display: none; }
+[data-example] .pill { box-sizing: border-box; display: inline-flex; align-items: center; gap: .125rem; max-width: 100%; height: 2rem; padding-left: .625rem; border: 1px solid var(--color-border, #888); border-radius: 1rem; background: var(--color-bg, #f4f4f5); font-size: .875rem; overflow-wrap: anywhere; }
+[data-example] .pill button { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 1rem; background: transparent; line-height: 1; }
+[data-example] .pill button:hover { background: var(--color-bg-soft, #e4e4e7); }
+[data-example] .pill-field { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; box-sizing: border-box; min-height: 3.125rem; padding: .5rem .75rem; border: 1px solid var(--color-border, #888); border-radius: .5rem; background: var(--color-bg-soft, #fff); cursor: text; }
+[data-example] .pill-field:focus-within { outline: 2px solid currentColor; outline-offset: 2px; }
+[data-example] .pill-field input[type="text"] { flex: 1 1 8rem; width: auto; min-width: 0; height: 2rem; padding: 0; border: 0; background: transparent; }
 [data-example] .pill-field input[type="text"]:focus-visible { outline: none; }
+/* The popup sits after the whole field and overlays what follows it. */
+[data-example="pills"] { --autocomplete-max-height: 10rem; }
+[data-example="pills"] form { display: grid; gap: .5rem; }
+[data-example="pills"] .field [data-autocomplete-popup] { position: absolute; top: 100%; }
+/* One reserved pill row: switching layouts never shifts what follows. */
+[data-example] [data-pills-below] { min-height: 2.25rem; }
+[data-example] .layout { display: flex; flex-wrap: wrap; gap: .25rem; margin: 0; padding: .25rem; border: 1px solid var(--color-border, #888); border-radius: .625rem; justify-self: start; }
+[data-example] .layout legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+[data-example] .layout label { display: flex; align-items: center; margin: 0; padding: .375rem .75rem; border-radius: .375rem; font-size: .875rem; cursor: pointer; }
+[data-example] .layout input { position: absolute; opacity: 0; pointer-events: none; }
+[data-example] .layout label:has(:checked) { background: var(--color-bg-soft, #e4e4e7); box-shadow: inset 0 0 0 1px var(--color-border, #888); font-weight: 600; }
+[data-example] .layout label:has(:focus-visible) { outline: 2px solid currentColor; outline-offset: 2px; }
 [data-example] .directory { display: grid; gap: .5rem; padding: 0; margin: 0; list-style: none; }
 [data-example] .directory button { width: 100%; text-align: left; }
 [data-example] [aria-disabled="true"] { opacity: .65; }
@@ -51,19 +65,27 @@ export default [
     tab: 'Pills',
     title: 'Select several items as removable pills',
     description:
-      'Pills and a real input share one visual field, and each selection is submitted as a repeated teams[] field. transformSuggestions hides teams already chosen and the application owns the collection: this composes the single-selection API, it is not a built-in multiple mode. With an empty input, Backspace or ← focuses the last pill; Backspace/Delete removes it, arrows move between pills and Escape returns to typing.',
+      'Switch where the pills live: inside the field next to the input, or in their own list below it. The suggestions always open below the whole field, because the example moves controller.popupElement after it. transformSuggestions hides chosen teams and each pill is submitted as a repeated teams[] field; this composes the single-selection API, it is not a built-in multiple mode. With an empty input, Backspace focuses the last pill, Delete removes it, arrows move between pills and Escape returns to typing.',
     files: {
-      html: `<form data-example="pills">
-  <div class="field">
-    <label for="pills-input">Teams</label>
-    <div class="pill-field"><ul data-pills aria-label="Selected teams"></ul><input id="pills-input" type="text" aria-describedby="pills-help" /></div>
-  </div>
-  <p id="pills-help">Type to add teams. With no text, press Backspace to focus the last pill, then Delete to remove it.</p>
-  <div data-values></div>
-  <p data-announcement role="status">No teams selected.</p>
-  <div class="actions"><button type="submit">Submit teams</button><button type="reset">Reset teams</button></div>
-  <p data-submitted aria-live="polite">Nothing submitted yet.</p>
-</form>`,
+      html: `<div data-example="pills">
+  <fieldset class="layout">
+    <legend>Show selected teams</legend>
+    <label><input type="radio" name="pills-layout" value="inside" checked /> Inside the field</label>
+    <label><input type="radio" name="pills-layout" value="below" /> Below the field</label>
+  </fieldset>
+  <form>
+    <div class="field">
+      <label for="pills-input">Teams</label>
+      <div class="pill-field"><ul data-pills aria-label="Selected teams"></ul><input id="pills-input" type="text" aria-describedby="pills-help" placeholder="Add a team" /></div>
+    </div>
+    <div data-pills-below></div>
+    <p id="pills-help">With no text, Backspace focuses the last pill and Delete removes it.</p>
+    <div data-values></div>
+    <p data-announcement role="status">No teams selected.</p>
+    <div class="actions"><button type="submit">Submit teams</button><button type="reset">Reset teams</button></div>
+    <p data-submitted aria-live="polite">Nothing submitted yet.</p>
+  </form>
+</div>`,
       css,
       js: script(setupPills),
       esm: script(setupPills, 'esm'),
