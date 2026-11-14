@@ -283,10 +283,13 @@ export async function checkContent({ root, project, release, audit = {}, sentine
 
   // Root conventions shared by the sibling packages.
   if (release) {
-    if (!(await exists(join(root, 'LICENSE.md')))) fail('Name the license file LICENSE.md.')
-    if (await exists(join(root, 'LICENSE'))) fail('Rename LICENSE to LICENSE.md.')
+    // A collection site lives inside its repository, whose LICENSE.md covers it.
+    const licenseRoot =
+      project.collection && !(await exists(join(root, 'LICENSE.md'))) ? join(root, '..') : root
+    if (!(await exists(join(licenseRoot, 'LICENSE.md')))) fail('Name the license file LICENSE.md.')
+    if (await exists(join(licenseRoot, 'LICENSE'))) fail('Rename LICENSE to LICENSE.md.')
     // One license per package: LICENSE.md covers the package and the website.
-    const license = await readFile(join(root, 'LICENSE.md'), 'utf8').catch(() => '')
+    const license = await readFile(join(licenseRoot, 'LICENSE.md'), 'utf8').catch(() => '')
     const holder = license.match(/^Copyright \(c\) \d{4}(?:-\d{4})? (.+)$/m)?.[1]?.trim()
     if (license && project.author && holder !== project.author)
       fail(`LICENSE.md copyright line must name the package author "${project.author}".`)

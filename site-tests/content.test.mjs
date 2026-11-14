@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises'
+import { cp, mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { execFileSync } from 'node:child_process'
@@ -205,4 +205,25 @@ test('LICENSE.md names the configured package author', async () => {
 
 test('a SITE-LICENSE.md with a different license is allowed', async () => {
   assert.deepEqual(await run({ 'SITE-LICENSE.md': 'Apache License 2.0' }), [])
+})
+
+test('a collection site uses the LICENSE.md of its repository', async () => {
+  const author = 'Ada Lovelace (ada)'
+  const license = `MIT License\n\nCopyright (c) 2026 ${author}\n\nPermission is hereby granted.\n`
+  // <repository>/site holds the website; the repository holds the license.
+  const site = await fixture({ 'LICENSE.md': null })
+  const repository = await mkdtemp(join(tmpdir(), 'package-site-collection-'))
+  const root = join(repository, 'site')
+  try {
+    await cp(site, root, { recursive: true })
+    await writeFile(join(repository, 'README.md'), readme)
+    const options = { project: { ...project, author, collection: { packagesDir: '../packages' } } }
+    const check = () => checkContent({ root, release: true, ...options })
+    assert.ok((await check()).some(problem => /Name the license file/.test(problem)))
+    await writeFile(join(repository, 'LICENSE.md'), license)
+    assert.ok(!(await check()).some(problem => /LICENSE/.test(problem)))
+  } finally {
+    await rm(site, { recursive: true, force: true })
+    await rm(repository, { recursive: true, force: true })
+  }
 })
