@@ -5,7 +5,7 @@ sidebar:
   order: 1
 title: 'Examples you can copy'
 titleAccent: 'copy'
-description: 'Each live autocomplete preview with its explanation and the complete source files to copy: search, options, events, local data, sections and forms.'
+description: 'Live autocomplete demos with copyable source: search, forms, pills, hooks, plugins, cache, state, custom rendering and headless search.'
 ---
 
 import PackagePreview from '../../../../../shared/components/PackagePreview.astro'
@@ -13,7 +13,11 @@ import { examplesFor } from '../../../../../shared/lib/package-examples'
 
 export const examples = examplesFor()
 
-Every preview runs the real package against a static list of cities. The copied files load the published browser bundle and the same public JSON, so they work as-is.
+Every preview runs the real package with local data, a public cities JSON file or a simulated async directory. Each includes complete and separate source files. Most copied examples load the browser bundle; the headless example also imports `createSearch` from the public ESM core entrypoint.
+
+The two pills recipes keep multiple selections in application state, render removable pills and submit repeated `teams[]` fields. They compose the existing single-selection API rather than enabling a native `multiple` option. Inline pills sit alongside a real input inside a shared visual field. With an empty input, Backspace or ArrowLeft focuses the last pill; Backspace/Delete removes a focused pill, arrows move between pills and Escape returns to the input.
+
+Explore hooks for query cleanup and selection guards; plugins for cache telemetry; observable state for edit-form prefill; render callbacks for loading, empty and error states; and `createSearch` for a custom directory. The headless directory uses native buttons and Tab/Enter. Building a custom combobox instead requires providing its ARIA and keyboard behavior.
 
 {examples.map(example => (
 

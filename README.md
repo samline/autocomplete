@@ -153,7 +153,9 @@ Every option with a plain value has an attribute (`data-autocomplete-min-length`
 - An optional stylesheet themed with `--autocomplete-*` custom properties.
 - React, Vue, Svelte, Shopify and WordPress through the same API, with no adapter.
 
-[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, events, local data, sections, forms and a no-JavaScript setup, each with copyable files.
+[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, events, local data, sections, forms, declarative setup, external and inline pills, hooks, plugins and cache, observable state and prefill, custom status/header/footer, and headless rendering. Each includes copyable files.
+
+The pills recipes compose the existing single-selection API with an application-owned collection. They support removable selections, duplicate prevention and repeated form fields; inline pills also demonstrate keyboard navigation and removal. There is no built-in `multiple` mode.
 
 ### Any source
 

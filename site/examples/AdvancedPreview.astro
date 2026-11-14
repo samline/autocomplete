@@ -1,0 +1,36 @@
+---
+import '../../dist/styles.css'
+import './_shared.css'
+import examples from '../advanced-examples'
+interface Props {
+  id: string
+}
+const example = examples.find(item => item.id === Astro.props.id)!
+---
+
+<style is:inline set:html={example.files.css} />
+<div class="preview" data-advanced-preview={example.id} set:html={example.files.html} />
+
+<script>
+  import { createAutocomplete, createSearch } from '@samline/autocomplete'
+  import { mountElements } from '../../shared/lib/mount-elements'
+  import { setupPills } from './behaviors/pills.js'
+  import { setupHooks } from './behaviors/hooks.js'
+  import { setupPlugins } from './behaviors/plugins.js'
+  import { setupState } from './behaviors/state.js'
+  import { setupRendering } from './behaviors/rendering.js'
+  import { setupHeadless } from './behaviors/headless.js'
+
+  mountElements('[data-advanced-preview]', root => {
+    if (root.dataset.advancedPreview === 'headless') return setupHeadless(root, createSearch)
+    const setup = {
+      'pills-external': setupPills,
+      'pills-inline': setupPills,
+      hooks: setupHooks,
+      plugins: setupPlugins,
+      state: setupState,
+      rendering: setupRendering,
+    }[root.dataset.advancedPreview!]
+    return setup?.(root, createAutocomplete)
+  })
+</script>

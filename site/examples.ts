@@ -1,3 +1,5 @@
+import advancedExamples from './advanced-examples'
+
 // Copyable files load the published browser bundle (window.Autocomplete) and
 // the site's public cities.json; the previews in examples/*.astro import the
 // package itself.
@@ -240,4 +242,5 @@ document.querySelector('#trip').addEventListener('submit', event => {
 // Read a mounted controller with window.Autocomplete.getAutocomplete('fruit').`,
     },
   },
+  ...advancedExamples,
 ] as const
