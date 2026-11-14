@@ -32,9 +32,11 @@ const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
 [data-example] .actions { display: flex; flex-wrap: wrap; gap: .5rem; }
 [data-example] [data-pills] { display: flex; flex-wrap: wrap; gap: .375rem; margin: 0; padding: 0; list-style: none; }
 [data-example] [data-pills]:empty { display: none; }
-[data-example] .pill { box-sizing: border-box; display: inline-flex; align-items: center; gap: .125rem; max-width: 100%; height: 2rem; padding-left: .625rem; border: 1px solid var(--color-border, #888); border-radius: 1rem; background: var(--color-bg, #f4f4f5); font-size: .875rem; overflow-wrap: anywhere; }
-[data-example] .pill button { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 1rem; background: transparent; line-height: 1; }
+[data-example] .pill { display: flex; max-width: 100%; }
+[data-example] .pill button { box-sizing: border-box; display: inline-flex; align-items: center; gap: .375rem; max-width: 100%; height: 2rem; padding: 0 .625rem; border: 1px solid var(--color-border, #888); border-radius: 1rem; background: var(--color-bg, #f4f4f5); color: inherit; font: inherit; font-size: .875rem; line-height: 1; overflow-wrap: anywhere; cursor: pointer; }
 [data-example] .pill button:hover { background: var(--color-bg-soft, #e4e4e7); }
+[data-example] .pill button span[aria-hidden] { font-size: 1rem; opacity: .7; }
+[data-example] .pill button:hover span[aria-hidden] { opacity: 1; }
 [data-example] .pill-field { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; box-sizing: border-box; min-height: 3.125rem; padding: .5rem .75rem; border: 1px solid var(--color-border, #888); border-radius: .5rem; background: var(--color-bg-soft, #fff); cursor: text; }
 [data-example] .pill-field:focus-within { outline: 2px solid currentColor; outline-offset: 2px; }
 [data-example] .pill-field input[type="text"] { flex: 1 1 8rem; width: auto; min-width: 0; height: 2rem; padding: 0; border: 0; background: transparent; }

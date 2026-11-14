@@ -23,12 +23,16 @@ export const setupPills = (root, createAutocomplete) => {
     for (const item of selected.values()) {
       const pill = document.createElement('li')
       pill.className = 'pill'
-      const label = document.createElement('span')
-      label.textContent = item.label
+      // The whole pill is the removal button, so any part of it removes it.
       const remove = document.createElement('button')
       remove.type = 'button'
-      remove.textContent = '×'
       remove.setAttribute('aria-label', `Remove ${item.label}`)
+      const label = document.createElement('span')
+      label.textContent = item.label
+      const icon = document.createElement('span')
+      icon.setAttribute('aria-hidden', 'true')
+      icon.textContent = '×'
+      remove.append(label, icon)
       remove.addEventListener('click', () => {
         selected.delete(item.id)
         render()
@@ -36,7 +40,7 @@ export const setupPills = (root, createAutocomplete) => {
         input.focus()
         announcement.textContent = `${item.label} removed. ${selected.size} selected.`
       })
-      pill.append(label, remove)
+      pill.append(remove)
       pills.append(pill)
       const hidden = document.createElement('input')
       hidden.type = 'hidden'
