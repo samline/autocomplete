@@ -1,7 +1,7 @@
 {
   "name": "@samline/autocomplete",
   "version": "2.2.0",
-  "description": "An accessible, framework-agnostic remote autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
+  "description": "An accessible, framework-agnostic autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
   "type": "module",
   "license": "MIT",
   "homepage": "https://samline.github.io/autocomplete/",

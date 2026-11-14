@@ -27,15 +27,15 @@ createAutocomplete('#city', {
 
 export default {
   hero: {
-    seoTitle: 'Accessible remote autocomplete',
+    seoTitle: 'Accessible autocomplete for any source',
     seoDescription:
-      'An accessible, dependency-free remote autocomplete for vanilla JavaScript, TypeScript and plain HTML, with debounce and abortable requests.',
+      'An accessible, dependency-free autocomplete for JavaScript, TypeScript and plain HTML: endpoints, local lists, sections, recent searches and headless search.',
     kicker: 'Type. Pick. Done.',
     title: project.name,
     titleAccent: 'Search that feels right.',
     description:
-      'Turn any text input into an accessible combobox that searches your endpoint, with debounce, cancellation and keyboard support built in.',
-    descriptionContinuation: 'Cities, products or people. Your data, one keystroke away.',
+      'Turn any text input into an accessible combobox over your endpoint, a function or a local list, with sections, recent searches, debounce and cancellation built in.',
+    descriptionContinuation: 'Cities, commands or people. Your data, one keystroke away.',
     footnotes: ['Zero dependencies', 'TypeScript ready', `${project.license} licensed`],
     compatibilityLabel: 'ONE SMALL SCRIPT. RIGHT AT HOME IN YOUR STACK.',
     platforms: ['JavaScript', 'TypeScript', 'React', 'Vue', 'Svelte', 'Shopify', 'WordPress'],
@@ -46,39 +46,39 @@ export default {
     titleAccent: 'Your data, your markup.',
     items: {
       endpoint: {
-        title: 'Your endpoint, any shape',
+        title: 'Any source, any shape',
         description: text(
-          'Point it at a URL, an async function or a local array. mapResponse, getId, getLabel and getValue adapt whatever shape your data has.'
+          'A URL, an async function or a local array, or several at once as labelled sections. mapResponse, getId, getLabel and getValue adapt whatever shape your data has.'
         ),
       },
       accessibility: {
         title: 'An accessible combobox',
         description: text(
-          'ARIA combobox and listbox roles, aria-activedescendant and a live region that announces results, with Arrow keys, Home, End, Enter, Escape and Tab.'
+          'ARIA combobox and listbox roles, labelled groups for sections, aria-activedescendant and a live region that announces results, with Arrow keys, Home, End, Enter, Escape and Tab.'
         ),
       },
       requests: {
         title: 'No stale results',
         description: text(
-          'Searches are debounced, superseded requests aborted and results cached per query. Closing the list cancels the pending search, so a late response never reopens it.'
+          'Searches are debounced, superseded requests aborted and results cached per query. If one section fails, the others still show. Closing the list cancels the pending search.'
         ),
       },
       delivery: {
-        title: 'Package or script tag',
+        title: 'Package, script tag or attributes',
         description: text(
-          'Import createAutocomplete as ESM or CommonJS, or load the browser bundle and call window.Autocomplete.newAutocomplete.'
+          'Import createAutocomplete as ESM or CommonJS, or load the browser bundle: it mounts every input[data-autocomplete] without writing JavaScript.'
         ),
       },
       events: {
-        title: 'Events for the rest of the form',
+        title: 'State, hooks and plugins',
         description: text(
-          'autocomplete:select, clear, loadstart, load and error bubble from the input, so hidden fields and other UI stay in sync.'
+          'subscribe(), on() and bubbling DOM events keep your framework and form in sync. beforeSearch, transformSuggestions, beforeSelect and plugins reshape every step.'
         ),
       },
       styling: {
         title: 'Styled with variables',
         description: text(
-          'An optional stylesheet themed with CSS custom properties. Your label and input markup stay yours.'
+          'An optional stylesheet themed with CSS custom properties, highlighted matches, and a list that flips above the field or joins the top layer as a popover.'
         ),
       },
     },
@@ -93,19 +93,19 @@ export default {
         label: 'Package / ESM',
         entrypoint: project.npmName,
         description:
-          'createAutocomplete, the source, cache and highlight helpers and types, as ESM or CommonJS.',
+          'createAutocomplete, createSearch for headless rendering, the source, cache, recent and highlight helpers and types, as ESM or CommonJS.',
       },
       global: {
         label: 'HTML / CDN',
         entrypoint: 'window.Autocomplete',
         description:
-          'Mounts input[data-autocomplete] on load, plus newAutocomplete(), getAutocomplete() and destroyAutocomplete() keyed by input id, for pages without a build step.',
+          'Mounts input[data-autocomplete] on load and as inputs appear, plus newAutocomplete(), getAutocomplete() and destroyAutocomplete() keyed by input id.',
       },
       controller: {
         label: 'Controller',
         entrypoint: 'createAutocomplete(input, options)',
         description:
-          'Renders the popup after your input and returns search(), close(), clear(), cancel(), clearCache() and getSelected().',
+          'Renders the popup after your input and returns search(), setValue(), getState(), subscribe(), on(), close(), clear() and more.',
       },
       cleanup: {
         label: 'Cleanup',
@@ -161,7 +161,7 @@ export default {
       ),
     },
     docs: {
-      description: 'Continue with every option, the controller and the events.',
+      description: 'Continue with every option, the controller, hooks and events.',
       label: 'Explore the options',
     },
   },
@@ -169,7 +169,8 @@ export default {
     eyebrow: '04 / Beyond the first search',
     title: 'Adapt any API.',
     titleAccent: 'Keep the form in sync.',
-    description: 'Three common integrations, built from the same options and events.',
+    description:
+      'Three common integrations, built from the same options. More in the recipes guide.',
     examplesLabel: 'Explore working examples',
     items: [
       {
@@ -185,26 +186,26 @@ export default {
         ),
       },
       {
-        title: 'Store the selected id',
-        context: 'Events',
-        docsRoute: 'api' as const,
-        docsLabel: 'Read the API',
-        description: text('Keep a hidden field with the id while the input shows the label.'),
+        title: 'Submit the selected id',
+        context: 'hiddenInput',
+        docsRoute: 'options' as const,
+        docsLabel: 'Read the options',
+        description: text('The input shows the label while a hidden field submits the id.'),
         code: code(
           'main.js',
-          `const input = document.querySelector('#city')\nconst hidden = document.querySelector('#city-id')\n\ninput.addEventListener('autocomplete:select', event => {\n  hidden.value = event.detail.suggestion.id\n})\ninput.addEventListener('autocomplete:clear', () => (hidden.value = ''))`,
+          `const city = createAutocomplete('#city', {\n  endpoint: '/api/cities',\n  getId: city => city.id,\n  getLabel: city => city.name,\n  hiddenInput: 'city_id',\n})\n\n// Editing a saved record:\ncity.setValue({ id: 42, name: 'Guadalajara' })`,
           'javascript'
         ),
       },
       {
-        title: 'Send headers and handle errors',
-        context: 'requestInit',
-        docsRoute: 'options' as const,
-        docsLabel: 'Read the options',
-        description: text('Add authentication headers and report failures your own way.'),
+        title: 'Build a command palette',
+        context: 'sections',
+        docsRoute: 'recipes' as const,
+        docsLabel: 'Read the recipes',
+        description: text('Group several sources under labels and bring back recent picks.'),
         code: code(
           'main.js',
-          `createAutocomplete('#city', {\n  endpoint: '/api/cities',\n  requestInit: { headers: { Authorization: \`Bearer \${token}\` } },\n  onError: error => report(error),\n})`,
+          `createAutocomplete('#palette', {\n  sections: [\n    { id: 'actions', label: 'Actions', source: actions },\n    { id: 'pages', label: 'Pages', source: query => searchPages(query) },\n  ],\n  minLength: 1,\n  recent: true,\n  popover: true,\n})`,
           'javascript'
         ),
       },
@@ -234,12 +235,12 @@ export default {
           {
             kind: 'text',
             value:
-              'Yes. HTML / CDN loads a script that exposes window.Autocomplete in plain HTML, WordPress or Shopify. Call ',
+              'Yes. The HTML / CDN script mounts every input with a data-autocomplete attribute, in plain HTML, WordPress or Shopify: ',
           },
-          { kind: 'code', value: "window.Autocomplete.newAutocomplete({ id: 'city', options })" },
+          { kind: 'code', value: '<input data-autocomplete="/api/cities">' },
           {
             kind: 'text',
-            value: ' with the id of an input, and pin the version in production.',
+            value: ' is a working search. Pin the version in production.',
           },
         ],
       },
@@ -248,12 +249,27 @@ export default {
         answer: [
           { kind: 'text', value: 'Yes. Pass the mounted input from a ref to ' },
           { kind: 'code', value: 'createAutocomplete()' },
-          { kind: 'text', value: ' and call ' },
+          { kind: 'text', value: ', read its state with ' },
+          { kind: 'code', value: 'subscribe()' },
+          { kind: 'text', value: ' and ' },
+          { kind: 'code', value: 'getState()' },
+          { kind: 'text', value: ', which fit React’s useSyncExternalStore, and call ' },
           { kind: 'code', value: 'destroy()' },
           {
             kind: 'text',
+            value: ' on unmount. There is no adapter to install and no peer dependency to ship.',
+          },
+        ],
+      },
+      headless: {
+        question: text('Can I render the results myself?'),
+        answer: [
+          { kind: 'text', value: 'Yes. ' },
+          { kind: 'code', value: 'createSearch()' },
+          {
+            kind: 'text',
             value:
-              ' from your unmount handler. There is no framework adapter to install and no peer dependency to ship.',
+              ' runs the same pipeline without any DOM: sources, sections, local filtering, caching and partial failures. You render the results and own the ARIA and keyboard support.',
           },
         ],
       },
@@ -326,9 +342,9 @@ export default {
             kind: 'text',
             value: 'The browser IIFE build is approximately ',
           },
-          { kind: 'strong', value: '4.1 KiB gzipped' },
+          { kind: 'strong', value: '12 KiB gzipped' },
           { kind: 'text', value: ', plus ' },
-          { kind: 'strong', value: '0.5 KiB gzipped' },
+          { kind: 'strong', value: '0.8 KiB gzipped' },
           {
             kind: 'text',
             value: ' for the optional stylesheet. There are zero runtime dependencies.',

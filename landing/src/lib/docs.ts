@@ -7,6 +7,7 @@ const routes = {
   lifecycle: 'reference/configuration/',
   accessibility: 'guides/accessibility/',
   examples: 'guides/examples/',
+  recipes: 'guides/recipes/',
   changelog: 'changelog/',
 } as const
 export type DocsRoute = keyof typeof routes

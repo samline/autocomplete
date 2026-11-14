@@ -3,7 +3,7 @@
     "name": "Autocomplete",
     "npmName": "@samline/autocomplete",
     "version": "2.2.0",
-    "description": "An accessible, framework-agnostic remote autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
+    "description": "An accessible, framework-agnostic autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
     "author": "Samuel Olvera (samline)",
     "license": "MIT",
     "keywords": ["autocomplete", "combobox", "typeahead", "search", "accessibility", "aria"]
