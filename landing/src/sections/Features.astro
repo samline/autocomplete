@@ -9,6 +9,47 @@ import FeatureCard from '../components/FeatureCard.astro'
 const i18n = getI18n(Astro)
 const t = i18n.sections.features
 const headingId = `section-heading-${crypto.randomUUID()}`
+// One icon per card, matched to what the card describes (Lucide outlines).
+const icons = {
+  // server: any endpoint
+  endpoint: [
+    'M4 2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z',
+    'M4 14h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z',
+    'M6 6h.01M6 18h.01',
+  ],
+  // accessibility: the ARIA combobox
+  accessibility: [
+    'M17 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0z',
+    'm18 19 1-7-6 1',
+    'm5 8 3-3 5.5 3-2.36 3.5',
+    'M4.24 14.5a5 5 0 0 0 6.88 6',
+    'M13.76 17.5a5 5 0 0 0-6.88-6',
+  ],
+  // timer: debounce and cancellation
+  requests: ['M10 2h4', 'M12 14l3-3', 'M20 14a8 8 0 1 1-16 0 8 8 0 0 1 16 0z'],
+  // package: npm package or browser bundle
+  delivery: [
+    'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z',
+    'M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12',
+  ],
+  // broadcast: bubbling DOM events
+  events: [
+    'M4.9 19.1C1 15.2 1 8.8 4.9 4.9',
+    'M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5',
+    'M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
+    'M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5',
+    'M19.1 4.9C23 8.8 23 15.1 19.1 19',
+  ],
+  // palette: themeable stylesheet
+  styling: [
+    'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2z',
+    'M13.5 6.5h.01M17.5 10.5h.01M8.5 7.5h.01M6.5 12.5h.01',
+  ],
+} as const
+const features = Object.entries(t.items) as [
+  keyof typeof icons,
+  (typeof t.items)[keyof typeof t.items],
+][]
 ---
 
 <Section
@@ -30,122 +71,28 @@ const headingId = `section-heading-${crypto.randomUUID()}`
     </SectionHeading>
 
     <CardGrid columns={3} class:list={['feature-grid']}>
-      <FeatureCard title={t.items.dependencies.title} number="01">
-        <Fragment slot="icon">
-          <svg
-            aria-hidden="true"
-            width="1.125rem"
-            height="1.125rem"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"></path>
-          </svg>
-        </Fragment>
-        <RichText parts={t.items.dependencies.description} />
-      </FeatureCard>
-      <FeatureCard title={t.items.accessibility.title} number="02">
-        <Fragment slot="icon">
-          <svg
-            aria-hidden="true"
-            width="1.125rem"
-            height="1.125rem"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </Fragment>
-        <RichText parts={t.items.accessibility.description} />
-      </FeatureCard>
-      <FeatureCard title={t.items.lifecycle.title} number="03">
-        <Fragment slot="icon">
-          <svg
-            aria-hidden="true"
-            width="1.125rem"
-            height="1.125rem"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-            <path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-            <path d="M3 21v-5h5"></path>
-          </svg>
-        </Fragment>
-        <RichText parts={t.items.lifecycle.description} />
-      </FeatureCard>
-      <FeatureCard title={t.items.entrypoints.title} number="04">
-        <Fragment slot="icon">
-          <svg
-            aria-hidden="true"
-            width="1.125rem"
-            height="1.125rem"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="5" cy="5" r="3"></circle>
-            <circle cx="19" cy="5" r="3"></circle>
-            <circle cx="12" cy="19" r="3"></circle>
-            <path d="M5 8v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8M12 12v4"></path>
-          </svg>
-        </Fragment>
-        <RichText parts={t.items.entrypoints.description} />
-      </FeatureCard>
-      <FeatureCard title={t.items.frameworks.title} number="05">
-        <Fragment slot="icon">
-          <svg
-            aria-hidden="true"
-            width="1.125rem"
-            height="1.125rem"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
-          </svg>
-        </Fragment>
-        <RichText parts={t.items.frameworks.description} />
-      </FeatureCard>
-      <FeatureCard title={t.items.markup.title} number="06">
-        <Fragment slot="icon">
-          <svg
-            aria-hidden="true"
-            width="1.125rem"
-            height="1.125rem"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-          </svg>
-        </Fragment>
-        <RichText parts={t.items.markup.description} />
-      </FeatureCard>
+      {features.map(([key, item], index) => (
+        <FeatureCard title={item.title} number={String(index + 1).padStart(2, '0')}>
+          <Fragment slot="icon">
+            <svg
+              aria-hidden="true"
+              width="1.125rem"
+              height="1.125rem"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              {icons[key].map(d => (
+                <path d={d} />
+              ))}
+            </svg>
+          </Fragment>
+          <RichText parts={item.description} />
+        </FeatureCard>
+      ))}
     </CardGrid>
   </Box>
 </Section>

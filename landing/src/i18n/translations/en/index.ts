@@ -70,13 +70,13 @@ export const examplesFor = (project: Named) =>
     seoDescription: `Try live ${project.name} previews of distinct scenarios, then copy separate HTML, CSS and JavaScript files or one complete runnable document.`,
     accent: 'examples.',
     description:
-      'Live previews of distinct scenarios, each with independently copyable files. The same demos and controls are used on Home and in Docs.',
+      'Live previews of distinct scenarios, each with independently copyable files. The same examples appear in the documentation.',
     possibilities:
       'These examples show a few possibilities. The next ideas are yours: combine the package’s capabilities with your own content, design and interactions to create the experience your project needs.',
     guide: 'Read the example guide',
     navigation: 'Choose an example',
     accessibility:
-      'Each preview runs the real package against a static list of cities; the copied files load the published bundle.',
+      'Each preview runs the real package against a static list of cities. The copied files load the published browser bundle and the same list, so they run as-is.',
     skill: `Download the ${project.name} skill for AI agents`,
   }) as const
 

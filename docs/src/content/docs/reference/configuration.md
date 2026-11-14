@@ -15,7 +15,7 @@ description: 'Every createAutocomplete option with its default: endpoint, reques
 | `requestInit`   | `{}`                      | `RequestInit` or `(query, input) => RequestInit` for headers, credentials, method.                |
 | `parseResponse` | `response.json()`         | Parses the response before mapping.                                                               |
 | `mapResponse`   | common arrays             | `(payload, response, query)`; the default reads a root array or `suggestions`, `items` or `data`. |
-| `getId`         | `item.id`                 | Stable option id.                                                                                 |
+| `getId`         | `id`, else the index      | Stable option id.                                                                                 |
 | `getLabel`      | `label`, `value`, `title` | Visible option text.                                                                              |
 | `getValue`      | `value`, `label`, `title` | Value written to the input on selection.                                                          |
 | `renderOption`  | none                      | `(option, suggestion)`; customize the created button without HTML strings.                        |

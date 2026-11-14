@@ -30,7 +30,13 @@ pnpm add @samline/autocomplete
 bun add @samline/autocomplete
 ```
 
-Works in modern browsers with `fetch` and `AbortController`, and imports in Node 20 or newer. No runtime dependencies; the stylesheet is optional.
+Requires Node 20+ when bundling. Runs in modern browsers with `fetch` and `AbortController`. No runtime dependencies.
+
+Import the optional stylesheet once in your application entrypoint:
+
+```js
+import '@samline/autocomplete/styles.css'
+```
 
 ## Quick start
 
@@ -52,69 +58,148 @@ const controller = createAutocomplete('#city', {
   onSelect: city => console.log('Selected', city),
 })
 
-controller.destroy() // removes the list and restores the input
+// When the owning component or page leaves:
+controller.destroy()
 ```
+
+What this does:
+
+- Turns the existing input into an ARIA combobox and renders a listbox right after it.
+- Searches once the query reaches two characters, 250 ms after typing stops.
+- Reads a root array, or a `suggestions`, `items` or `data` array, from the JSON response.
+- Writes the chosen suggestion into the input, dispatches `autocomplete:select` and calls `onSelect`.
+- Restores the input attributes it changed and removes the list when `destroy()` runs.
+
+The wrapper needs `position: relative` because the default list is absolutely positioned under the input.
 
 ## HTML / CDN
 
-For Shopify, WordPress or plain HTML pages without a build step, load the stylesheet and the browser bundle. Pin the version in production.
+Choose **Package / ESM** when installing with npm, pnpm or bun and importing Autocomplete in your application. Choose **HTML / CDN** for Shopify, WordPress or plain HTML pages without a build step. Both use the same options and controller.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/styles.css" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/styles.css"
+/>
 <script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@1.0.0/dist/browser/global.global.js"></script>
+```
+
+> Pin the version in production, or self-host the same files.
+
+The standalone script (an IIFE) defines `window.Autocomplete`:
+
+```html
+<div class="field" style="position: relative">
+  <label for="city">City</label>
+  <input id="city" type="text" />
+</div>
+
 <script>
-  window.Autocomplete.create('#city', { endpoint: '/api/cities' })
+  const city = window.Autocomplete.create('#city', { endpoint: '/api/cities' })
 </script>
 ```
 
-`window.Autocomplete` has `create(target, options)` (requires an input id and registers the controller), `destroy(id)`, `available` and `autocomplete(target, options)`.
+`create(target, options)` requires an input with an `id` and stores the controller in `Autocomplete.available[id]`; `destroy(id)` removes it. `autocomplete(target, options)` creates a controller without the registry.
 
 ## Capabilities
 
+- Remote search on any URL, `URL` object or function of the query.
+- Any response shape through `parseResponse`, `mapResponse`, `getId`, `getLabel` and `getValue`.
+- WAI-ARIA combobox and listbox with full keyboard operation and announced states.
+- Debounced searches, aborted superseded requests and ignored late responses.
+- Bubbling DOM events that keep hidden fields and other UI in sync.
+- An optional stylesheet themed with `--autocomplete-*` custom properties.
+
+[Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options and events, each with copyable files.
+
 ### Any endpoint, any response
 
-`endpoint` is a URL or a function of the query. `requestInit` adds headers or credentials, `parseResponse` replaces JSON parsing, and `mapResponse`, `getId`, `getLabel` and `getValue` adapt whatever your API returns.
+`endpoint` is a URL or a function of the query. `queryParam` names the query-string key (`q` by default; `null` when the function builds the complete URL). `requestInit` adds headers or credentials, `parseResponse` replaces JSON parsing, and `mapResponse` returns the suggestion array.
+
+```js
+createAutocomplete('#city', {
+  endpoint: query => `/api/search?term=${encodeURIComponent(query)}`,
+  queryParam: null,
+  requestInit: { headers: { Authorization: `Bearer ${token}` } },
+  mapResponse: payload => payload.data.items,
+  getLabel: item => item.title,
+})
+```
 
 ### An accessible combobox
 
-ARIA `combobox` and `listbox` roles, `aria-expanded` and `aria-activedescendant`, status and error messages, and ArrowUp, ArrowDown, Home, End, Enter, Escape and Tab. Searches wait for IME composition to finish.
+ARIA `combobox` and `listbox` roles, `aria-expanded` and `aria-activedescendant`, status and error messages, and ArrowUp, ArrowDown, Home, End, Enter, Escape and Tab. Searches wait for IME composition to finish. Option content is set with `textContent`; `renderOption` appends your own DOM nodes, never HTML strings.
 
 ### No stale results
 
 Searches are debounced, superseded requests are aborted and late responses ignored. Closing the list (Escape, Tab, clicking outside, selecting or `close()`) cancels the pending search.
 
-### Events and styling
-
-`autocomplete:select`, `autocomplete:clear`, `autocomplete:load`, `autocomplete:loadstart` and `autocomplete:error` bubble from the input. The optional stylesheet is themed with `--autocomplete-*` custom properties, and `renderOption` adds your own content to each option.
-
 ## API at a glance
 
-| API | Purpose |
-| --- | --- |
-| `createAutocomplete(input, options)` | Attach the combobox and return a controller (`autocomplete` is an alias). |
-| `controller.search(query?)` / `close()` / `clear()` / `cancel()` | Run a search now, close the list, clear everything or cancel pending work. |
-| `controller.getSelected()` / `destroy()` | Read the selected suggestion or remove the combobox. |
-| `mapCommonResponse`, `parseJsonResponse` | The default response mapper and parser. |
+| API                                      | Purpose                                                |
+| ---------------------------------------- | ------------------------------------------------------ |
+| `createAutocomplete(input, options)`     | Controller factory (`autocomplete` is an alias).       |
+| `search(query?)`, `close()`, `cancel()`  | Run a search now, close the list, cancel pending work. |
+| `clear()`, `getSelected()`               | Clear input and selection, or read the selected item.  |
+| `destroy()`                              | Cleanup.                                               |
+| `mapCommonResponse`, `parseJsonResponse` | The default response mapper and parser.                |
+| `browser`                                | Importable equivalent of `window.Autocomplete`.        |
+
+The controller also exposes `element` (the input), `listElement` (the listbox) and `options`.
 
 ### Entrypoints
 
-| Entrypoint | When to use |
-| --- | --- |
-| `@samline/autocomplete` | ESM or CommonJS: `createAutocomplete`, helpers, `browser` registry and types. |
-| `@samline/autocomplete/browser` | Classic script that defines `window.Autocomplete`. |
-| `@samline/autocomplete/styles.css` | Optional base stylesheet. |
+| Entrypoint                         | When to use                                                     |
+| ---------------------------------- | --------------------------------------------------------------- |
+| `@samline/autocomplete`            | ESM or CommonJS: factories, helpers, `browser` registry, types. |
+| `@samline/autocomplete/browser`    | Standalone script (IIFE) that defines `window.Autocomplete`.    |
+| `@samline/autocomplete/styles.css` | Optional base stylesheet.                                       |
+
+### Events
+
+All events bubble from the input.
+
+| Event                    | `detail`                       |
+| ------------------------ | ------------------------------ |
+| `autocomplete:loadstart` | `{ query }`                    |
+| `autocomplete:load`      | `{ query, suggestions }`       |
+| `autocomplete:error`     | `{ query, error }`             |
+| `autocomplete:select`    | `{ suggestion, label, value }` |
+| `autocomplete:clear`     | `{ query }`                    |
+
+```js
+const input = document.querySelector('#city')
+const hidden = document.querySelector('#city-id')
+
+input.addEventListener('autocomplete:select', event => {
+  hidden.value = event.detail.suggestion.id
+})
+input.addEventListener('autocomplete:clear', () => (hidden.value = ''))
+```
+
+### One lifecycle
+
+- Each `createAutocomplete()` call owns one input. Keep the returned controller.
+- `close()` and `cancel()` keep the controller usable; `clear()` also empties the input and dispatches `autocomplete:clear` when something was selected.
+- `destroy()` aborts pending work, removes the list and listeners, and restores the input attributes. Repeated calls are harmless.
+- With the browser global, `create()` on an id that is already registered destroys the previous controller first.
+
+### TypeScript
+
+The package includes declarations. Pass your suggestion type to `createAutocomplete<T>()` to type `getLabel`, `onSelect`, `renderOption` and `getSelected()`. `AutocompleteOptions<T>`, `AutocompleteController<T>` and the event detail types are exported; see the [API reference](https://samline.github.io/autocomplete/docs/reference/api/#types).
 
 ## Documentation
 
 Read the [documentation](https://samline.github.io/autocomplete/docs/) for the full guides and API contracts, and explore [working examples](https://samline.github.io/autocomplete/examples/) with complete and separate source files.
 
-| Guide | What it covers |
-| --- | --- |
-| [Installation](https://samline.github.io/autocomplete/docs/getting-started/) | Package / ESM, HTML / CDN and working starter files. |
-| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/) | Every option and its default. |
-| [API reference](https://samline.github.io/autocomplete/docs/reference/api/) | The controller, helpers, browser global and events. |
+| Guide                                                                              | What it covers                                          |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [Installation](https://samline.github.io/autocomplete/docs/getting-started/)       | Package / ESM, HTML / CDN and working starter files.    |
+| [Examples](https://samline.github.io/autocomplete/docs/guides/examples/)           | Live previews with their complete, copyable source.     |
+| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/)    | Every option and its default.                           |
+| [API reference](https://samline.github.io/autocomplete/docs/reference/api/)        | The controller, helpers, browser global, events, types. |
 | [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides. |
-| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/) | The DOM contract and the custom properties. |
+| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/)             | The DOM contract and the custom properties.             |
 
 ## Changelog
 

@@ -10,7 +10,7 @@ description: 'createAutocomplete, the controller members, the response helpers, 
 
 ## `createAutocomplete(target, options)`
 
-`target` is an `HTMLInputElement` or a selector. Returns an `AutocompleteController<T>`. `autocomplete` is an alias.
+`target` is an `HTMLInputElement` or a selector. Returns an `AutocompleteController<T>`. `autocomplete` is an alias. Throws a `TypeError` when the target is not an input or an option is invalid.
 
 ## Controller
 
@@ -28,6 +28,7 @@ description: 'createAutocomplete, the controller members, the response helpers, 
 
 ## Helpers
 
+- `createAutocompleteController(target, options)`: the core factory behind `createAutocomplete`; same arguments and controller.
 - `mapCommonResponse(payload)`: reads a root array or `suggestions`, `items` or `data` arrays.
 - `parseJsonResponse(response)`: the default JSON parser.
 - `browser`: the importable equivalent of the browser global.

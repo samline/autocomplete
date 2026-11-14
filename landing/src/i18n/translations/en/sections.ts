@@ -46,71 +46,73 @@ export default {
     title: 'Every detail handled.',
     titleAccent: 'Your data, your markup.',
     items: {
-      dependencies: {
+      endpoint: {
         title: 'Your endpoint, any shape',
         description: text(
-          'Point it at any URL or function. mapResponse, getLabel and getValue adapt whatever JSON your API returns.'
+          'Point it at a URL or a function of the query. mapResponse, getId, getLabel and getValue adapt whatever JSON your API returns.'
         ),
       },
       accessibility: {
         title: 'An accessible combobox',
         description: text(
-          'role combobox and listbox, aria-expanded, aria-activedescendant and status messages, with arrows, Home, End, Enter and Escape.'
+          'ARIA combobox and listbox roles, aria-activedescendant and announced status messages, with Arrow keys, Home, End, Enter, Escape and Tab.'
         ),
       },
-      lifecycle: {
+      requests: {
         title: 'No stale results',
         description: text(
-          'Requests are debounced and aborted when superseded; closing the list cancels the pending search, so a late response never reopens it.'
+          'Searches are debounced and superseded requests aborted. Closing the list cancels the pending search, so a late response never reopens it.'
         ),
       },
-      entrypoints: {
+      delivery: {
         title: 'Package or script tag',
         description: text(
-          'Import createAutocomplete from the package, or load the browser bundle and use window.Autocomplete.'
+          'Import createAutocomplete as ESM or CommonJS, or load the browser bundle and call window.Autocomplete.create.'
         ),
       },
-      frameworks: {
+      events: {
         title: 'Events for the rest of the form',
         description: text(
-          'autocomplete:select, clear, load and error bubble from the input, so hidden fields and other UI stay in sync.'
+          'autocomplete:select, clear, loadstart, load and error bubble from the input, so hidden fields and other UI stay in sync.'
         ),
       },
-      markup: {
+      styling: {
         title: 'Styled with variables',
         description: text(
-          'A small optional stylesheet driven by CSS custom properties; keep your own input and label markup.'
+          'An optional stylesheet themed with CSS custom properties. Your label and input markup stay yours.'
         ),
       },
     },
   },
   runtimes: {
     eyebrow: '02 / Fit it into your stack',
-    heading: heading('Two ways in.', 'Same createAutocomplete.'),
-    description: 'The same call works with a bundler or with a plain script tag.',
+    heading: heading('Two ways in.', 'One controller.'),
+    description:
+      'Import the package with a bundler or load the browser bundle with a script tag; both return the same controller.',
     items: {
-      main: {
-        label: 'Package',
+      package: {
+        label: 'Package / ESM',
         entrypoint: project.npmName,
-        description: 'createAutocomplete as ESM or CommonJS, with types.',
-      },
-      vanilla: {
-        label: 'Browser',
-        entrypoint: 'createAutocomplete(input, options)',
-        description: 'Attach to an existing input; the package renders the listbox after it.',
-      },
-      browser: {
-        label: 'Ownership',
-        entrypoint: 'controller.destroy()',
-        description:
-          'Each call returns a controller; destroy restores the input and removes the list.',
+        description: 'createAutocomplete, the response helpers and types, as ESM or CommonJS.',
       },
       global: {
         label: 'HTML / CDN',
         entrypoint: 'window.Autocomplete',
-        description: 'create(), destroy() and an id registry for pages without a build step.',
+        description:
+          'create(), destroy() and the available registry, keyed by input id, for pages without a build step.',
       },
-      core: {
+      controller: {
+        label: 'Controller',
+        entrypoint: 'createAutocomplete(input, options)',
+        description:
+          'Renders the listbox after your input and returns search(), close(), clear(), cancel() and getSelected().',
+      },
+      cleanup: {
+        label: 'Cleanup',
+        entrypoint: 'controller.destroy()',
+        description: 'Aborts pending work, removes the list and listeners, and restores the input.',
+      },
+      types: {
         label: 'Types',
         entrypoint: 'AutocompleteOptions<T>',
         description: 'Typed options, controller and event details for your own suggestion type.',
@@ -146,7 +148,7 @@ export default {
     eyebrow: '04 / Beyond the first search',
     title: 'Adapt any API.',
     titleAccent: 'Keep the form in sync.',
-    description: 'Three common integrations, all with the same call.',
+    description: 'Three common integrations, built from the same options and events.',
     examplesLabel: 'Explore working examples',
     items: [
       {
@@ -169,7 +171,7 @@ export default {
         description: text('Keep a hidden field with the id while the input shows the label.'),
         code: code(
           'main.js',
-          `input.addEventListener('autocomplete:select', event => {\n  hidden.value = event.detail.suggestion.id\n})\ninput.addEventListener('autocomplete:clear', () => (hidden.value = ''))`,
+          `const input = document.querySelector('#city')\nconst hidden = document.querySelector('#city-id')\n\ninput.addEventListener('autocomplete:select', event => {\n  hidden.value = event.detail.suggestion.id\n})\ninput.addEventListener('autocomplete:clear', () => (hidden.value = ''))`,
           'javascript'
         ),
       },
@@ -244,7 +246,7 @@ export default {
   callToAction: {
     eyebrow: 'Search your users can rely on',
     heading: heading('Make every search', 'feel instant.'),
-    description: 'Try the examples or follow the first steps.',
+    description: 'Follow the first steps, or read the source on GitHub.',
     docs: {
       description: 'Guides, the complete API and release notes, in one place.',
       label: 'Read the documentation',

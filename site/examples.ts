@@ -16,7 +16,7 @@ export default [
     tab: 'Basic',
     title: 'Search a remote list as you type',
     description:
-      'Two characters start a debounced request; arrows, Home, End, Enter and Escape work out of the box, and a late response never reopens a closed list.',
+      'Two characters start a debounced request. Arrow keys, Home, End, Enter, Escape and Tab work out of the box, and a late response never reopens a closed list.',
     files: {
       html: `<div class="field">
   <label for="city">City</label>
@@ -42,7 +42,7 @@ export default [
     tab: 'Custom options',
     title: 'Render richer options',
     description:
-      'renderOption receives each option button and its data, so you can add a secondary line without losing the accessible label.',
+      'renderOption receives each option button and its suggestion, so you can append a secondary line with DOM nodes instead of HTML strings.',
     files: {
       html: `<div class="field">
   <label for="destination">Destination</label>
@@ -70,7 +70,7 @@ export default [
     tab: 'Events',
     title: 'React to selection and clearing',
     description:
-      'The input dispatches autocomplete:select, autocomplete:clear, autocomplete:load and autocomplete:error, so the rest of the form can stay in sync.',
+      'Listen for autocomplete:select and autocomplete:clear on the input to keep a hidden id field in sync. Editing the text after a selection also clears it.',
     files: {
       html: `<div class="field">
   <label for="origin">Origin</label>
