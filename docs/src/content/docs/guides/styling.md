@@ -11,7 +11,7 @@ description: 'Theme the optional stylesheet with CSS custom properties or style 
 Import the optional stylesheet once:
 
 ```js
-import '@samline/autocomplete/styles.css'
+import '@samline/autocomplete/style.css'
 ```
 
 ## DOM contract

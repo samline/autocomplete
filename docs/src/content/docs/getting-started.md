@@ -23,7 +23,7 @@ npm install @samline/autocomplete
 
 ```js
 import { createAutocomplete } from '@samline/autocomplete'
-import '@samline/autocomplete/styles.css'
+import '@samline/autocomplete/style.css'
 
 const controller = createAutocomplete('#city', {
   endpoint: '/api/cities',
@@ -53,9 +53,9 @@ For Shopify, WordPress or plain HTML pages without a build step, load the styles
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/styles.css"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/browser/global.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/browser/autocomplete.global.js"></script>
 <script>
   window.Autocomplete.newAutocomplete({ id: 'city', options: { endpoint: '/api/cities' } })
 </script>
@@ -108,7 +108,7 @@ A complete page that runs as-is. It searches the public list of cities used by t
     <title>Autocomplete starter</title>
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/styles.css"
+      href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css"
     />
   </head>
   <body>
@@ -116,7 +116,7 @@ A complete page that runs as-is. It searches the public list of cities used by t
       <label for="city">City</label>
       <input id="city" type="text" />
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/browser/global.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/browser/autocomplete.global.js"></script>
     <script>
       window.Autocomplete.newAutocomplete({
         id: 'city',

@@ -26,4 +26,3 @@ export const mount = Autocomplete.mount
 export const unmount = Autocomplete.unmount
 export const refresh = Autocomplete.refresh
 export const getMounted = Autocomplete.getMounted
-export default Autocomplete

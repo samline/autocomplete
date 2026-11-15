@@ -13,7 +13,7 @@ Mirror the sibling `@samline` packages (`../ticker` is the closest reference).
 - `src/vanilla/`: the DOM controller (`autocomplete` / `createAutocomplete`), positioning, dataset parsing and DOM helpers.
 - `src/browser/`: the shared registry (`newAutocomplete`, `getAutocomplete`, `getAutocompletes`, `destroyAutocomplete`, `destroyAutocompletes`, `available`), the declarative `mount()`, its module entrypoint and the `window.Autocomplete` IIFE entrypoint (`global.ts`, which mounts on load).
 - `src/index.ts`: side-effect-free package entrypoint.
-- `src/styles.css`: optional data-attribute-driven styles.
+- `src/style.css`: optional data-attribute-driven styles.
 - `test/`: Vitest + jsdom contracts.
 - `docs/`: public API and integration documentation.
 - `example/`: direct-browser example consuming `dist/`.
@@ -29,6 +29,13 @@ Mirror the sibling `@samline` packages (`../ticker` is the closest reference).
 - Any public API change must update tests, README, and `docs/` in the same change.
 - One license file: `LICENSE.md` (MIT, `Copyright (c) 2026 Samuel Olvera (samline)`), covering the package and the website. Add `SITE-LICENSE.md` only if the site theme ever uses a different license.
 - Run `bun run build`, `bun run typecheck`, `bun run test`, `bun run format:check`, and `npm pack --dry-run` before release. Use `bun run test`, not Bun's native `bun test`, because the suite depends on Vitest's jsdom configuration.
+
+## pnpm migration and 3.0.0 — 2026-11-15
+
+- Installs with pnpm (`pnpm-workspace.yaml` lists landing, docs and shared); every script runs with `bun run`. Site scripts call `bun run --cwd <app>`; `site-tools/test-adaptation.mjs` links each app's own `node_modules` into the isolated copy.
+- 3.0.0 renames: the stylesheet source is `src/style.css`; tsup writes `dist/style.css` and the alias `dist/styles.css`. The IIFE is `dist/browser/autocomplete.global.js`, with `global.global.js` as an identical alias. Browser entries export named members only (no `default`).
+- `content-audit.json` records sha256 hashes of reviewed sources; refresh them after reviewing a change or `bun run site:check:release` fails.
+- The site checks and the package smoke test run in `.github/workflows/site.yml`; the managed `ci.yml` only runs the family checks.
 
 <!-- samline:family:start -->
 

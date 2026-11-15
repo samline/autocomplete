@@ -135,7 +135,9 @@ export async function checkContent({ root, project, release, audit = {}, sentine
   const fail = message => problems.push(message)
   const dist = join(root, 'landing/dist')
   if (!(await exists(join(dist, 'index.html'))))
-    return ['Build the combined site first (npm run build); landing/dist/index.html is missing.']
+    return [
+      'Build the combined site first (bun run site:build); landing/dist/index.html is missing.',
+    ]
   const html = {}
   for (const path of await pages(dist)) html[path] = await readFile(join(dist, path), 'utf8')
   const all = Object.values(html).join('\n')

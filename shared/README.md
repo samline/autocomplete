@@ -6,7 +6,7 @@ styles/theme.css owns palette/font/spacing/focus/motion/breakpoint tokens. SiteH
 
 Components keep scoped CSS, processed scripts and lifecycle cleanup. DrawerStyles adapts vendor CSS inside native scope; Drawer owns actual gestures, animation, focus and locking. Reuse complete implementations rather than copies of their CSS.
 
-Run the root npm run verify after shared changes. Read ../ADAPTATION.md before moving these foundations into a package.
+Run the root bun run site:verify after shared changes. Read ../ADAPTATION.md before moving these foundations into a package.
 
 Interactive roots register arrow functions through lib/mount-elements.ts and return cleanup; tags are DOM scopes, not custom elements. CopyButton reads live code from its frame; only command controls pass explicit text. lib/demo-files.ts formats split and complete files per scenario and loading mode once from the catalog; lib/demo-source.ts generates them and copies each behavior region of lib/demo-behavior.js verbatim, so the live preview and copied code share one source. Use Select (custom chevron, appearance none, pointer cursor) and the visible-label Field for every form control; TextField keeps its visually hidden label for compact search-style inputs. lib/site-build.mjs is the shared CSS inlining policy. See ../UPSTREAM.md for reviewed commits and ../AGENTS.md for lifecycle/loading contracts.
 

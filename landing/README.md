@@ -4,7 +4,7 @@ These are one product surface. src/layouts/Main.astro composes shared metadata/f
 
 Editable interface/content copy is in src/i18n/translations/en. The project config owns identity, version, URLs and accents. Section/Box own layout; never add competing gutters or maximum widths.
 
-From the root: npm run dev for two-origin development; npm run build && npm run preview for the production artifact and indexed Docs. Shared primitives live in ../shared; do not duplicate them here.
+From the root: bun run site:dev for two-origin development; bun run site:build && bun run site:preview for the production artifact and indexed Docs. Shared primitives live in ../shared; do not duplicate them here.
 
 The combined build assembles Docs, local fonts, social artwork, robots and the merged sitemap into dist. CI validates the resulting site before Pages deployment. Read ../AGENTS.md and ../ADAPTATION.md for coverage and publication rules.
 

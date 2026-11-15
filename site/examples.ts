@@ -40,8 +40,8 @@ export default [
     },
   },
 })`,
-      esm: `import Autocomplete from '@samline/autocomplete/browser'
-import '@samline/autocomplete/styles.css'
+      esm: `import { Autocomplete } from '@samline/autocomplete/browser'
+import '@samline/autocomplete/style.css'
 
 Autocomplete.newAutocomplete({
   id: 'city',
@@ -88,8 +88,8 @@ Autocomplete.newAutocomplete({
     },
   },
 })`,
-      esm: `import Autocomplete from '@samline/autocomplete/browser'
-import '@samline/autocomplete/styles.css'
+      esm: `import { Autocomplete } from '@samline/autocomplete/browser'
+import '@samline/autocomplete/style.css'
 
 Autocomplete.newAutocomplete({
   id: 'destination',
@@ -153,8 +153,8 @@ controller.on('select', ({ label, value }) => write(\`select \${label} → \${va
 controller.on('clear', () => write('clear'))
 controller.on('error', ({ error }) => write(\`error \${error}\`))
 document.querySelector('#reset').addEventListener('click', () => controller.clear())`,
-      esm: `import Autocomplete from '@samline/autocomplete/browser'
-import '@samline/autocomplete/styles.css'
+      esm: `import { Autocomplete } from '@samline/autocomplete/browser'
+import '@samline/autocomplete/style.css'
 
 const log = document.querySelector('#log')
 const write = text => {
@@ -209,8 +209,8 @@ document.querySelector('#reset').addEventListener('click', () => controller.clea
     messages: { empty: ({ query }) => \`No state matches “\${query}”\` },
   },
 })`,
-      esm: `import Autocomplete from '@samline/autocomplete/browser'
-import '@samline/autocomplete/styles.css'
+      esm: `import { Autocomplete } from '@samline/autocomplete/browser'
+import '@samline/autocomplete/style.css'
 
 Autocomplete.newAutocomplete({
   id: 'state',
@@ -262,8 +262,8 @@ Autocomplete.newAutocomplete({
     recent: { label: 'Recent' },
   },
 })`,
-      esm: `import Autocomplete from '@samline/autocomplete/browser'
-import '@samline/autocomplete/styles.css'
+      esm: `import { Autocomplete } from '@samline/autocomplete/browser'
+import '@samline/autocomplete/style.css'
 
 Autocomplete.newAutocomplete({
   id: 'place',
@@ -330,8 +330,8 @@ document.querySelector('#trip').addEventListener('submit', event => {
     ? \`Submitted city_id=\${cityId}.\`
     : 'Pick a city first.'
 })`,
-      esm: `import Autocomplete from '@samline/autocomplete/browser'
-import '@samline/autocomplete/styles.css'
+      esm: `import { Autocomplete } from '@samline/autocomplete/browser'
+import '@samline/autocomplete/style.css'
 
 Autocomplete.newAutocomplete({
   id: 'destination-city',
@@ -378,8 +378,8 @@ document.querySelector('#trip').addEventListener('submit', event => {
       css: baseCss,
       js: `// Nothing to write: the browser bundle mounts input[data-autocomplete] on load.
 // Read a mounted controller with window.Autocomplete.getAutocomplete('fruit').`,
-      esm: `import Autocomplete from '@samline/autocomplete/browser'
-import '@samline/autocomplete/styles.css'
+      esm: `import { Autocomplete } from '@samline/autocomplete/browser'
+import '@samline/autocomplete/style.css'
 
 Autocomplete.mount()`,
     },

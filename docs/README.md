@@ -4,11 +4,11 @@ Astro content collections validate locale, title, optional explicit titleAccent,
 
 Navigation derives from entries, checks duplicate order positions and requires a localized label for every page. The shared metadata component provides per-article canonical/social data and breadcrumbs. No empty Edit this page action is included.
 
-Pagefind indexes article content after build and loads lazily through the top Drawer. It remains a static site. Use npm run build && npm run preview from the root to test real indexed search. The Drawer owns dismissal/focus/scroll/gestures; the integration only owns search state and rendering. ToC geometry tracks the header plus 2.5rem anchor offset.
+Pagefind indexes article content after build and loads lazily through the top Drawer. It remains a static site. Use bun run site:build && bun run site:preview from the root to test real indexed search. The Drawer owns dismissal/focus/scroll/gestures; the integration only owns search state and rendering. ToC geometry tracks the header plus 2.5rem anchor offset.
 
 Article frames native Astro/Shiki fences with the shared CodeFrame and preserves token spans. data-ui components are excluded from prose styles. Tabs, cards, callouts and mixed code files use shared components, not a Markdown transform that reconstructs them.
 
-Replace all instructional starter prose with the actual API and reconcile content-audit.json before release. Read ../ADAPTATION.md; run root npm run verify and check:release after adaptation.
+Replace all instructional starter prose with the actual API and reconcile content-audit.json before release. Read ../ADAPTATION.md; run root bun run site:verify and check:release after adaptation.
 
 Follow the root [PageSpeed performance contract](../AGENTS.md#pagespeed-performance-contract) for targets, asset/loading conventions, layout stability, measurement evidence and publication verification. Keep this policy linked when replicating the theme.
 

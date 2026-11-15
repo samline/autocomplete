@@ -190,7 +190,7 @@ export async function migrate(args = process.argv.slice(2)) {
   )
   const sourceRoot = values.source ?? manifest.source
   if (!sourceRoot)
-    throw new Error('Usage: npm run migrate:starlight -- --source ../pkg/src/content/docs')
+    throw new Error('Usage: bun run site:migrate:starlight --source ../pkg/src/content/docs')
   const routes = Object.fromEntries(
     manifest.pages.map(page => [
       routeOf(page.source)
@@ -232,7 +232,7 @@ export async function migrate(args = process.argv.slice(2)) {
     process.exitCode = 1
   }
   console.log(
-    `Converted ${manifest.pages.length} pages; ${Object.keys(manifest.redirects ?? {}).length} redirects are emitted by assemble.mjs. Review every page, then run npm run build.`
+    `Converted ${manifest.pages.length} pages; ${Object.keys(manifest.redirects ?? {}).length} redirects are emitted by assemble.mjs. Review every page, then run bun run site:build.`
   )
 }
 

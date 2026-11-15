@@ -11,7 +11,7 @@ import { project } from '../shared/lib/project.mjs'
 // The browser bundle exposes the DOM controller only, so the CDN headless
 // example imports the ESM core build published next to it, at the same version.
 const coreModule = project.delivery.cdnScript.replace(
-  /browser\/global\.global\.js$/,
+  /browser\/autocomplete\.global\.js$/,
   'core/index.js'
 )
 const endpoint = 'https://samline.github.io/autocomplete/cities.json'
@@ -20,7 +20,7 @@ const endpoint = 'https://samline.github.io/autocomplete/cities.json'
 // and the copyable document run the same behavior, using only public APIs.
 const script = (setup: Function, mode: 'cdn' | 'esm' = 'cdn') =>
   mode === 'esm'
-    ? `import { autocomplete } from '@samline/autocomplete'\nimport '@samline/autocomplete/styles.css'\nconst setup = ${setup.toString()}\nsetup(document, autocomplete)`
+    ? `import { autocomplete } from '@samline/autocomplete'\nimport '@samline/autocomplete/style.css'\nconst setup = ${setup.toString()}\nsetup(document, autocomplete)`
     : `const setup = ${setup.toString()}\nsetup(document, window.Autocomplete.autocomplete)`
 const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
 [data-example] .field { position: relative; }

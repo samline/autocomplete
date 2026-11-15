@@ -16,7 +16,7 @@ const markup = `<div class="field" style="position: relative">
 </div>`
 
 const script = `import { createAutocomplete } from '@samline/autocomplete'
-import '@samline/autocomplete/styles.css'
+import '@samline/autocomplete/style.css'
 
 createAutocomplete('#city', {
   endpoint: '/api/cities',
@@ -120,7 +120,7 @@ export default {
       },
       style: {
         label: 'Styles',
-        entrypoint: `${project.npmName}/styles.css`,
+        entrypoint: `${project.npmName}/style.css`,
         description: 'Optional stylesheet; theme it with --autocomplete-* custom properties.',
       },
     },

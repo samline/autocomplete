@@ -2,6 +2,25 @@
 
 All notable changes to `@samline/autocomplete` are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-11-15
+
+Family conventions: one bundle name, one stylesheet name and pnpm. The old file names still ship as aliases.
+
+### Breaking changes
+
+- The classic script no longer has a `default` export, so `window.Autocomplete.default` is gone, and the extra `window.AutocompleteBundle` global is removed. Use `window.Autocomplete`.
+- `@samline/autocomplete/browser` no longer has a default export. Use `import { Autocomplete } from '@samline/autocomplete/browser'`.
+- The standalone script is now `dist/browser/autocomplete.global.js` (the `./browser/global` export points to it) and the stylesheet is `dist/style.css` (export `./style.css`). `dist/browser/global.global.js` and `dist/styles.css` (export `./styles.css`) are still built as identical aliases.
+
+### Changed
+
+- The standalone script is minified.
+- The package installs with pnpm and runs its scripts with Bun; CDN examples are pinned to 3.0.0.
+
+### Tests
+
+- Coverage thresholds (95 % statements, functions and lines, 90 % branches), gzip budgets for every public entry and browser tests in Chromium, Firefox and WebKit.
+
 ## [2.2.0] - 2026-11-14
 
 Observable state, hooks, plugins, a headless search pipeline and a no-JavaScript setup. No breaking changes.

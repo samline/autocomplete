@@ -31,7 +31,7 @@ export const getStaticPaths = () => {
     })
   if (!sources[path])
     throw new Error(
-      `Missing skills/${project.skill}/SKILL.md. Every package site ships its integration skill; run npm run configure or copy package-skill-template.md from the site tooling directory.`
+      `Missing skills/${project.skill}/SKILL.md. Every package site ships its integration skill; run bun run site:configure or copy package-skill-template.md from the site tooling directory.`
     )
   return [{ params: { skill: project.skill }, props: { source: sources[path] } }]
 }

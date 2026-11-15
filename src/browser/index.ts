@@ -1,6 +1,5 @@
 export {
   Autocomplete,
-  Autocomplete as default,
   available,
   browser,
   destroyAutocomplete,

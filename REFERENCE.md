@@ -4,7 +4,7 @@ This theme derives from [samline/ticker](https://github.com/samline/ticker), com
 
 Home, Examples and Docs must retain the original shapes, color hierarchy, typography, borders/radii, layout, gaps, hover/focus/motion and responsive conventions. Neutralizing content does not authorize redesigning a section. Adapt actual runtime integrations and package data without replacing the presentation.
 
-`design-reference.json` maps extracted components to immutable source paths and records their style fingerprints. `npm run check:design` catches unreviewed stylesheet drift. For intentional design changes requested by the user, review the source side by side, document the exception and update its fingerprint. Do not automatically bless a failing fingerprint.
+`design-reference.json` maps extracted components to immutable source paths and records their style fingerprints. `bun run site:check:design` catches unreviewed stylesheet drift. For intentional design changes requested by the user, review the source side by side, document the exception and update its fingerprint. Do not automatically bless a failing fingerprint.
 
 Reference groups: Hero/Section/Box and Main for page geometry; SectionHeading/FeatureCard/StepCard/RuntimeItem/RecipeCard/FaqItem/CallToAction for sections and effects; Header/MobileMenu/Footer for navigation; DemoStudio/DemoPanel/DemoFooter for real shared previews; shared Heading/PageTitle, CodeFrame/CodeFiles/CopyButton/Tabs, Theme and DrawerStyles for primitives.
 

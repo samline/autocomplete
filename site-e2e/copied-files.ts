@@ -44,7 +44,7 @@ export const openCopiedFiles = async (
       alias: {
         '@samline/autocomplete/browser': `${root}dist/browser/index.js`,
         '@samline/autocomplete/core': `${root}dist/core/index.js`,
-        '@samline/autocomplete/styles.css': `${root}dist/styles.css`,
+        '@samline/autocomplete/style.css': `${root}dist/style.css`,
         '@samline/autocomplete': `${root}dist/index.js`,
       },
       bundle: true,

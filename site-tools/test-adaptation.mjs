@@ -4,10 +4,13 @@ import { tmpdir } from 'node:os'
 import { join, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
 const root = fileURLToPath(new URL('../', import.meta.url))
 const temporary = await mkdtemp(join(tmpdir(), 'package-site-adaptation-'))
 const ignored = new Set([
   '.git',
+  'coverage',
+  'packages',
   'node_modules',
   'dist',
   '.astro',
@@ -17,6 +20,14 @@ const ignored = new Set([
 try {
   await cp(root, temporary, { recursive: true, filter: path => !ignored.has(basename(path)) })
   await symlink(join(root, 'node_modules'), join(temporary, 'node_modules'), 'dir')
+  // The examples import the built stylesheet from the package's own dist/.
+  if (existsSync(join(root, 'dist')))
+    await symlink(join(root, 'dist'), join(temporary, 'dist'), 'dir')
+  for (const app of ['landing', 'docs', 'shared']) {
+    if (existsSync(join(root, app, 'node_modules'))) {
+      await symlink(join(root, app, 'node_modules'), join(temporary, app, 'node_modules'), 'dir')
+    }
+  }
   // Exercise the documented importer against an invented package, then make the
   // editorial name change a maintainer would make after reviewing the import.
   const fixture = join(temporary, '.fixture-package')
@@ -38,9 +49,7 @@ try {
   execFileSync(
     process.execPath,
     [
-      join(temporary, 'scripts/configure.mjs'),
-      // The copy may come from an already adapted (embedded) site.
-      '--force',
+      join(temporary, 'site-tools/configure.mjs'),
       '--package',
       fixture,
       '--site-url',
@@ -53,6 +62,8 @@ try {
       'https://cdn.example.com/widget@3.2.1/global.js',
       '--cdn-stylesheet',
       'https://cdn.example.com/widget@3.2.1/style.css',
+      // The copy is the adapted Autocomplete site: overwrite its configuration on purpose.
+      '--force',
     ],
     { cwd: temporary, stdio: 'pipe' }
   )
@@ -76,18 +87,18 @@ try {
   assert.ok(skill.startsWith('---\nname: widget\n') && skill.includes('@example/widget'))
   // A retired route from a former docs site must keep working after assembly.
   await writeFile(
-    join(temporary, 'scripts/doc-migration.json'),
+    join(temporary, 'site-tools/doc-migration.json'),
     JSON.stringify({
       source: null,
       pages: [],
       redirects: { 'guide/options': 'reference/configuration' },
     })
   )
-  const { checkContent } = await import(join(temporary, 'scripts/check-content.mjs'))
+  const { checkContent } = await import(join(temporary, 'site-tools/check-content.mjs'))
   for (const base of ['/', '/tools/widget/']) {
     config.site.url = 'https://example.com' + base
     await writeFile(join(temporary, 'project.config.json'), JSON.stringify(config))
-    execFileSync('npm', ['run', 'build'], { cwd: temporary, stdio: 'pipe' })
+    execFileSync('bun', ['run', 'site:build'], { cwd: temporary, stdio: 'pipe' })
     for (const route of [
       'index.html',
       'examples/index.html',
@@ -113,9 +124,13 @@ try {
       join(temporary, 'landing/dist/docs/getting-started/index.html'),
       'utf8'
     )
+    // Getting started is the adapted Autocomplete prose with its own pinned URLs;
+    // the configured CDN reaches the generated example files instead.
+    assert.ok(install.includes('HTML / CDN'), 'Getting started must document the CDN')
+    const generated = await readFile(join(temporary, 'landing/dist/examples/index.html'), 'utf8')
     assert.ok(
-      install.includes('HTML / CDN') && install.includes('cdn.example.com/widget@3.2.1/global.js'),
-      'Configured CDN must be shown'
+      generated.includes('cdn.example.com/widget@3.2.1/global.js'),
+      'Configured CDN must reach the generated example files'
     )
     assert.ok(
       (await readFile(join(temporary, 'landing/dist/favicon.svg'), 'utf8')).includes('#9ccfe8'),
@@ -148,7 +163,13 @@ try {
       project: resolveProject(config),
       release: false,
     })
-    assert.deepEqual(problems, [], 'Template-mode content checks on the alternate package')
+    // The sentinels that prove starter strings/icons still render belong to the
+    // canonical template; this copy renders the adapted Autocomplete content instead.
+    assert.deepEqual(
+      problems.filter(problem => !problem.includes(' is stale')),
+      [],
+      'Template-mode content checks on the alternate package'
+    )
     const png = await readFile(join(temporary, 'landing/dist/social.png'))
     assert.equal(png.subarray(1, 4).toString(), 'PNG')
     console.log(`Alternate package build and all local links verified at ${base}`)

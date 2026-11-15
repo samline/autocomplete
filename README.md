@@ -35,7 +35,7 @@ Requires Node 20+ when bundling. Runs in modern browsers with `fetch` and `Abort
 Import the optional stylesheet once in your application entrypoint:
 
 ```js
-import '@samline/autocomplete/styles.css'
+import '@samline/autocomplete/style.css'
 ```
 
 ## Quick start
@@ -49,7 +49,7 @@ import '@samline/autocomplete/styles.css'
 
 ```js
 import { createAutocomplete } from '@samline/autocomplete'
-import '@samline/autocomplete/styles.css'
+import '@samline/autocomplete/style.css'
 
 const controller = createAutocomplete('#city', {
   endpoint: '/api/cities', // GET /api/cities?q=<query>
@@ -80,9 +80,9 @@ Choose **Package / ESM** when installing with npm, pnpm or bun and importing Aut
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/styles.css"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/browser/global.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/browser/autocomplete.global.js"></script>
 ```
 
 > Pin the version in production, or self-host the same files.
@@ -374,7 +374,7 @@ The controller also exposes `element` (the input), `popupElement`, `listElement`
 | `@samline/autocomplete/vanilla`        | The DOM factory and `renderHighlight`.                        |
 | `@samline/autocomplete/browser`        | The registry as a module (`Autocomplete`, `newAutocomplete`). |
 | `@samline/autocomplete/browser/global` | Standalone script (IIFE) that defines `window.Autocomplete`.  |
-| `@samline/autocomplete/styles.css`     | Optional base stylesheet (also `style.css`).                  |
+| `@samline/autocomplete/style.css`      | Optional base stylesheet (also `style.css`).                  |
 
 ### Events
 

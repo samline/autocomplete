@@ -55,10 +55,30 @@ for (const api of [esm, cjs]) {
 }
 assert.equal(globalThis.Autocomplete, undefined, 'The root import must not install a global')
 
-const source = await readFile(new URL('../dist/browser/global.global.js', import.meta.url), 'utf8')
+const source = await readFile(
+  new URL('../dist/browser/autocomplete.global.js', import.meta.url),
+  'utf8'
+)
+// global.global.js and styles.css are the pre-3.0.0 names, kept as identical aliases.
+const withoutMap = text => text.replace(/\n\/\/# sourceMappingURL=.*\n?$/, '')
+const alias = await readFile(new URL('../dist/browser/global.global.js', import.meta.url), 'utf8')
+assert.equal(
+  withoutMap(alias),
+  withoutMap(source),
+  'global.global.js must match autocomplete.global.js'
+)
+assert.equal(
+  await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8'),
+  await readFile(new URL('../dist/style.css', import.meta.url), 'utf8')
+)
 const context = {}
 vm.runInNewContext(source, context)
 assert.deepEqual(Object.keys(context.Autocomplete).sort(), registry)
+assert.equal(
+  context.AutocompleteBundle,
+  undefined,
+  'The classic script defines only window.Autocomplete'
+)
 
 for (const subpath of ['core', 'vanilla', 'browser']) {
   const esmSubpath = await import(`../dist/${subpath}/index.js`)
@@ -66,12 +86,18 @@ for (const subpath of ['core', 'vanilla', 'browser']) {
   assert.deepEqual(Object.keys(esmSubpath).sort(), Object.keys(cjsSubpath).sort())
 }
 
-const [packed] = JSON.parse(
-  execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { encoding: 'utf8' })
+const packed = JSON.parse(
+  execFileSync('pnpm', ['pack', '--dry-run', '--json'], { encoding: 'utf8' })
 )
 const paths = new Set(packed.files.map(file => file.path))
 const allowed = ['package.json', 'README.md', 'LICENSE.md', 'CHANGELOG.md']
-for (const file of [...allowed, 'dist/browser/global.global.js', 'dist/styles.css'])
+for (const file of [
+  ...allowed,
+  'dist/browser/autocomplete.global.js',
+  'dist/browser/global.global.js',
+  'dist/style.css',
+  'dist/styles.css',
+])
   assert.ok(paths.has(file), `Missing published file: ${file}`)
 const manifest = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
 const checkExport = entry => {

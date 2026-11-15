@@ -8,5 +8,11 @@ export default defineConfig({
     },
     include: ['test/**/*.test.ts'],
     restoreMocks: true,
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      reporter: ['text', 'json-summary'],
+      thresholds: { statements: 95, branches: 90, functions: 95, lines: 95 },
+    },
   },
 })

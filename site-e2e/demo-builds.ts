@@ -8,10 +8,13 @@
  * - `esm`: the built ESM entry, mapped from the bare `npmName` import through an
  *   import map injected into the routed document.
  *
- * Paths are relative to the project root, e.g. 'dist/browser/global.global.js'.
+ * Paths are relative to the project root, e.g. 'dist/browser/autocomplete.global.js'.
  * The ESM entry must be one self-contained file: an import map covers only the
  * bare package specifier, so a dist entry that imports chunks or optional peers
  * needs bundling first (for example with esbuild inside readBuild).
  * The neutral template scenarios have no dependency, so both are null.
  */
-export const localBuilds = { iife: null as string | null, esm: null as string | null }
+export const localBuilds = {
+  iife: 'dist/browser/autocomplete.global.js' as string | null,
+  esm: null as string | null,
+}

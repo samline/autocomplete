@@ -14,7 +14,7 @@ Build against the installed `@samline/autocomplete` version. This skill describe
 
 ```js
 import { createAutocomplete } from '@samline/autocomplete'
-import '@samline/autocomplete/styles.css'
+import '@samline/autocomplete/style.css'
 
 const controller = createAutocomplete('#city', {
   endpoint: '/api/cities', // GET /api/cities?q=<query>
@@ -30,8 +30,8 @@ Keep the host's `<label for>` and `<input>`; wrap the input in an element with `
 
 ## Choose a loading mode
 
-- **Package / ESM:** `npm install @samline/autocomplete`, import `createAutocomplete` (ESM or CommonJS) and optionally `@samline/autocomplete/styles.css`.
-- **HTML / CDN:** load `https://cdn.jsdelivr.net/npm/@samline/autocomplete@2.2.0/dist/styles.css` and `.../dist/browser/global.global.js`, then `window.Autocomplete.newAutocomplete({ id: 'city', options })`. Read it back with `getAutocomplete(id)` and remove it with `destroyAutocomplete(id)`.
+- **Package / ESM:** `npm install @samline/autocomplete`, import `createAutocomplete` (ESM or CommonJS) and optionally `@samline/autocomplete/style.css`.
+- **HTML / CDN:** load `https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css` and `.../dist/browser/autocomplete.global.js`, then `window.Autocomplete.newAutocomplete({ id: 'city', options })`. Read it back with `getAutocomplete(id)` and remove it with `destroyAutocomplete(id)`.
 
 - **No JavaScript:** the browser bundle mounts `input[data-autocomplete="/api/url"]` or `input[data-autocomplete][data-autocomplete-source="#json-script"]`, configured with `data-autocomplete-*` attributes. Prefer it in CMS templates.
 
