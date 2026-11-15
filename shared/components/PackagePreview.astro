@@ -51,6 +51,8 @@ const Preview = previewFor(slug, example.id) as any
     color: var(--palette-specimen-text);
     font-size: var(--text-small);
     line-height: 1.75;
+    /* Long API names (controller.popupElement) must wrap on narrow, enlarged text. */
+    overflow-wrap: anywhere;
   }
   .stage {
     min-width: 0;
