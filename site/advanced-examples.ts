@@ -49,8 +49,8 @@ const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
 [data-example] [data-pills-below] { min-height: 2.25rem; }
 [data-example] .layout { display: flex; flex-wrap: wrap; gap: .25rem; margin: 0; padding: .25rem; border: 1px solid var(--color-border, #888); border-radius: .625rem; justify-self: start; }
 [data-example] .layout legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-[data-example] .layout label { display: flex; align-items: center; margin: 0; padding: .375rem .75rem; border-radius: .375rem; font-size: .875rem; cursor: pointer; }
-[data-example] .layout input { position: absolute; opacity: 0; pointer-events: none; }
+[data-example] .layout label { position: relative; display: flex; align-items: center; margin: 0; padding: .375rem .75rem; border-radius: .375rem; font-size: .875rem; cursor: pointer; }
+[data-example] .layout input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
 [data-example] .layout label:has(:checked) { background: var(--color-bg-soft, #e4e4e7); box-shadow: inset 0 0 0 1px var(--color-border, #888); font-weight: 600; }
 [data-example] .layout label:has(:focus-visible) { outline: 2px solid currentColor; outline-offset: 2px; }
 [data-example] .directory { display: grid; gap: .5rem; padding: 0; margin: 0; list-style: none; }
