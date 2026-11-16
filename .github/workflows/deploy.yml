@@ -25,6 +25,8 @@ jobs:
         with:
           bun-version: 1.4.4
       - run: pnpm install --frozen-lockfile
+      - name: Build the package (the examples import dist/style.css)
+        run: bun run build
       - name: Build landing, examples and docs and verify links
         run: bun run site:build
       - name: Check release documentation evidence
