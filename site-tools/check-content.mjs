@@ -1,6 +1,6 @@
 import { readFile, readdir, access } from 'node:fs/promises'
 import { execFileSync } from 'node:child_process'
-import { dirname, join, resolve } from 'node:path'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { realpathSync } from 'node:fs'
 import { README_SECTIONS, proseLines } from './lib/identity-checks.mjs'
@@ -198,29 +198,15 @@ export async function checkContent({ root, project, release, audit = {}, sentine
       fail(`DEFAULT_ICONS is stale: the "${name}" path is not in Features.astro.`)
   }
 
-  // Collection mode (see .agents/collection-mode.md): every package Home,
-  // skill and README is checked like a single-package site's.
-  const collection =
-    project.mode === 'collection'
-      ? JSON.parse(await readFile(join(root, 'shared/generated/collection.json'), 'utf8')).packages
-      : []
-  const packagesDir = project.collection ? resolve(root, project.collection.packagesDir) : null
-  const targets = collection.length
-    ? collection.map(item => ({
-        ...item,
-        prefix: `${item.slug}/`,
-        skillSource: join(packagesDir, item.slug, 'site', 'SKILL.md'),
-        skillLabel: `${item.slug}/site/SKILL.md`,
-      }))
-    : [
-        {
-          ...project,
-          prefix: '',
-          hasExamples: true,
-          skillSource: join(root, 'skills', project.skill, 'SKILL.md'),
-          skillLabel: `skills/${project.skill}/SKILL.md`,
-        },
-      ]
+  const targets = [
+    {
+      ...project,
+      prefix: '',
+      hasExamples: true,
+      skillSource: join(root, 'skills', project.skill, 'SKILL.md'),
+      skillLabel: `skills/${project.skill}/SKILL.md`,
+    },
+  ]
 
   // FAQ depth: answer the real integration questions, not three placeholders.
   for (const target of targets) {
@@ -260,10 +246,8 @@ export async function checkContent({ root, project, release, audit = {}, sentine
         fail(`${path}: missing the downloadable package skill link (footer / Examples resources).`)
   }
 
-  // Root README follows the sibling structure. In collection mode that is the
-  // monorepo README beside the packages directory.
-  const readmeRoot = packagesDir ? dirname(packagesDir) : root
-  const readme = await readFile(join(readmeRoot, 'README.md'), 'utf8')
+  // Root README follows the sibling structure.
+  const readme = await readFile(join(root, 'README.md'), 'utf8')
   const headings = readmeHeadings(readme)
   // HTML / CDN is optional, but required in release mode when a CDN script is configured.
   const core = headings.filter(heading => README_HEADINGS.includes(heading))
@@ -285,9 +269,7 @@ export async function checkContent({ root, project, release, audit = {}, sentine
 
   // Root conventions shared by the sibling packages.
   if (release) {
-    // A collection site lives inside its repository, whose LICENSE.md covers it.
-    const licenseRoot =
-      project.collection && !(await exists(join(root, 'LICENSE.md'))) ? join(root, '..') : root
+    const licenseRoot = root
     if (!(await exists(join(licenseRoot, 'LICENSE.md')))) fail('Name the license file LICENSE.md.')
     if (await exists(join(licenseRoot, 'LICENSE'))) fail('Rename LICENSE to LICENSE.md.')
     // One license per package: LICENSE.md covers the package and the website.
