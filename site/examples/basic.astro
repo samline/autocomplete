@@ -18,21 +18,26 @@ const endpoint = sitePath('cities.json')
 
 <script>
   import { createAutocomplete } from '@samline/autocomplete'
+  import { preview } from '../../shared/lib/preview'
   type City = { key: string; name: string; country: string }
-  const root = document.querySelector<HTMLElement>('[data-preview="basic"]')!
-  const note = root.querySelector('.note')!
-  createAutocomplete<City>('#preview-city', {
-    endpoint: root.dataset.endpoint!,
-    minLength: 2,
-    mapResponse: (payload, _response, query) =>
-      (payload as { results: City[] }).results.filter(city =>
-        city.name.toLowerCase().includes(query.toLowerCase())
-      ),
-    getId: city => city.key,
-    getLabel: city => `${city.name}, ${city.country}`,
-    getValue: city => city.name,
-    onSelect: city => {
-      note.textContent = `Selected ${city.name}.`
-    },
+
+  preview('basic', stage => {
+    const root = stage.querySelector<HTMLElement>('[data-preview="basic"]')!
+    const note = root.querySelector('.note')!
+    const controller = createAutocomplete<City>('#preview-city', {
+      endpoint: root.dataset.endpoint!,
+      minLength: 2,
+      mapResponse: (payload, _response, query) =>
+        (payload as { results: City[] }).results.filter(city =>
+          city.name.toLowerCase().includes(query.toLowerCase())
+        ),
+      getId: city => city.key,
+      getLabel: city => `${city.name}, ${city.country}`,
+      getValue: city => city.name,
+      onSelect: city => {
+        note.textContent = `Selected ${city.name}.`
+      },
+    })
+    return controller
   })
 </script>

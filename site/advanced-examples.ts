@@ -35,8 +35,8 @@ const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
 [data-example] .pill { display: flex; max-width: 100%; }
 [data-example] .pill button { box-sizing: border-box; display: inline-flex; align-items: center; gap: .375rem; max-width: 100%; height: 2rem; padding: 0 .625rem; border: 1px solid var(--color-border, #888); border-radius: 1rem; background: var(--color-bg, #f4f4f5); color: inherit; font: inherit; font-size: .875rem; line-height: 1; overflow-wrap: anywhere; cursor: pointer; }
 [data-example] .pill button:hover { background: var(--color-bg-soft, #e4e4e7); }
-[data-example] .pill button span[aria-hidden] { font-size: 1rem; opacity: .7; }
-[data-example] .pill button:hover span[aria-hidden] { opacity: 1; }
+[data-example] .pill button svg { width: .875rem; height: .875rem; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; opacity: .7; }
+[data-example] .pill button:hover svg { opacity: 1; }
 [data-example] .pill-field { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; box-sizing: border-box; min-height: 3.125rem; padding: .5rem .75rem; border: 1px solid var(--color-border, #888); border-radius: .5rem; background: var(--color-bg-soft, #fff); cursor: text; }
 [data-example] .pill-field:focus-within { outline: 2px solid currentColor; outline-offset: 2px; }
 [data-example] .pill-field input[type="text"] { flex: 1 1 8rem; width: auto; min-width: 0; height: 2rem; padding: 0; border: 0; background: transparent; }

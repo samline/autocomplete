@@ -23,23 +23,28 @@ const endpoint = sitePath('cities.json')
 
 <script>
   import { createAutocomplete } from '@samline/autocomplete'
+  import { preview } from '../../shared/lib/preview'
   type City = { key: string; name: string; country: string }
-  const root = document.querySelector<HTMLElement>('[data-preview="form"]')!
-  const note = root.querySelector('.note')!
-  createAutocomplete<City>('#preview-destination-city', {
-    endpoint: root.dataset.endpoint!,
-    mapResponse: (payload, _response, query) =>
-      (payload as { results: City[] }).results.filter(city =>
-        city.name.toLowerCase().includes(query.toLowerCase())
-      ),
-    getId: city => city.key,
-    getLabel: city => city.name,
-    hiddenInput: 'city_id',
-    popover: true,
-  })
-  root.querySelector('form')!.addEventListener('submit', event => {
-    event.preventDefault()
-    const cityId = new FormData(event.currentTarget as HTMLFormElement).get('city_id')
-    note.textContent = cityId ? `Submitted city_id=${cityId}.` : 'Pick a city first.'
+
+  preview('form', stage => {
+    const root = stage.querySelector<HTMLElement>('[data-preview="form"]')!
+    const note = root.querySelector('.note')!
+    const controller = createAutocomplete<City>('#preview-destination-city', {
+      endpoint: root.dataset.endpoint!,
+      mapResponse: (payload, _response, query) =>
+        (payload as { results: City[] }).results.filter(city =>
+          city.name.toLowerCase().includes(query.toLowerCase())
+        ),
+      getId: city => city.key,
+      getLabel: city => city.name,
+      hiddenInput: 'city_id',
+      popover: true,
+    })
+    root.querySelector('form')!.addEventListener('submit', event => {
+      event.preventDefault()
+      const cityId = new FormData(event.currentTarget as HTMLFormElement).get('city_id')
+      note.textContent = cityId ? `Submitted city_id=${cityId}.` : 'Pick a city first.'
+    })
+    return controller
   })
 </script>

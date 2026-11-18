@@ -26,34 +26,39 @@ const endpoint = sitePath('cities.json')
 
 <script>
   import { createAutocomplete } from '@samline/autocomplete'
+  import { preview } from '../../shared/lib/preview'
   type City = { key: string; name: string; country: string }
-  const root = document.querySelector<HTMLElement>('[data-preview="events"]')!
-  const log = root.querySelector('.log')!
-  const write = (text: string) => {
-    const entry = document.createElement('li')
-    entry.textContent = text
-    log.prepend(entry)
-    log.querySelectorAll('li:nth-child(n + 7)').forEach(item => item.remove())
-  }
 
-  const controller = createAutocomplete<City>('#preview-origin', {
-    endpoint: root.dataset.endpoint!,
-    mapResponse: (payload, _response, query) =>
-      (payload as { results: City[] }).results.filter(city =>
-        city.name.toLowerCase().includes(query.toLowerCase())
-      ),
-    getId: city => city.key,
-    getLabel: city => city.name,
+  preview('events', stage => {
+    const root = stage.querySelector<HTMLElement>('[data-preview="events"]')!
+    const log = root.querySelector('.log')!
+    const write = (text: string) => {
+      const entry = document.createElement('li')
+      entry.textContent = text
+      log.prepend(entry)
+      log.querySelectorAll('li:nth-child(n + 7)').forEach(item => item.remove())
+    }
+
+    const controller = createAutocomplete<City>('#preview-origin', {
+      endpoint: root.dataset.endpoint!,
+      mapResponse: (payload, _response, query) =>
+        (payload as { results: City[] }).results.filter(city =>
+          city.name.toLowerCase().includes(query.toLowerCase())
+        ),
+      getId: city => city.key,
+      getLabel: city => city.name,
+    })
+
+    controller.on('loadstart', ({ query }) => write(`loadstart “${query}”`))
+    controller.on('load', ({ suggestions, cached }) =>
+      write(`load ${suggestions.length} results${cached ? ' (cache)' : ''}`)
+    )
+    controller.on('open', () => write('open'))
+    controller.on('close', () => write('close'))
+    controller.on('select', ({ label, value }) => write(`select ${label} → ${value}`))
+    controller.on('clear', () => write('clear'))
+    controller.on('error', ({ error }) => write(`error ${error}`))
+    root.querySelector('.reset')!.addEventListener('click', () => controller.clear())
+    return controller
   })
-
-  controller.on('loadstart', ({ query }) => write(`loadstart “${query}”`))
-  controller.on('load', ({ suggestions, cached }) =>
-    write(`load ${suggestions.length} results${cached ? ' (cache)' : ''}`)
-  )
-  controller.on('open', () => write('open'))
-  controller.on('close', () => write('close'))
-  controller.on('select', ({ label, value }) => write(`select ${label} → ${value}`))
-  controller.on('clear', () => write('clear'))
-  controller.on('error', ({ error }) => write(`error ${error}`))
-  root.querySelector('.reset')!.addEventListener('click', () => controller.clear())
 </script>

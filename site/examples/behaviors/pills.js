@@ -29,9 +29,10 @@ export const setupPills = (root, createAutocomplete) => {
       remove.setAttribute('aria-label', `Remove ${item.label}`)
       const label = document.createElement('span')
       label.textContent = item.label
-      const icon = document.createElement('span')
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      icon.setAttribute('viewBox', '0 0 24 24')
       icon.setAttribute('aria-hidden', 'true')
-      icon.textContent = '×'
+      icon.innerHTML = '<path d="M6 6l12 12M18 6 6 18" />'
       remove.append(label, icon)
       remove.addEventListener('click', () => {
         selected.delete(item.id)

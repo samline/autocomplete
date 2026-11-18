@@ -3,12 +3,12 @@ name: autocomplete
 description: Integrate @samline/autocomplete to turn a text input into an accessible combobox in vanilla JavaScript, TypeScript or plain HTML. Use it when suggestions come from an HTTP endpoint, an async function or a local array; do not use it for static select menus.
 metadata:
   package: '@samline/autocomplete'
-  package-version: '2.2.0'
+  package-version: '3.0.0'
 ---
 
 # @samline/autocomplete
 
-Build against the installed `@samline/autocomplete` version. This skill describes **2.2.0**. Check the dependency version before applying it, and preserve the host project's markup, components and design.
+Build against the installed `@samline/autocomplete` version. This skill describes **3.0.0**. Check the dependency version before applying it, and preserve the host project's markup, components and design.
 
 ## The one contract
 

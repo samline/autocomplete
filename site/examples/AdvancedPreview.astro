@@ -22,6 +22,7 @@ const html = example.files.html.replace(
 <script>
   import { createAutocomplete, createSearch } from '@samline/autocomplete'
   import { mountElements } from '../../shared/lib/mount-elements'
+  import { preview } from '../../shared/lib/preview'
   import { setupPills } from './behaviors/pills.js'
   import { setupHooks } from './behaviors/hooks.js'
   import { setupPlugins } from './behaviors/plugins.js'
@@ -30,6 +31,12 @@ const html = example.files.html.replace(
   import { setupHeadless } from './behaviors/headless.js'
   import { setupPalette } from './behaviors/palette.js'
   import { setupDependent } from './behaviors/dependent.js'
+
+  // Examples that keep a selection or a log get Reset. preview() stores the
+  // authored markup before mountElements changes it; restoring that markup
+  // makes mountElements destroy the old controller and mount a new one.
+  const resettable = new Set(['pills', 'hooks', 'plugins', 'state', 'palette', 'dependent'])
+  for (const id of resettable) preview(id, () => {})
 
   mountElements('[data-advanced-preview]', root => {
     if (root.dataset.advancedPreview === 'headless') return setupHeadless(root, createSearch)
