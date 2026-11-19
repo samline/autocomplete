@@ -22,7 +22,9 @@ const script = (setup: Function, mode: 'cdn' | 'esm' = 'cdn') =>
   mode === 'esm'
     ? `import { autocomplete } from '@samline/autocomplete'\nimport '@samline/autocomplete/style.css'\nconst setup = ${setup.toString()}\nsetup(document, autocomplete)`
     : `const setup = ${setup.toString()}\nsetup(document, window.Autocomplete.autocomplete)`
-const css = `[data-example] { display: grid; gap: .75rem; max-width: 32rem; }
+const css = `[data-example] { display: grid; gap: .75rem; }
+/* Forms lay out like the example root: actions never touch the fields. */
+[data-example] form { display: grid; gap: .75rem; }
 [data-example] .field { position: relative; }
 [data-example] label { display: block; margin-bottom: .5rem; }
 [data-example] input[type="text"] { box-sizing: border-box; width: 100%; padding: .75rem 1rem; border: 1px solid var(--color-border, #888); border-radius: .5rem; background: var(--color-bg-soft, #fff); color: inherit; font: inherit; }

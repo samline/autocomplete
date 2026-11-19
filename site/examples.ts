@@ -5,7 +5,7 @@ import advancedExamples from './advanced-examples'
 // package itself.
 const endpoint = 'https://samline.github.io/autocomplete/cities.json'
 
-const baseCss = `.field { position: relative; max-width: 28rem; }
+const baseCss = `.field { position: relative; max-width: 28rem; margin-bottom: 0.75rem; }
 label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
 input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #aaa; border-radius: 0.5rem; font: inherit; }`
 
@@ -309,8 +309,7 @@ Autocomplete.newAutocomplete({
 </form>
 <p id="submitted" aria-live="polite">Nothing submitted yet.</p>`,
       css: `${baseCss}
-.card { overflow: hidden; max-width: 28rem; padding: 1rem; border: 1px solid #aaa; border-radius: 0.75rem; }
-.card button { margin-top: 0.75rem; }`,
+.card { overflow: hidden; max-width: 28rem; padding: 1rem; border: 1px solid #aaa; border-radius: 0.75rem; }`,
       js: `window.Autocomplete.newAutocomplete({
   id: 'destination-city',
   options: {
