@@ -98,7 +98,7 @@
     },
     {
       "source": "CHANGELOG.md",
-      "sha256": "599c2638562cb2a1183c68f12cf6df951219b4a00010bfad822b6654f8fcb9fb",
+      "sha256": "02d3543232b4f20c4ffaaeedd60a5c0b6f81999cfb112dc09e4f110191c1f2b4",
       "destination": "CHANGELOG.md",
       "reviewed": true
     },
@@ -152,7 +152,7 @@
     },
     {
       "source": "src/core/recent.ts",
-      "sha256": "c9e61c8f26334e9b80e56d8b0ed02674bfc099d2fd31ba4d21258fd409a6836d",
+      "sha256": "a2f65fa62a898f01642e44b1c3c54cc30fb7da361c8d59cfadc4bff83817ab3a",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
@@ -164,7 +164,7 @@
     },
     {
       "source": "src/core/source.ts",
-      "sha256": "0ba0148fd69cf9d7af11d88639a3d1a22d297f84a2106f7bda795046c73c5fc9",
+      "sha256": "d6455377d5bac90efc68f72e71693a531b27f67d5c3c6d5705942959edcaa4e1",
       "destination": "docs/src/content/docs/reference/api.md",
       "reviewed": true
     },
@@ -305,7 +305,14 @@
   ],
   "notes": "Reviewed 2026-11-13 against 2.2.0 source, entrypoints, tests, current reference, recipes and seven browser examples. Covers the 2.0 registry/rendering migration, 2.1 sections/recents/forms/placement and 2.2 state/hooks/plugins/headless/declarative APIs. Removed obsolete v1 source paths and createAutocompleteController export; refreshed SHA-256 evidence. Existing maintainer theme preference is unchanged.",
   "iconReview": {
-    "kept": ["package", "eye", "refresh", "branch", "layers", "wrench"],
+    "kept": [
+      "package",
+      "eye",
+      "refresh",
+      "branch",
+      "layers",
+      "wrench"
+    ],
     "reason": "The template icons read as endpoint, accessibility, cancellation, entry points, events and styling for these cards; reviewed 2026-11-13."
   }
 }
