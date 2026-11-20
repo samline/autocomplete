@@ -305,14 +305,7 @@
   ],
   "notes": "Reviewed 2026-11-13 against 2.2.0 source, entrypoints, tests, current reference, recipes and seven browser examples. Covers the 2.0 registry/rendering migration, 2.1 sections/recents/forms/placement and 2.2 state/hooks/plugins/headless/declarative APIs. Removed obsolete v1 source paths and createAutocompleteController export; refreshed SHA-256 evidence. Existing maintainer theme preference is unchanged.",
   "iconReview": {
-    "kept": [
-      "package",
-      "eye",
-      "refresh",
-      "branch",
-      "layers",
-      "wrench"
-    ],
+    "kept": ["package", "eye", "refresh", "branch", "layers", "wrench"],
     "reason": "The template icons read as endpoint, accessibility, cancellation, entry points, events and styling for these cards; reviewed 2026-11-13."
   }
 }
