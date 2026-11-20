@@ -20,7 +20,7 @@ export interface CreateRecentStoreOptions<T> {
 
 const defaultStorage = (): AutocompleteStorage | null => {
   try {
-    return typeof localStorage === 'undefined' ? null : localStorage
+    return globalThis.localStorage ?? null
   } catch {
     // Accessing localStorage throws when site data is blocked.
     return null

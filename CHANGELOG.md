@@ -2,6 +2,12 @@
 
 All notable changes to `@samline/autocomplete` are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `fromEndpoint` from `@samline/autocomplete/core` no longer reads `document`, so it works outside a browser (Node, workers) with an absolute endpoint; relative endpoints still resolve against the page URL.
+
 ## [3.0.0] - 2026-11-15
 
 Family conventions: one bundle name, one stylesheet name and pnpm. The old file names still ship as aliases.

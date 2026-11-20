@@ -38,7 +38,9 @@ export const fromEndpoint = <T>({
 
   return async (query, { signal, input }) => {
     const resolved = typeof endpoint === 'function' ? endpoint(query, input) : endpoint
-    const url = new URL(resolved, document.baseURI)
+    // Relative endpoints resolve against the page (or worker) URL; outside a
+    // browser only absolute endpoints work, and URL reports the invalid one.
+    const url = new URL(resolved, globalThis.document?.baseURI ?? globalThis.location?.href)
     if (queryParam !== null) url.searchParams.set(queryParam, query)
 
     const init = typeof requestInit === 'function' ? requestInit(query, input) : requestInit
