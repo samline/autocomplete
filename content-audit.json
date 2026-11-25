@@ -11,13 +11,13 @@
       {
         "name": "HTML / CDN and declarative mounting",
         "evidence": "src/browser/global.ts; src/browser/mount.ts; src/vanilla/dataset.ts; test/vanilla/phase-three.test.ts",
-        "destination": "docs/src/content/docs/guides/recipes.md",
+        "destination": "docs/src/content/docs/guides/frameworks.md",
         "reviewed": true
       },
       {
         "name": "Framework lifecycle and observable state",
         "evidence": "src/core/types.ts; src/vanilla/render.ts subscribe/getState/on; test/vanilla/phase-three.test.ts",
-        "destination": "docs/src/content/docs/guides/recipes.md",
+        "destination": "docs/src/content/docs/guides/frameworks.md",
         "reviewed": true
       }
     ],
@@ -92,13 +92,13 @@
   "sources": [
     {
       "source": "README.md",
-      "sha256": "33233608cad409d02cdd05569559a397bd631cc2451e631c80d2c85896a8f3fc",
+      "sha256": "ee1c206c859ed8c28b3105db525b4924502d2753b63358162894af9dceb642fb",
       "destination": "README.md",
       "reviewed": true
     },
     {
       "source": "CHANGELOG.md",
-      "sha256": "02d3543232b4f20c4ffaaeedd60a5c0b6f81999cfb112dc09e4f110191c1f2b4",
+      "sha256": "5c73d2f6b36207fb9b24ff017e949c4dde18fc0967234b3f3eee942a88bf86fb",
       "destination": "CHANGELOG.md",
       "reviewed": true
     },

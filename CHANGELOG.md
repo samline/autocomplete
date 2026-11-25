@@ -4,6 +4,10 @@ All notable changes to `@samline/autocomplete` are documented in this file. The 
 
 ## [Unreleased]
 
+### Added
+
+- A "Framework integrations" guide with React, Vue, Svelte, Astro and plain HTML/CDN usage. The React and Vue wrappers moved there from the recipes.
+
 ### Fixed
 
 - `fromEndpoint` from `@samline/autocomplete/core` no longer reads `document`, so it works outside a browser (Node, workers) with an absolute endpoint; relative endpoints still resolve against the page URL.

@@ -285,7 +285,7 @@ createAutocomplete('#city', {
 })
 ```
 
-[Recipes](https://samline.github.io/autocomplete/docs/guides/recipes/) cover React, Vue, Alpine, Livewire, a ⌘K palette, plugins and headless rendering with `createSearch`.
+[Framework integrations](https://samline.github.io/autocomplete/docs/guides/frameworks/) cover React, Vue, Svelte, Astro and plain HTML. [Recipes](https://samline.github.io/autocomplete/docs/guides/recipes/) cover Alpine, Livewire, a ⌘K palette, plugins and headless rendering with `createSearch`.
 
 ### Caching
 
@@ -415,15 +415,16 @@ The package includes declarations. Pass your suggestion type to `createAutocompl
 
 Read the [documentation](https://samline.github.io/autocomplete/docs/) for the full guides and API contracts, and explore [working examples](https://samline.github.io/autocomplete/examples/) with complete and separate source files.
 
-| Guide                                                                              | What it covers                                                         |
-| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [Installation](https://samline.github.io/autocomplete/docs/getting-started/)       | Package / ESM, HTML / CDN, frameworks and starter files.               |
-| [Examples](https://samline.github.io/autocomplete/docs/guides/examples/)           | Live previews with their complete, copyable source.                    |
-| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/)    | Every option and its default.                                          |
-| [API reference](https://samline.github.io/autocomplete/docs/reference/api/)        | The controller, helpers, browser global, events, types.                |
-| [Recipes](https://samline.github.io/autocomplete/docs/guides/recipes/)             | React, Vue, Alpine, Livewire, a command palette, plugins and headless. |
-| [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides.                |
-| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/)             | The DOM contract and the custom properties.                            |
+| Guide                                                                              | What it covers                                             |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [Installation](https://samline.github.io/autocomplete/docs/getting-started/)       | Package / ESM, HTML / CDN, frameworks and starter files.   |
+| [Examples](https://samline.github.io/autocomplete/docs/guides/examples/)           | Live previews with their complete, copyable source.        |
+| [Options](https://samline.github.io/autocomplete/docs/reference/configuration/)    | Every option and its default.                              |
+| [API reference](https://samline.github.io/autocomplete/docs/reference/api/)        | The controller, helpers, browser global, events, types.    |
+| [Frameworks](https://samline.github.io/autocomplete/docs/guides/frameworks/)       | React, Vue, Svelte, Astro and plain HTML or CDN.           |
+| [Recipes](https://samline.github.io/autocomplete/docs/guides/recipes/)             | Alpine, Livewire, a command palette, plugins and headless. |
+| [Accessibility](https://samline.github.io/autocomplete/docs/guides/accessibility/) | What the combobox provides and what your page provides.    |
+| [Styling](https://samline.github.io/autocomplete/docs/guides/styling/)             | The DOM contract and the custom properties.                |
 
 ## Changelog
 

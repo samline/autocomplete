@@ -2,10 +2,10 @@
 locale: en
 sidebar:
   group: guides
-  order: 4
+  order: 5
 title: 'Recipes for your stack'
 titleAccent: 'your stack'
-description: 'Plain HTML with data attributes, React, Vue and Alpine wrappers, Livewire forms, a command palette, plugins and a fully headless search.'
+description: 'Plain HTML with data attributes, Alpine wrappers, Livewire forms, a command palette, plugins and a fully headless search.'
 ---
 
 Every recipe uses the public API only; there is no adapter package to install.
@@ -37,68 +37,9 @@ The standalone script mounts every `input[data-autocomplete]` on load and as inp
 
 Mounted inputs with an id are available through `Autocomplete.getAutocomplete(id)`. With a bundler, call `mount({ defaults })` yourself; `defaults` carries options that attributes cannot express, such as `renderOption`.
 
-## React
+## React and Vue
 
-`subscribe` and `getState` plug straight into `useSyncExternalStore`.
-
-```jsx
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { createAutocomplete } from '@samline/autocomplete'
-
-const idle = { status: 'idle', open: false, suggestions: [], selected: null }
-
-export const useAutocomplete = options => {
-  const ref = useRef(null)
-  const [controller, setController] = useState(null)
-
-  useEffect(() => {
-    const instance = createAutocomplete(ref.current, options)
-    setController(instance)
-    return () => instance.destroy()
-  }, [])
-
-  const state = useSyncExternalStore(
-    listener => controller?.subscribe(listener) ?? (() => {}),
-    () => controller?.getState() ?? idle
-  )
-
-  return { ref, controller, state }
-}
-
-export const CitySearch = () => {
-  const { ref, state } = useAutocomplete({ endpoint: '/api/cities', getLabel: city => city.name })
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <label htmlFor="city">City</label>
-      <input id="city" ref={ref} />
-      <p>{state.selected ? `Selected ${state.selected.name}` : 'Nothing selected'}</p>
-    </div>
-  )
-}
-```
-
-## Vue
-
-```js
-import { onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
-import { createAutocomplete } from '@samline/autocomplete'
-
-export const useAutocomplete = options => {
-  const input = ref(null)
-  const state = shallowRef(null)
-  let controller
-
-  onMounted(() => {
-    controller = createAutocomplete(input.value, options)
-    state.value = controller.getState()
-    controller.subscribe(next => (state.value = next))
-  })
-  onBeforeUnmount(() => controller?.destroy())
-
-  return { input, state }
-}
-```
+The React hook and the Vue composable live in [Framework integrations](../frameworks/), together with Svelte, Astro and plain HTML. The pattern is the same everywhere: create on mount, `destroy()` on unmount, and bind `getState` / `subscribe`.
 
 ## Alpine
 
