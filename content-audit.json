@@ -193,7 +193,7 @@
       "reviewed": true
     },
     {
-      "source": "src/styles.css",
+      "source": "src/style.css",
       "sha256": "0451f29b2685c595c5231a2c219b32bc96325da0edb94640e76cfac261fc12bc",
       "destination": "docs/src/content/docs/guides/styling.md",
       "reviewed": true
