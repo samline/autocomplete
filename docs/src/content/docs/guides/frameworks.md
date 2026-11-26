@@ -5,7 +5,7 @@ sidebar:
   order: 4
 title: 'Framework integrations'
 titleAccent: 'integrations'
-description: 'Use @samline/autocomplete in React, Vue, Svelte, Astro and plain HTML or CDN pages: create on mount, destroy on unmount, bind the observable state.'
+description: 'Use @samline/autocomplete in React, Vue, Svelte, Astro, Shopify, WordPress and plain HTML or CDN pages: create on mount, destroy on unmount.'
 ---
 
 There is no adapter package. `createAutocomplete(input, options)` takes the real `<input>` and returns a controller, so every framework follows the same lifecycle: create it once the element exists, call `destroy()` when the component leaves (it is idempotent and removes every listener and the listbox), and read the state through the controller.
@@ -145,6 +145,42 @@ import '@samline/autocomplete/style.css'
 ```
 
 For options that attributes cannot express, such as `renderOption`, pass `mount({ defaults })`. If you need the controller itself, call `createAutocomplete(document.querySelector('#city'), options)` in the same script. With Astro view transitions, destroy the controller before the swap (for example on `astro:before-swap`) and create it again on `astro:page-load`; `mount()` already handles replaced inputs by itself.
+
+## Shopify
+
+Load the pinned classic script once from theme assets. Copy the `dist/browser/autocomplete.global.js` to `assets/autocomplete.global.js` and `dist/style.css` to `assets/autocomplete.css` from the matching published release (`@samline/autocomplete@3.0.0`), then include it once in `layout/theme.liquid` before `</body>`:
+
+```liquid
+{{ 'autocomplete.css' | asset_url | stylesheet_tag }}
+{{ 'autocomplete.global.js' | asset_url | script_tag }}
+```
+
+Mark up any section with the `data-autocomplete*` attributes; the script defines `window.Autocomplete`. A deferred `<script src="{{ 'autocomplete.global.js' | asset_url }}" defer></script>` works the same.
+
+```liquid
+<div style="position: relative">
+  <label for="city">City</label>
+  <input id="city" data-autocomplete="/api/cities" data-autocomplete-label-key="name" />
+</div>
+```
+
+The script calls `mount()` on load and keeps watching the document, so inputs inside a section the theme editor adds are enhanced and inputs in a section it removes are destroyed: you do not need `shopify:section:load` or `shopify:section:unload` handlers. If you do need a manual rescan after custom DOM changes, call `Autocomplete.refresh()`; to release one input yourself, call `Autocomplete.destroyAutocomplete(id)`. See [Shopify's section events](https://shopify.dev/docs/storefronts/themes/best-practices/editor/integrate-sections-and-blocks).
+
+## WordPress
+
+Enqueue the pinned script and stylesheet from your theme or plugin, copied from the matching published release (`@samline/autocomplete@3.0.0`), in the `wp_enqueue_scripts` hook. The `strategy` argument needs WordPress 6.3 or later.
+
+```php
+add_action('wp_enqueue_scripts', function () {
+  wp_enqueue_style('autocomplete', plugins_url('assets/autocomplete.css', __FILE__), [], '3.0.0');
+  wp_enqueue_script('autocomplete', plugins_url('assets/autocomplete.global.js', __FILE__), [], '3.0.0', [
+    'in_footer' => true,
+    'strategy' => 'defer',
+  ]);
+});
+```
+
+The script mounts every `input[data-autocomplete]` on load and as inputs are added or removed, so the markup can live in a block, a template or a shortcode output. Use `Autocomplete.getAutocomplete(id)` when you need the controller. See [wp_enqueue_script](https://developer.wordpress.org/reference/functions/wp_enqueue_script/).
 
 ## Plain HTML and CDN
 

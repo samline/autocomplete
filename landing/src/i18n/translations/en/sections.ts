@@ -38,7 +38,16 @@ export default {
     descriptionContinuation: 'Cities, commands or people. Your data, one keystroke away.',
     footnotes: ['Zero dependencies', 'TypeScript ready', `${project.license} licensed`],
     compatibilityLabel: 'ONE SMALL SCRIPT. RIGHT AT HOME IN YOUR STACK.',
-    platforms: ['JavaScript', 'TypeScript', 'React', 'Vue', 'Svelte', 'Shopify', 'WordPress'],
+    platforms: [
+      'JavaScript',
+      'TypeScript',
+      'React',
+      'Vue',
+      'Svelte',
+      'Astro',
+      'Shopify',
+      'WordPress',
+    ],
   },
   features: {
     eyebrow: '01 / More than a dropdown',
