@@ -16,7 +16,8 @@ Mirror the sibling `@samline` packages (`../ticker` is the closest reference).
 - `src/style.css`: optional data-attribute-driven styles.
 - `test/`: Vitest + jsdom contracts.
 - `docs/`: public API and integration documentation.
-- `example/`: direct-browser example consuming `dist/`.
+- `site/`: interactive previews and copyable examples.
+- `tests/e2e/`: browser contracts against `dist/`.
 
 ## Rules
 
