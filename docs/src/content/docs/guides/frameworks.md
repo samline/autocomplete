@@ -148,7 +148,7 @@ For options that attributes cannot express, such as `renderOption`, pass `mount(
 
 ## Shopify
 
-Load the pinned classic script once from theme assets. Copy the `dist/browser/autocomplete.global.js` to `assets/autocomplete.global.js` and `dist/style.css` to `assets/autocomplete.css` from the matching published release (`@samline/autocomplete@3.0.0`), then include it once in `layout/theme.liquid` before `</body>`:
+Load the pinned classic script once from theme assets. Copy the `dist/browser/autocomplete.global.js` to `assets/autocomplete.global.js` and `dist/style.css` to `assets/autocomplete.css` from the matching published release (`@samline/autocomplete@3.1.0`), then include it once in `layout/theme.liquid` before `</body>`:
 
 ```liquid
 {{ 'autocomplete.css' | asset_url | stylesheet_tag }}
@@ -168,12 +168,12 @@ The script calls `mount()` on load and keeps watching the document, so inputs in
 
 ## WordPress
 
-Enqueue the pinned script and stylesheet from your theme or plugin, copied from the matching published release (`@samline/autocomplete@3.0.0`), in the `wp_enqueue_scripts` hook. The `strategy` argument needs WordPress 6.3 or later.
+Enqueue the pinned script and stylesheet from your theme or plugin, copied from the matching published release (`@samline/autocomplete@3.1.0`), in the `wp_enqueue_scripts` hook. The `strategy` argument needs WordPress 6.3 or later.
 
 ```php
 add_action('wp_enqueue_scripts', function () {
-  wp_enqueue_style('autocomplete', plugins_url('assets/autocomplete.css', __FILE__), [], '3.0.0');
-  wp_enqueue_script('autocomplete', plugins_url('assets/autocomplete.global.js', __FILE__), [], '3.0.0', [
+  wp_enqueue_style('autocomplete', plugins_url('assets/autocomplete.css', __FILE__), [], '3.1.0');
+  wp_enqueue_script('autocomplete', plugins_url('assets/autocomplete.global.js', __FILE__), [], '3.1.0', [
     'in_footer' => true,
     'strategy' => 'defer',
   ]);
@@ -189,7 +189,7 @@ The standalone script mounts every `input[data-autocomplete]` on load and as inp
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/style.css"
 />
 
 <div style="position: relative">
@@ -198,7 +198,7 @@ The standalone script mounts every `input[data-autocomplete]` on load and as inp
   <p id="picked">Nothing selected</p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/browser/autocomplete.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/browser/autocomplete.global.js"></script>
 <script>
   // The standalone script mounts on DOMContentLoaded; this listener runs right after it.
   document.addEventListener('DOMContentLoaded', function () {

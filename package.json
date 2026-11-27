@@ -1,6 +1,6 @@
 {
   "name": "@samline/autocomplete",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "An accessible, framework-agnostic autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
   "type": "module",
   "license": "MIT",

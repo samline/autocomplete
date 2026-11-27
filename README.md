@@ -80,9 +80,9 @@ Choose **Package / ESM** when installing with npm, pnpm or bun and importing Aut
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css"
+  href="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/style.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/browser/autocomplete.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/browser/autocomplete.global.js"></script>
 ```
 
 > Pin the version in production, or self-host the same files.

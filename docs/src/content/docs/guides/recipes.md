@@ -32,7 +32,7 @@ The standalone script mounts every `input[data-autocomplete]` on load and as inp
   data-autocomplete-recent
 />
 
-<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/browser/autocomplete.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/browser/autocomplete.global.js"></script>
 ```
 
 Mounted inputs with an id are available through `Autocomplete.getAutocomplete(id)`. With a bundler, call `mount({ defaults })` yourself; `defaults` carries options that attributes cannot express, such as `renderOption`.

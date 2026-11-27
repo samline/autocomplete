@@ -3,12 +3,12 @@ name: autocomplete
 description: Integrate @samline/autocomplete to turn a text input into an accessible combobox in vanilla JavaScript, TypeScript or plain HTML. Use it when suggestions come from an HTTP endpoint, an async function or a local array; do not use it for static select menus.
 metadata:
   package: '@samline/autocomplete'
-  package-version: '3.0.0'
+  package-version: '3.1.0'
 ---
 
 # @samline/autocomplete
 
-Build against the installed `@samline/autocomplete` version. This skill describes **3.0.0**. Check the dependency version before applying it, and preserve the host project's markup, components and design.
+Build against the installed `@samline/autocomplete` version. This skill describes **3.1.0**. Check the dependency version before applying it, and preserve the host project's markup, components and design.
 
 ## The one contract
 
@@ -32,7 +32,7 @@ Keep the host's `<label for>` and `<input>`; wrap the input in an element with `
 
 - **Package / ESM:** `npm install @samline/autocomplete`, import `createAutocomplete` (ESM or CommonJS) and optionally `@samline/autocomplete/style.css`.
 - **Theming:** the stylesheet reads `--autocomplete-*` custom properties; the active option gets an inset ring (`--autocomplete-active-ring`, default the text color) in addition to its background tint.
-- **HTML / CDN:** load `https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css` and `.../dist/browser/autocomplete.global.js`, then `window.Autocomplete.newAutocomplete({ id: 'city', options })`. Read it back with `getAutocomplete(id)` and remove it with `destroyAutocomplete(id)`.
+- **HTML / CDN:** load `https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/style.css` and `.../dist/browser/autocomplete.global.js`, then `window.Autocomplete.newAutocomplete({ id: 'city', options })`. Read it back with `getAutocomplete(id)` and remove it with `destroyAutocomplete(id)`.
 
 - **No JavaScript:** the browser bundle mounts `input[data-autocomplete="/api/url"]` or `input[data-autocomplete][data-autocomplete-source="#json-script"]`, configured with `data-autocomplete-*` attributes. Prefer it in CMS templates.
 

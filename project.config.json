@@ -2,7 +2,7 @@
   "package": {
     "name": "Autocomplete",
     "npmName": "@samline/autocomplete",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "An accessible, framework-agnostic autocomplete (combobox) for vanilla JavaScript, TypeScript and plain HTML.",
     "author": "Samuel Olvera (samline)",
     "license": "MIT",
@@ -20,8 +20,8 @@
     "accentDark": "#8cc2bd"
   },
   "delivery": {
-    "cdnScript": "https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/browser/autocomplete.global.js",
-    "cdnStylesheet": "https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css"
+    "cdnScript": "https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/browser/autocomplete.global.js",
+    "cdnStylesheet": "https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.1.0/dist/style.css"
   },
   "dev": {
     "landingPort": 4370,

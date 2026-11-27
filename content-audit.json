@@ -88,17 +88,17 @@
     "accentDark": "#8cc2bd"
   },
   "status": "verified",
-  "packageVersion": "3.0.0",
+  "packageVersion": "3.1.0",
   "sources": [
     {
       "source": "README.md",
-      "sha256": "96c30e8697efc825bb795be947887255e7cb70ef179722a2fc850395be1ce261",
+      "sha256": "9b83b41a0ece3f57ed6cbc06441e3094c4d484bb1bda765d3e19d5cb34485732",
       "destination": "README.md",
       "reviewed": true
     },
     {
       "source": "CHANGELOG.md",
-      "sha256": "9fcac0d1f6d11a5985c6e958d1009527290253a459a95be55a7efda136c6d235",
+      "sha256": "91af869f446740c826168f332522ac7909896d5a9d023237863b1e064cb09651",
       "destination": "CHANGELOG.md",
       "reviewed": true
     },
@@ -218,7 +218,7 @@
     },
     {
       "source": "src/vanilla/position.ts",
-      "sha256": "85156615791146d3e764859ce03218ee6d76a190387f7ca742dbaa3ad908a50a",
+      "sha256": "21f003522a6e541f8ea954310a763a74eecd4543fe8093378c5ec93da404d3fa",
       "destination": "docs/src/content/docs/guides/styling.md",
       "reviewed": true
     },
@@ -230,13 +230,13 @@
     },
     {
       "source": "site/examples.ts",
-      "sha256": "facf72b541c89335a005031ee2073a8c16f45df78449363031a22124e9199282",
+      "sha256": "90bc8da009901adb1b015a644cadd7c57b81bad9224770943fb05781e2b9d195",
       "destination": "docs/src/content/docs/guides/examples.mdx",
       "reviewed": true
     },
     {
       "source": "skills/autocomplete/SKILL.md",
-      "sha256": "19a9fa51c82785f68cc24d67f961efe2aebe8008896a647f444974859752b83c",
+      "sha256": "5a1189a85cfd54e742cb2202fee20a69236c4372b4db0ec3af55cf0e1922bc30",
       "destination": "skills/autocomplete/SKILL.md",
       "reviewed": true
     }
