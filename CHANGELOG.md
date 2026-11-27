@@ -8,8 +8,14 @@ All notable changes to `@samline/autocomplete` are documented in this file. The 
 
 - A "Framework integrations" guide with React, Vue, Svelte, Astro and plain HTML/CDN usage. The React and Vue wrappers moved there from the recipes.
 
+### Changed
+
+- The active option now has a visible default indicator: an inset 2px ring in the text color (`--autocomplete-active-ring`, default `currentColor`), because the `#f3f4f6` tint on `#fff` was about 1.1:1. Set `--autocomplete-active-ring: transparent` to keep the previous tint-only look. The forced-colors outline is unchanged.
+
 ### Fixed
 
+- The popup placement measures free space against `window.visualViewport` (height and `offsetTop`), so `placement: 'auto'` flips above the input when the on-screen keyboard covers the space below. The list's `max-height` is capped to the free space on the chosen side while open (inline, removed on close; cleared before each re-measure so a previous cap never hides a roomier side), and in `popover` mode the popup repositions on visual viewport `resize` and `scroll` events (listeners removed on close and `destroy()`).
+- Pressing Enter to confirm an IME candidate (Japanese, Chinese, Korean) no longer selects the highlighted suggestion; keydown handling is skipped during composition, including Safari's confirming `Enter` reported with `keyCode` 229.
 - `fromEndpoint` from `@samline/autocomplete/core` no longer reads `document`, so it works outside a browser (Node, workers) with an absolute endpoint; relative endpoints still resolve against the page URL.
 
 ## [3.0.0] - 2026-11-15

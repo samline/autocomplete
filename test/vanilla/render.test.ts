@@ -142,6 +142,35 @@ describe('createAutocomplete', () => {
     expect(controller.listElement.hidden).toBe(true)
   })
 
+  it('ignores Enter while an IME composition is active', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ results: places })))
+    const onSelect = vi.fn()
+    const controller = createAutocomplete('#place', { ...options(), onSelect })
+
+    await controller.search('me')
+    controller.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }))
+
+    const composing = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      isComposing: true,
+      cancelable: true,
+    })
+    controller.element.dispatchEvent(composing)
+    // Safari delivers the confirming Enter after compositionend, with keyCode 229.
+    const confirming = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      keyCode: 229,
+      cancelable: true,
+    })
+    controller.element.dispatchEvent(confirming)
+
+    expect(composing.defaultPrevented).toBe(false)
+    expect(confirming.defaultPrevented).toBe(false)
+    expect(onSelect).not.toHaveBeenCalled()
+    expect(controller.getSelected()).toBeNull()
+    expect(controller.listElement.hidden).toBe(false)
+  })
+
   it('wraps keyboard navigation in both directions', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ results: places })))
     const controller = createAutocomplete('#place', options())

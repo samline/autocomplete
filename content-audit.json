@@ -92,13 +92,13 @@
   "sources": [
     {
       "source": "README.md",
-      "sha256": "ee1c206c859ed8c28b3105db525b4924502d2753b63358162894af9dceb642fb",
+      "sha256": "96c30e8697efc825bb795be947887255e7cb70ef179722a2fc850395be1ce261",
       "destination": "README.md",
       "reviewed": true
     },
     {
       "source": "CHANGELOG.md",
-      "sha256": "5c73d2f6b36207fb9b24ff017e949c4dde18fc0967234b3f3eee942a88bf86fb",
+      "sha256": "9fcac0d1f6d11a5985c6e958d1009527290253a459a95be55a7efda136c6d235",
       "destination": "CHANGELOG.md",
       "reviewed": true
     },
@@ -194,7 +194,7 @@
     },
     {
       "source": "src/style.css",
-      "sha256": "0451f29b2685c595c5231a2c219b32bc96325da0edb94640e76cfac261fc12bc",
+      "sha256": "c79219af77d11ddd239a6b0108ba203dbcf08273759d3dcd15aa220fffed0fab",
       "destination": "docs/src/content/docs/guides/styling.md",
       "reviewed": true
     },
@@ -218,13 +218,13 @@
     },
     {
       "source": "src/vanilla/position.ts",
-      "sha256": "ccc15be8f606c1bb798a1a9a8efdc0a7ae20cd7a255b4919bd019e0c0521de09",
+      "sha256": "85156615791146d3e764859ce03218ee6d76a190387f7ca742dbaa3ad908a50a",
       "destination": "docs/src/content/docs/guides/styling.md",
       "reviewed": true
     },
     {
       "source": "src/vanilla/render.ts",
-      "sha256": "bd2b7ff33dd349cf6bd875d4d979ee99f447f3a888c17e0a651a84cedf0f16c6",
+      "sha256": "658aec61bcbbf043403c6ee249a7ec3f5b3897ebfb3c8d04b984593803519df8",
       "destination": "docs/src/content/docs/guides/accessibility.md",
       "reviewed": true
     },
@@ -236,7 +236,7 @@
     },
     {
       "source": "skills/autocomplete/SKILL.md",
-      "sha256": "1efd6cfa7b21a685b39c4bfd4770e8c44caf36aa6274793d9e0e817ea9819697",
+      "sha256": "19a9fa51c82785f68cc24d67f961efe2aebe8008896a647f444974859752b83c",
       "destination": "skills/autocomplete/SKILL.md",
       "reviewed": true
     }

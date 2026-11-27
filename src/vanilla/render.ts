@@ -631,6 +631,10 @@ export const autocomplete = <T = unknown>(
   }
 
   const handleKeydown = (event: KeyboardEvent): void => {
+    // IME composition: Enter confirms the candidate and must not select a suggestion. Safari
+    // reports the confirming keydown after compositionend, so also check keyCode 229.
+    if (event.isComposing || (event.key === 'Enter' && event.keyCode === 229)) return
+
     const listOpen = !list.hidden && suggestions.length > 0
 
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {

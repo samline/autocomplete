@@ -42,18 +42,33 @@ export const createPositioner = ({
 
   if (usePopover) element.setAttribute('popover', 'manual')
 
+  // The visual viewport shrinks when the on-screen keyboard opens or the page is pinch-zoomed,
+  // while `window.innerHeight` does not (iOS Safari): measure free space against it.
+  const freeSpace = (rect: DOMRect): { above: number; below: number } => {
+    const viewport = window.visualViewport
+    const top = viewport?.offsetTop ?? 0
+    const height = viewport?.height ?? window.innerHeight
+    return { above: rect.top - top, below: top + height - rect.bottom }
+  }
+
   const chooseSide = (rect: DOMRect): 'top' | 'bottom' => {
     if (placement !== 'auto') return placement
     const height = popup.offsetHeight
-    const below = window.innerHeight - rect.bottom
-    return below < height + offset && rect.top > below ? 'top' : 'bottom'
+    const { above, below } = freeSpace(rect)
+    return below < height + offset && above > below ? 'top' : 'bottom'
   }
 
   const update = (): void => {
     if (popup.hidden) return
+    // The previous cap clamps `offsetHeight` (the list scrolls), so measure the natural height.
+    popup.style.maxHeight = ''
     const rect = input.getBoundingClientRect()
     const side = chooseSide(rect)
     popup.dataset.placement = side
+    // Never let the list outgrow the free space on the chosen side (keyboard, small windows).
+    const space = freeSpace(rect)
+    const available = Math.max(0, (side === 'top' ? space.above : space.below) - offset)
+    popup.style.maxHeight = `min(var(--autocomplete-max-height, 18rem), ${available}px)`
 
     if (usePopover) {
       Object.assign(popup.style, {
@@ -88,6 +103,8 @@ export const createPositioner = ({
         if (!element.matches(':popover-open')) element.showPopover!()
         window.addEventListener('scroll', schedule, { capture: true, passive: true })
         window.addEventListener('resize', schedule, { passive: true })
+        window.visualViewport?.addEventListener('resize', schedule)
+        window.visualViewport?.addEventListener('scroll', schedule)
       }
     }
     update()
@@ -97,9 +114,12 @@ export const createPositioner = ({
     if (!opened) return
     opened = false
     cancelAnimationFrame(frame)
+    popup.style.maxHeight = ''
     if (usePopover) {
       window.removeEventListener('scroll', schedule, { capture: true })
       window.removeEventListener('resize', schedule)
+      window.visualViewport?.removeEventListener('resize', schedule)
+      window.visualViewport?.removeEventListener('scroll', schedule)
       if (element.matches(':popover-open')) element.hidePopover!()
     }
   }

@@ -150,7 +150,7 @@ Every option with a plain value has an attribute (`data-autocomplete-min-length`
 - WAI-ARIA combobox and listbox with full keyboard operation and a polite live region.
 - Debounced searches, aborted superseded requests and ignored late responses.
 - Bubbling DOM events that keep hidden fields and other UI in sync.
-- An optional stylesheet themed with `--autocomplete-*` custom properties.
+- An optional stylesheet themed with `--autocomplete-*` custom properties, including a visible active-option ring (`--autocomplete-active-ring`, default the text color).
 - React, Vue, Svelte, Shopify and WordPress through the same API, with no adapter.
 
 [Working examples](https://samline.github.io/autocomplete/examples/) cover remote search, custom options, the event lifecycle, local data, sections, forms, declarative setup, removable pills, hooks, plugins and cache, observable state and prefill, custom status/header/footer, headless rendering, a command palette and dependent fields. Each includes copyable HTML / CDN and Package / ESM files.

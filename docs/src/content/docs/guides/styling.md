@@ -50,7 +50,7 @@ import '@samline/autocomplete/style.css'
 | `[data-autocomplete-status='loading' \| 'empty' \| 'error']` | The visible request state, outside the listbox         |
 | `[data-autocomplete-live]`                                   | The visually hidden live region, styled inline         |
 
-The popup, list, status, header and footer use the native `hidden` attribute while closed. With `popover: true` the popup also gets `popover="manual"` and inline fixed coordinates.
+The popup, list, status, header and footer use the native `hidden` attribute while closed. While open, the popup also gets an inline `max-height` that caps `--autocomplete-max-height` to the free space on the side it opened on (measured against the visual viewport, so an on-screen keyboard counts); it is removed on close. With `popover: true` the popup also gets `popover="manual"` and inline fixed coordinates.
 
 ## Custom properties
 
@@ -65,7 +65,7 @@ The popup, list, status, header and footer use the native `hidden` attribute whi
 }
 ```
 
-Also available: `--autocomplete-z-index`, `--autocomplete-offset`, `--autocomplete-shadow`, `--autocomplete-option-padding`, `--autocomplete-active-color`, `--autocomplete-muted-color`, `--autocomplete-error-color`, `--autocomplete-highlight-background` (`transparent`), `--autocomplete-highlight-color` (`inherit`) `--autocomplete-highlight-weight` (`600`), `--autocomplete-group-padding` and `--autocomplete-group-font-size`. In forced-colors mode the active option gets a system-color outline.
+Also available: `--autocomplete-z-index`, `--autocomplete-offset`, `--autocomplete-shadow`, `--autocomplete-option-padding`, `--autocomplete-active-color`, `--autocomplete-active-ring` (`currentColor`: an inset 2px ring on the active option, because the background tint alone has too little contrast; set it to `transparent` only if your `--autocomplete-active-background` already contrasts 3:1 with the popup), `--autocomplete-muted-color`, `--autocomplete-error-color`, `--autocomplete-highlight-background` (`transparent`), `--autocomplete-highlight-color` (`inherit`) `--autocomplete-highlight-weight` (`600`), `--autocomplete-group-padding` and `--autocomplete-group-font-size`. In forced-colors mode the active option gets a system-color outline.
 
 ## Richer options
 

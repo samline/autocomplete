@@ -31,6 +31,7 @@ Keep the host's `<label for>` and `<input>`; wrap the input in an element with `
 ## Choose a loading mode
 
 - **Package / ESM:** `npm install @samline/autocomplete`, import `createAutocomplete` (ESM or CommonJS) and optionally `@samline/autocomplete/style.css`.
+- **Theming:** the stylesheet reads `--autocomplete-*` custom properties; the active option gets an inset ring (`--autocomplete-active-ring`, default the text color) in addition to its background tint.
 - **HTML / CDN:** load `https://cdn.jsdelivr.net/npm/@samline/autocomplete@3.0.0/dist/style.css` and `.../dist/browser/autocomplete.global.js`, then `window.Autocomplete.newAutocomplete({ id: 'city', options })`. Read it back with `getAutocomplete(id)` and remove it with `destroyAutocomplete(id)`.
 
 - **No JavaScript:** the browser bundle mounts `input[data-autocomplete="/api/url"]` or `input[data-autocomplete][data-autocomplete-source="#json-script"]`, configured with `data-autocomplete-*` attributes. Prefer it in CMS templates.

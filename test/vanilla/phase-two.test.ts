@@ -323,6 +323,99 @@ describe('templates and placement', () => {
     vi.unstubAllGlobals()
   })
 
+  it('re-measures the natural height on re-render and flips to the roomier side', async () => {
+    const controller = createAutocomplete<City>('#q', {
+      source: cities,
+      getLabel: item => item.name,
+    })
+    vi.spyOn(controller.element, 'getBoundingClientRect').mockReturnValue(
+      DOMRect.fromRect({ x: 0, y: 500, width: 200, height: 40 })
+    )
+    // Natural list height; an inline max-height clamps it like `overflow-y: auto` does.
+    let natural = 40
+    vi.spyOn(controller.popupElement, 'offsetHeight', 'get').mockImplementation(() =>
+      controller.popupElement.style.maxHeight ? Math.min(natural, 56) : natural
+    )
+    vi.stubGlobal('innerHeight', 600)
+
+    // 40px of list fits in the 60px below the input: stays below, capped to 56px.
+    await controller.search('mo')
+    expect(controller.popupElement.dataset.placement).toBe('bottom')
+    expect(controller.popupElement.style.maxHeight).toContain('56px')
+
+    // A long list no longer fits below (clamped height would read 56 and stay put); 500px above is roomier.
+    natural = 300
+    await controller.search('m')
+    expect(controller.popupElement.dataset.placement).toBe('top')
+    expect(controller.popupElement.style.maxHeight).toContain('496px')
+
+    vi.unstubAllGlobals()
+  })
+
+  it('measures free space against the visual viewport and caps the list height', async () => {
+    const controller = createAutocomplete<City>('#q', {
+      source: cities,
+      getLabel: item => item.name,
+    })
+    vi.spyOn(controller.element, 'getBoundingClientRect').mockReturnValue(
+      DOMRect.fromRect({ x: 0, y: 300, width: 200, height: 40 })
+    )
+    vi.spyOn(controller.popupElement, 'offsetHeight', 'get').mockReturnValue(200)
+    vi.stubGlobal('innerHeight', 900)
+    // The on-screen keyboard leaves only 420px visible: 80px below the input, 300px above (minus the 4px offset).
+    vi.stubGlobal('visualViewport', {
+      height: 420,
+      offsetTop: 0,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })
+
+    await controller.search('mo')
+    expect(controller.popupElement.dataset.placement).toBe('top')
+    expect(controller.popupElement.style.maxHeight).toContain('296px')
+
+    controller.close()
+    expect(controller.popupElement.style.maxHeight).toBe('')
+
+    vi.unstubAllGlobals()
+  })
+
+  it('repositions on visual viewport changes while open in popover mode and cleans up', async () => {
+    const show = vi.fn()
+    const hide = vi.fn()
+    Object.assign(HTMLElement.prototype, { showPopover: show, hidePopover: hide })
+    const matches = vi.spyOn(HTMLElement.prototype, 'matches').mockImplementation(function (
+      this: HTMLElement,
+      selector: string
+    ) {
+      return selector === ':popover-open' ? show.mock.calls.length > hide.mock.calls.length : false
+    })
+    const add = vi.fn()
+    const remove = vi.fn()
+    vi.stubGlobal('visualViewport', {
+      height: 600,
+      offsetTop: 0,
+      addEventListener: add,
+      removeEventListener: remove,
+    })
+
+    const controller = createAutocomplete<City>('#q', {
+      source: cities,
+      getLabel: item => item.name,
+      popover: true,
+    })
+    await controller.search('mo')
+    expect(add.mock.calls.map(call => call[0]).sort()).toEqual(['resize', 'scroll'])
+
+    controller.destroy()
+    expect(remove.mock.calls.map(call => call[0]).sort()).toEqual(['resize', 'scroll'])
+
+    vi.unstubAllGlobals()
+    matches.mockRestore()
+    delete (HTMLElement.prototype as { showPopover?: unknown }).showPopover
+    delete (HTMLElement.prototype as { hidePopover?: unknown }).hidePopover
+  })
+
   it('honours a fixed placement and validates it', async () => {
     const controller = createAutocomplete<City>('#q', {
       source: cities,
